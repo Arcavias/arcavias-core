@@ -21,7 +21,7 @@ class Client_Html_Catalog_List_Default
 {
 	private $_cache;
 	private $_subPartPath = 'client/html/catalog/list/default/subparts';
-	private $_subPartNames = array( 'header', 'pagination', 'items', 'pagination' );
+	private $_subPartNames = array( 'breadcrumb', 'header', 'pagination', 'items', 'pagination' );
 
 
 	/**
@@ -31,13 +31,43 @@ class Client_Html_Catalog_List_Default
 	 */
 	public function getBody()
 	{
-		$view = $this->_setViewParams( $this->getView() );
+		try
+		{
+			$view = $this->_setViewParams( $this->getView() );
 
-		$html = '';
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$html .= $subclient->setView( $view )->getBody();
+			$html = '';
+			foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
+				$html .= $subclient->setView( $view )->getBody();
+			}
+			$view->listBody = $html;
 		}
-		$view->listBody = $html;
+		catch( Client_Html_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'client/html', $e->getMessage() ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
+		catch( Controller_Frontend_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
+		catch( MShop_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
+		catch( Exception $e )
+		{
+			$context = $this->_getContext();
+			$context->getLogger()->log( $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+
+			$view = $this->getView();
+			$error = array( $context->getI18n()->dt( 'client/html', 'A non-recoverable error occured' ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
 
 		$tplconf = 'client/html/catalog/list/default/template-body';
 		$default = 'catalog/list/body-default.html';
@@ -53,13 +83,21 @@ class Client_Html_Catalog_List_Default
 	 */
 	public function getHeader()
 	{
-		$view = $this->_setViewParams( $this->getView() );
+		try
+		{
+			$view = $this->_setViewParams( $this->getView() );
 
-		$html = '';
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$html .= $subclient->setView( $view )->getHeader();
+			$html = '';
+			foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
+				$html .= $subclient->setView( $view )->getHeader();
+			}
+			$view->listHeader = $html;
 		}
-		$view->listHeader = $html;
+		catch( Exception $e )
+		{
+			$this->_getContext()->getLogger()->log( $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+			return;
+		}
 
 		$tplconf = 'client/html/catalog/list/default/template-header';
 		$default = 'catalog/list/header-default.html';
@@ -100,7 +138,37 @@ class Client_Html_Catalog_List_Default
 	 */
 	public function process()
 	{
-		$this->_process( $this->_subPartPath, $this->_subPartNames );
+		try
+		{
+			$this->_process( $this->_subPartPath, $this->_subPartNames );
+		}
+		catch( Client_Html_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'client/html', $e->getMessage() ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
+		catch( Controller_Frontend_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
+		catch( MShop_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
+		catch( Exception $e )
+		{
+			$context = $this->_getContext();
+			$context->getLogger()->log( $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+
+			$view = $this->getView();
+			$error = array( $context->getI18n()->dt( 'client/html', 'A non-recoverable error occured' ) );
+			$view->listErrorList = $view->get( 'listErrorList', array() ) + $error;
+		}
 	}
 
 
@@ -150,15 +218,14 @@ class Client_Html_Catalog_List_Default
 			$controller = Controller_Frontend_Catalog_Factory::createController( $context );
 			$catalogManager = MShop_Catalog_Manager_Factory::createManager( $context );
 
-			if( !empty( $text ) ) {
-				$filter = $controller->createProductFilterByText( $text, $sort, $sortdir, ($page-1) * $size, $size );
-				$node = $catalogManager->createItem();
-			} else if( !empty( $catid ) ) {
+			if( !empty( $catid ) )
+			{
 				$filter = $controller->createProductFilterByCategory( $catid, $sort, $sortdir, ($page-1) * $size, $size );
-				$node = $catalogManager->getItem( $catid, array( 'text', 'media' ) );
-			} else {
+				$view->listCatPath = $catalogManager->getPath( $catid, array( 'text', 'media', 'attribute' ) );
+			}
+			else
+			{
 				$filter = $controller->createProductFilterByText( $text, $sort, $sortdir, ($page-1) * $size, $size );
-				$node = $catalogManager->createItem();
 			}
 
 			$items = $controller->getProductList( $filter, $total, $domains );
@@ -170,7 +237,6 @@ class Client_Html_Catalog_List_Default
 			$view->listPageCurr = $page;
 			$view->listPageSize = $size;
 			$view->listParams = $params;
-			$view->listCatItem = $node;
 
 			$this->_cache = $view;
 		}
