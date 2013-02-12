@@ -9,12 +9,19 @@ $listTarget = $this->config( 'client/html/catalog/list/url/target' );
 $listController = $this->config( 'client/html/catalog/list/url/controller', 'catalog' );
 $listAction = $this->config( 'client/html/catalog/list/url/action', 'list' );
 
+$lastCatNum = count( $this->get( 'listCatPath', array() ) );
+$cnt = 1;
 ?>
 <div class="catalog-list-breadcrumb">
 <?php if( isset( $this->listCatPath ) ) : ?>
 	<ol>
 <?php	foreach( (array) $this->listCatPath as $cat ) : ?>
+<?php		if( $cnt == $lastCatNum ) : ?>
+		<li><a class="active" href="<?php echo $this->url( $listTarget, $listController, $listAction, array( 'f-catalog-id' => $cat->getId() ), array( $cat->getName() ) ); ?>"><?php echo $cat->getName(); ?></a></li>
+<?php		else : ?>
 		<li><a href="<?php echo $this->url( $listTarget, $listController, $listAction, array( 'f-catalog-id' => $cat->getId() ), array( $cat->getName() ) ); ?>"><?php echo $cat->getName(); ?></a></li>
+<?php		endif; ?>
+<?php		$cnt++; ?>
 <?php	endforeach; ?>
 	</ol>
 <?php endif; ?>
