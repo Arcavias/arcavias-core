@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <?php
 
 /**
@@ -65,8 +65,13 @@ $sites = $this->sites();
 								</div>
 							</div>
 							<div id="headerCart" align="center">
-								<div id="headerArticleBox">1 article - <strong>69,90 €</strong></div>
-								<button class="minibutton" value="" type="submit" onClick="alert('Not available at the moment.');">Basket</button>
+								<div id="headerArticleBox">
+									<?php
+										if( isset( $this->minibasket ) ) {
+											echo $this->minibasket->getBody();
+										}
+									?>
+								</div>
 							</div>
 						</div>
 						<div id="navigation">
