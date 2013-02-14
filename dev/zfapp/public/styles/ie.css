@@ -48,3 +48,24 @@
 .checkout-standard .form-list select {
 	border: 1px solid #689DB9;
 }
+
+/* ----- IE6 ----- */
+* #frame {
+	width: 984px; 
+}
+
+* #content {
+	width: 960px; 
+
+}
+* #contentLeft {
+    width: 173px;
+	margin: 0px;
+	padding:0px 0px 0px 10px;;
+}
+
+* #contentRight {
+	width: 767px; 
+	padding: 0px 0px;
+	margin: 0px;
+}

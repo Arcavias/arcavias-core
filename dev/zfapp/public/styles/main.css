@@ -16,7 +16,7 @@
 body{
 	background: url(../images/bodyBackground.gif) repeat #FFFFFF; 
 	font-family: Arial, Verdana, Helvetica, sans-serif; 
-	font-size: 100%; 
+	font-size: 0.75em; 
 	color: #000000;
 }
 
@@ -32,12 +32,19 @@ h2, h3, h4 {
 	color: #004266; 
 }
 
-a {
+a:link {
 	color: #679CB8;
+	text-decoration: none;
 }
-
+a:visited  {
+	color: #679CB8;
+	text-decoration: none;
+}
 a:focus {
 	outline: none;
+}
+a:visited  {
+	color: #679CB8;
 }
 
 select {
@@ -54,7 +61,7 @@ input[type="password"] {
 /* ----- Layout ----- */
 #frame {
 	max-width: 1000px; 
-	min-width: 270px;
+	min-width: 300px;
 	background: url(../images/middleBackground.jpg) repeat;  
 	margin: auto; 
 }
@@ -79,7 +86,7 @@ input[type="password"] {
 
 #header {
 	height: 94px; 
-	width: 100%;
+	margin: 0px 8px;
 	background: #FFFFFF;
 	border-bottom: 1px solid #5C88A1;
     border-radius: 0 0 15px 15px;
@@ -89,7 +96,7 @@ input[type="password"] {
 #headerLogo {
 	width: 32%;
 	float: left; 
-	padding: 1% 1% 0% 1%;
+	padding: 0.5% 1% 0% 1%;
 }
 
 #headerMiddle {
@@ -104,10 +111,9 @@ input[type="password"] {
 
 #headerNavigation a {
 	color: #004266; 
-	padding: 0px 7px 0px 8px; 
+	padding: 0px 0px 0px 10px; 
 	text-decoration: none; 
 	text-transform: uppercase; 
-	font-size: 0.75em;
 }
 
 #headerNavigation a:hover {
@@ -116,7 +122,7 @@ input[type="password"] {
 
 #headerSearch {
 	float: right;
-	padding: 10px 5px 0px 0px;
+	padding: 10px 0px 0px 0px;
 }
 
 #headerSearch input {
@@ -137,7 +143,6 @@ input[type="password"] {
 	display: inline-block; 
 	float: left; 
 	font-weight: bold; 
-	font-size: 0.75em;
 }
 
 .searchbutton12 {
@@ -163,7 +168,6 @@ input[type="password"] {
 	border-bottom: 1px solid #C3D9E5; 
 	border-right: 1px solid #C3D9E5; 
 	color: #004266; 
-	font-size: 0.75em;
 }
 
 #headerArticleBox {
@@ -205,7 +209,7 @@ input[type="password"] {
 	color: #FFFFFF; 
 	display: inline-block; 
 	font-weight: bold; 
-	font-size: 1.0em; 
+	font-size: 1.5em; 
 	line-height: 44px; 
 	text-transform: uppercase; 
 	text-decoration: none;
@@ -228,24 +232,20 @@ input[type="password"] {
 }
 
 #contentLeft {
-	min-width: 15%; 
+	min-width: 17%; 
 	float: left; 
 	padding: 0px 1.2%; 
 	background: #FFFFFF;
 }
 
 #contentRight {
-	width: 81%; 
+	width: 79%; 
 	float: left; 
 	padding: 0 1.6% 0 0;
 	background: #FFFFFF;
 }
 
 /* ----- Footer -----*/
-#footer {
-	clear: both;
-}
-
 #footerTop {
 	height: 16px;
 	background: url(../images/middleBottomBackground.jpg) repeat-x; 
@@ -254,7 +254,7 @@ input[type="password"] {
 #footerBottom {
 	padding: 19px; 
 	color: #004266;
-	font-size: 0.75em;
+	clear: both;
 }
 
 #footerTopLeft,
@@ -549,9 +549,6 @@ select {
 
 /*----- Media Queries -----*/
 @media only screen and (min-device-width: 509px) and (max-width: 768px) {
-	#headerImg #spacer {
-		display:none;
-	}
 	#headerLogo img {
 		max-width: 100%;
 		height: auto;
@@ -575,9 +572,19 @@ select {
 		width: 28%;
 		margin: 0 3%;
 	}
+	#headerImg #spacer {
+		display:none;
+	}
+	#navigation {
+		height: 10px;
+    }
+	
+	#navigationMenue{
+		display: none;
+	}
 }
 
-@media only screen and (max-width: 360px) and (orientation: portrait) {
+@media only screen and (max-width: 380px) and (orientation: portrait) {
 	#headerSearch span {
 		display: none;
 	}	
@@ -586,7 +593,7 @@ select {
 	}
 }
 
-@media only screen and (max-width: 270px) and (orientation: portrait) {
+@media only screen and (max-width: 300px) and (orientation: portrait) {
 	#headerMiddle {
 		width: 165px;
 	}
