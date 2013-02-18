@@ -11,8 +11,8 @@
 }
 
 .arcavias .standardbutton {
-	padding: 5px 5px 5px 5px;
-	background: url(../images/buttonfond.gif) repeat scroll 0 0 transparent;
+	padding: 4px 4px 4px 4px;
+	background: url(../images/buttonfond.gif) repeat-x; 
 	border: 1px solid #689DB9;
 	box-shadow: 2px 2px 4px #5C88A1;
 	color: #FFFFFF;
@@ -22,8 +22,15 @@
 	font-weight: bold;
 }
 
+@-moz-document url-prefix() { 
+	.button-group a.standardbutton {
+		padding: 5px 5px 5px 5px;
+		font-size: 1.1em;
+	}
+}
+
 .arcavias .minibutton {
-	background: url(../images/minibuttonfond.gif) repeat scroll 0 0 transparent;
+	background: url(../images/buttonfond.gif) repeat-x; 
 	border-bottom: 1px solid #303639;
 	border-right: 1px solid #303639;
 	border-top: 1px solid #FFFFFF;
@@ -34,8 +41,7 @@
 	text-decoration: none;
 	display: inline-block;
 	font-weight: bold;
-	font-size: 80%;
-	padding: 5px 8px;
+	padding: 4px 7px;
 }
 
 .arcavias .button-group {
@@ -137,6 +143,11 @@
 
 .catalog-filter-tree .tree-level-3  .active a {
 	font-weight: bold;
+}
+
+/* Product list, media stage section */
+.catalog-list-stage {
+	display: none;
 }
 
 /* Product list, breadcrumb section */
@@ -500,8 +511,7 @@
 .basket-standard,
 .checkout-standard,
 .checkout-confirm {
-	min-width: 240px;
-	max-width: 920px;
+	width: 115%;
 	margin: 0 auto;
 	padding: 0px 0px 0px 15px;
 }
@@ -572,6 +582,10 @@
 	border-top: 1px solid #689DB9;
 	background-color: #F2F7FA;
 	color: #004266;
+}
+
+.basket-standard-main td.details img {
+	display: none;
 }
 
 .basket-standard-main td.quantity a {
@@ -1039,8 +1053,37 @@
 	}
 }
 
-@media only screen and (max-width: 301px) and (orientation: portrait) {
-	.catalog-detail-image {
-		padding: 0px;
+@media only screen and (max-width: 360px) and (orientation: portrait) {
+	.checkout-standard-summary-basket tr.subtotal,
+	.checkout-standard-summary-basket tr.delivery,
+	.checkout-standard-summary-basket tr.payment,
+	.checkout-standard-summary-basket tr.total,
+	.checkout-standard-summary-basket tr.rebate,
+	.checkout-standard-summary-basket tr.tax,
+	.checkout-standard-summary-basket td.unitprice,
+	.checkout-standard-summary-basket td.price,
+	.basket-standard-main tr.subtotal,
+	.basket-standard-main tr.delivery,
+	.basket-standard-main tr.payment,
+	.basket-standard-main tr.total,
+	.basket-standard-main tr.rebate,
+	.basket-standard-main tr.tax,
+	.basket-standard-main td.unitprice,
+	.basket-standard-main td.price {
+		text-align: left;
+	}
+}
+
+@media only screen and (max-width: 330px) and (orientation: portrait) {
+	.basket-standard,
+	.checkout-standard,
+	.checkout-confirm {
+		padding: 0px 0px 0px 10px;
+	}
+	 .basket-standard-main th.unitprice, .basket-standard-main td.unitprice  {
+		display: none;
+	}
+	.basket-standard-main td.price {
+		text-align: center;
 	}
 }
