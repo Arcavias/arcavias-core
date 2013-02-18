@@ -5,12 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  */
 
-$salutations = array(
-	MShop_Common_Item_Address_Abstract::SALUTATION_MR,
-	MShop_Common_Item_Address_Abstract::SALUTATION_MRS,
-	MShop_Common_Item_Address_Abstract::SALUTATION_MISS,
-);
-
 ?>
 <div class="email-confirm-main-address">
 	<h2><?php echo $this->translate( 'client/html', 'Addresses' ); ?></h2>
@@ -42,7 +36,7 @@ Fax: %13$s
 Website: %14$s
 '
 			),
-			( in_array( $addr->getSalutation(), $salutations ) ? $this->translate( 'client/html', $addr->getSalutation() ) : '' ),
+			$this->translate( 'client/html', $addr->getSalutation() ),
 			$addr->getFirstName(),
 			$addr->getLastName(),
 			$addr->getAddress1(),
@@ -89,7 +83,8 @@ Fax: %13$s
 Website: %14$s
 '
 			),
-			( in_array( $addr->getSalutation(), $salutations ) ? $this->translate( 'client/html', $addr->getSalutation() ) : '' ),
+			$this->translate( 'client/html',
+			$addr->getSalutation() ),
 			$addr->getFirstName(),
 			$addr->getLastName(),
 			$addr->getAddress1(),

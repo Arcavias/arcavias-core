@@ -7,17 +7,17 @@
  */
 
 if( isset( $this->detailProductItem ) ) {
-	$textItems = $this->detailProductItem->getRefItems( 'text', 'long' );
+	$textItems = $this->detailProductItem->getRefItems( 'text', 'long', 'default' );
 } else {
 	$textItems = array();
 }
 
 ?>
 <?php if( count( $textItems ) > 0 ) : ?>
-<h2 class="header description"><?php echo $this->translate( 'client/html', 'Description' ); ?></h2>
-<div class="content description">
+<h2 class="tabheader"><?php echo $this->translate( 'client/html', 'Description' ); ?></h2>
+<div class="tabcontent">
 <?php foreach( $textItems as $textItem ) : ?> 
-	<div class="long"><?php echo $textItem->getContent(); ?></div>
+	<p><?php echo $textItem->getContent(); ?></p>
 <?php endforeach; ?>
 <?php echo $this->get( 'textBody' ); ?>
 </div>

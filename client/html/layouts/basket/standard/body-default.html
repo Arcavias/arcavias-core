@@ -6,7 +6,7 @@
  */
 
 ?>
-<section class="arcavias basket-standard">
+<div class="arcavias basket-standard">
 <?php if( isset( $this->standardErrorList ) ) : ?>
 	<ul class="error-list">
 <?php foreach( (array) $this->standardErrorList as $errmsg ) : ?>
@@ -16,4 +16,4 @@
 <?php endif; ?>
 	<h1><?php echo $this->translate( 'client/html', 'Basket' ); ?></h1>
 <?php echo $this->get( 'standardBody' ); ?>
-</section>
+</div>
