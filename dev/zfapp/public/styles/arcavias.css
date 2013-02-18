@@ -96,44 +96,41 @@
  * Hide all list blocks of the sub-levels.
  * The active ones will be enabled by the interal style sheet
  */
-.catalog-filter-tree .level-1 ul {
-}
-
 .catalog-filter-tree .level-0 li a {
-text-transform: uppercase;
-font-weight: bold;
-font-size: 120%;
+	text-transform: uppercase;
+	font-weight: bold;
+	font-size: 120%;
 }
 
 .catalog-filter-tree .level-1 {
-margin: 10px 0;
+	margin: 10px 0;
 }
 
 .catalog-filter-tree .level-1 li a {
-text-transform: none;
+	text-transform: none;
 }
 
 .catalog-filter-tree .level-2 {
-margin: 0;
+	margin: 0;
 }
 
 .catalog-filter-tree .level-2 li {
-padding-left: 15px;
+	padding-left: 15px;
 }
 
 .catalog-filter-tree .level-3 li {
-padding-left: 15px;
-margin-bottom: 0;
+	padding-left: 15px;
+	margin-bottom: 0;
 }
 
 .catalog-filter-tree .level-3 li a {
-font-weight: normal;
-font-size: 100%;
-margin-top: 1px;
+	font-weight: normal;
+	font-size: 100%;
+	margin-top: 1px;
 }
 
 .catalog-filter-tree .level-3 .active a {
-font-weight: bold;
+	ont-weight: bold;
 }
 
 /* stage image section */
@@ -218,10 +215,6 @@ font-weight: bold;
 
 /* Product list, items section */
 .catalog-list-head {
-	display: none;
-}
-
-.catalog-list-header {
 	display: none;
 }
 
