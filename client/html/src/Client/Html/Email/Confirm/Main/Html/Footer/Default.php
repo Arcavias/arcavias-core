@@ -1,26 +1,26 @@
 <?php
 
 /**
- * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
+ * @copyright Copyright (c) Metaways Infosystems GmbH, 2013
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Client
  * @subpackage Html
- * @version $Id: Default.php 1324 2012-10-21 13:17:19Z nsendetzky $
  */
 
 
 /**
- * Default implementation of catalog list item section for HTML clients.
+ * Default implementation of email html footer HTML client.
  *
  * @package Client
  * @subpackage Html
  */
-class Client_Html_Catalog_List_Header_Default
+class Client_Html_Email_Confirm_Main_Html_Footer_Default
 	extends Client_Html_Abstract
 	implements Client_Html_Interface
 {
+	private $_cache;
+	private $_subPartPath = 'client/html/email/confirm/main/html/footer/default/subparts';
 	private $_subPartNames = array();
-	private $_subPartPath = 'client/html/catalog/list/header/default/subparts';
 
 
 	/**
@@ -36,10 +36,10 @@ class Client_Html_Catalog_List_Header_Default
 		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
 			$html .= $subclient->setView( $view )->getBody();
 		}
-		$view->headerBody = $html;
+		$view->headBody = $html;
 
-		$tplconf = 'client/html/catalog/list/header/default/template-body';
-		$default = 'catalog/list/header-body-default.html';
+		$tplconf = 'client/html/email/confirm/main/html/footer/default/template-body';
+		$default = 'email/confirm/main-html-footer-body-default.html';
 
 		return $view->render( $this->_getTemplate( $tplconf, $default ) );
 	}
@@ -58,10 +58,10 @@ class Client_Html_Catalog_List_Header_Default
 		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
 			$html .= $subclient->setView( $view )->getHeader();
 		}
-		$view->headerHeader = $html;
+		$view->headHeader = $html;
 
-		$tplconf = 'client/html/catalog/list/header/default/template-header';
-		$default = 'catalog/list/header-header-default.html';
+		$tplconf = 'client/html/email/confirm/main/html/footer/default/template-header';
+		$default = 'email/confirm/main-html-footer-header-default.html';
 
 		return $view->render( $this->_getTemplate( $tplconf, $default ) );
 	}
@@ -76,7 +76,7 @@ class Client_Html_Catalog_List_Header_Default
 	 */
 	public function getSubClient( $type, $name = null )
 	{
-		return $this->_createSubClient( 'catalog/list/header/' . $type, $name );
+		return $this->_createSubClient( 'email/confirm/main/html/footer/' . $type, $name );
 	}
 
 
@@ -88,7 +88,7 @@ class Client_Html_Catalog_List_Header_Default
 	 */
 	public function isCachable( $what )
 	{
-		return $this->_isCachable( $what, $this->_subPartPath, $this->_subPartNames );
+		return false;
 	}
 
 

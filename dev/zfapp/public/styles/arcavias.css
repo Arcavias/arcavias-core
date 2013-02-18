@@ -12,7 +12,7 @@
 
 .arcavias .standardbutton {
 	padding: 4px 4px 4px 4px;
-	background: url(../images/buttonfond.gif) repeat-x; 
+	background: url(../images/buttonfond.gif) repeat-x;
 	border: 1px solid #689DB9;
 	box-shadow: 2px 2px 4px #5C88A1;
 	color: #FFFFFF;
@@ -22,15 +22,8 @@
 	font-weight: bold;
 }
 
-@-moz-document url-prefix() { 
-	.button-group a.standardbutton {
-		padding: 5px 5px 5px 5px;
-		font-size: 1.1em;
-	}
-}
-
 .arcavias .minibutton {
-	background: url(../images/buttonfond.gif) repeat-x; 
+	background: url(../images/buttonfond.gif) repeat-x;
 	border-bottom: 1px solid #303639;
 	border-right: 1px solid #303639;
 	border-top: 1px solid #FFFFFF;
@@ -41,7 +34,7 @@
 	text-decoration: none;
 	display: inline-block;
 	font-weight: bold;
-	padding: 4px 7px;
+	padding: 5px 8px;
 }
 
 .arcavias .button-group {
@@ -52,6 +45,13 @@
 .button-group a.standardbutton {
 	margin: 0px 0px 0px 10px;
 }
+
+@-moz-document url-prefix() { 
+	.button-group a.standardbutton {
+		padding: 6px 6px 6px 6px;
+	}
+}
+
 .button-group button {
 	margin: 0px 0px 0px 10px;
 }
@@ -96,56 +96,47 @@
  * Hide all list blocks of the sub-levels.
  * The active ones will be enabled by the interal style sheet
  */
- .catalog-filter-tree .tree-level-0 li a {
-	text-transform: uppercase;
-	font-weight: bold;
-	color: #004266;
+.catalog-filter-tree .level-1 ul {
 }
 
-.catalog-filter-tree .tree-level-1 {
-	margin: 10px 0;
+.catalog-filter-tree .level-0 li a {
+text-transform: uppercase;
+font-weight: bold;
+font-size: 120%;
 }
 
-.catalog-filter-tree .tree-level-1 ul {
-	display: none;
+.catalog-filter-tree .level-1 {
+margin: 10px 0;
 }
 
-.catalog-filter-tree .tree-level-1 li a {
-	text-transform: none;
+.catalog-filter-tree .level-1 li a {
+text-transform: none;
 }
 
-.catalog-filter-tree .tree-level-2 {
-	margin: 0;
+.catalog-filter-tree .level-2 {
+margin: 0;
 }
 
-.catalog-filter-tree .tree-level-2 li {
-	padding: 0px 0px 0px 9px;
+.catalog-filter-tree .level-2 li {
+padding-left: 15px;
 }
 
-.catalog-filter-tree .tree-level-2 li a {
-	color: #679CB8;
+.catalog-filter-tree .level-3 li {
+padding-left: 15px;
+margin-bottom: 0;
 }
 
-.catalog-filter-tree .tree-level-2  .catWithChild {
-	background: url(../images/listIconClose.png) no-repeat;
-	background-position: 0.1em 0.5em;
+.catalog-filter-tree .level-3 li a {
+font-weight: normal;
+font-size: 100%;
+margin-top: 1px;
 }
 
-.catalog-filter-tree .tree-level-2  .active {
-	background: url(../images/listIconOpen.png) no-repeat;
-	background-position: 0.1em 0.5em;
+.catalog-filter-tree .level-3 .active a {
+font-weight: bold;
 }
 
-.catalog-filter-tree .tree-level-3  li a {
-	font-weight: normal;
-	padding: 1px 0px 0px 0px;
-}
-
-.catalog-filter-tree .tree-level-3  .active a {
-	font-weight: bold;
-}
-
-/* Product list, media stage section */
+/* stage image section */
 .catalog-list-stage {
 	display: none;
 }
@@ -226,10 +217,14 @@
 }
 
 /* Product list, items section */
+.catalog-list-head {
+	display: none;
+}
+
 .catalog-list-header {
 	display: none;
-
 }
+
 .catalog-list-items {
 	padding: 10px 0px;
 }
@@ -582,10 +577,6 @@
 	border-top: 1px solid #689DB9;
 	background-color: #F2F7FA;
 	color: #004266;
-}
-
-.basket-standard-main td.details img {
-	display: none;
 }
 
 .basket-standard-main td.quantity a {
@@ -1050,40 +1041,5 @@
 	.catalog-list-pagination .page-browser {
 		text-align: center;
 		display: block;
-	}
-}
-
-@media only screen and (max-width: 360px) and (orientation: portrait) {
-	.checkout-standard-summary-basket tr.subtotal,
-	.checkout-standard-summary-basket tr.delivery,
-	.checkout-standard-summary-basket tr.payment,
-	.checkout-standard-summary-basket tr.total,
-	.checkout-standard-summary-basket tr.rebate,
-	.checkout-standard-summary-basket tr.tax,
-	.checkout-standard-summary-basket td.unitprice,
-	.checkout-standard-summary-basket td.price,
-	.basket-standard-main tr.subtotal,
-	.basket-standard-main tr.delivery,
-	.basket-standard-main tr.payment,
-	.basket-standard-main tr.total,
-	.basket-standard-main tr.rebate,
-	.basket-standard-main tr.tax,
-	.basket-standard-main td.unitprice,
-	.basket-standard-main td.price {
-		text-align: left;
-	}
-}
-
-@media only screen and (max-width: 330px) and (orientation: portrait) {
-	.basket-standard,
-	.checkout-standard,
-	.checkout-confirm {
-		padding: 0px 0px 0px 10px;
-	}
-	 .basket-standard-main th.unitprice, .basket-standard-main td.unitprice  {
-		display: none;
-	}
-	.basket-standard-main td.price {
-		text-align: center;
 	}
 }
