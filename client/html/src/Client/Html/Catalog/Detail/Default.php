@@ -186,10 +186,13 @@ class Client_Html_Catalog_Detail_Default
 
 			$domains = $config->get( 'client/html/catalog/detail/default/domains', array( 'media', 'price', 'text', 'attribute' ) );
 			$prodid = (int) $view->param( 'l-product-id' );
+			$catid = (int) $view->param( 'f-catalog-id' );
 
 			$manager = MShop_Product_Manager_Factory::createManager( $context );
+			$catManager = MShop_Catalog_Manager_Factory::createManager( $context );
 
 			$view->detailProductItem = $manager->getItem( $prodid, $domains );
+			$view->listCurrentCatItem = $catManager->getItem( $catid );
 
 			$this->_cache = $view;
 		}
