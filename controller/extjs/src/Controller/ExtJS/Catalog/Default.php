@@ -249,11 +249,11 @@ class Controller_ExtJS_Catalog_Default
 
 
 	/**
-	* Retrieves all items matching the given criteria.
-	*
-	* @param stdClass $params Associative array containing the parameters
-	* @return array List of associative arrays with item properties, total number of items and success property
-	*/
+	 * Retrieves all items matching the given criteria.
+	 *
+	 * @param stdClass $params Associative array containing the parameters
+	 * @return array List of associative arrays with item properties, total number of items and success property
+	 */
 	public function searchItems( stdClass $params )
 	{
 		$this->_checkParams( $params, array( 'site' ) );
