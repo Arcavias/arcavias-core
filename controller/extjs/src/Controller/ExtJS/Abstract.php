@@ -297,8 +297,8 @@ abstract class Controller_ExtJS_Abstract
 
 		if( isset( $params->start ) && isset( $params->limit ) )
 		{
-			$start = ( isset( $params->start ) ? $params->start : 0 );
-			$size = ( isset( $params->limit ) ? $params->limit : 25 );
+			$start = $params->start;
+			$size = $params->limit;
 
 			$criteria->setSlice( $start, $size );
 		}
