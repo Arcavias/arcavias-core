@@ -80,14 +80,10 @@ class Controller_Frontend_Catalog_Default
 	 */
 	public function createProductFilterByCategory( $catid, $sort = null, $direction = '+', $start = 0, $size = 100, $listtype = 'default' )
 	{
+		$expr = $sortations = array();
 		$search = $this->_indexManager->createSearch( true );
 
-		$expr = array(
-			$search->compare( '==', 'catalog.index.catalog.id', $catid ),
-			$search->getConditions(),
-		);
-
-		$sortations = array();
+		$expr[] = $search->compare( '==', 'catalog.index.catalog.id', $catid );
 
 		switch( $sort )
 		{
@@ -124,6 +120,8 @@ class Controller_Frontend_Catalog_Default
 				break;
 		}
 
+		$expr[] = $search->getConditions();
+
 		$search->setConditions( $search->combine( '&&', $expr ) );
 		$search->setSortations( $sortations );
 		$search->setSlice( $start, $size );
@@ -151,11 +149,7 @@ class Controller_Frontend_Catalog_Default
 
 		$search = $this->_indexManager->createSearch( true );
 
-		$expr = array(
-			$search->compare( '>', $search->createFunction( 'catalog.index.text.relevance', array( $listtype, $langid, $input ) ), 0 ),
-			$search->compare( '!=', 'catalog.index.catalog.id', null ),
-			$search->getConditions(),
-		);
+		$expr = array( $search->compare( '>', $search->createFunction( 'catalog.index.text.relevance', array( $listtype, $langid, $input ) ), 0 ) );
 
 		$sortations = array();
 
@@ -183,11 +177,14 @@ class Controller_Frontend_Catalog_Default
 				$sortations[] = $search->sort( $direction, $sortfunc );
 				break;
 
+			case 'position':
 			case 'relevance':
 				$sortfunc = $search->createFunction( 'sort:catalog.index.text.relevance', array( $listtype, $langid, $input ) );
-				$sortations[] = $search->sort( $direction, $sortfunc );
+				$sortations[] = $search->sort( ( $direction === '+' ? '-' : '+' ), $sortfunc );
 				break;
 		}
+
+		$expr[] = $search->getConditions();
 
 		$search->setConditions( $search->combine( '&&', $expr ) );
 		$search->setSortations( $sortations );
@@ -224,7 +221,7 @@ class Controller_Frontend_Catalog_Default
 	 * @param string $domain Text associated to the domain e.g. product, attribute
 	 * @return MW_Common_Criteria_Interface Criteria object containing the conditions for searching
 	 */
-	public function createTextFilter( $input, $sort = null, $direction = 'desc', $start = 0, $size = 25, $listtype = 'default', $type = 'name' )
+	public function createTextFilter( $input, $sort = null, $direction = '+', $start = 0, $size = 25, $listtype = 'default', $type = 'name' )
 	{
 		$locale = $this->_getContext()->getLocale();
 		$langid = $locale->getLanguageId();

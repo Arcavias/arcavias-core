@@ -99,9 +99,10 @@ implements MShop_Service_Provider_Interface
 	 * Returns the configuration attribute definitions of the provider to generate a list of available fields and
 	 * rules for the value of each field in the frontend.
 	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket object
 	 * @return array List of attribute definitions implementing MW_Common_Critera_Attribute_Interface
 	 */
-	public function getConfigFE()
+	public function getConfigFE( MShop_Order_Item_Base_Interface $basket )
 	{
 		return array();
 	}
@@ -150,7 +151,7 @@ implements MShop_Service_Provider_Interface
 	 */
 	public function query( MShop_Order_Item_Interface $order )
 	{
-		throw new MShop_Service_Exception( sprintf( 'Method is not available: "%1$s"', 'query' ) );
+		throw new MShop_Service_Exception( sprintf( 'Method "%1$s" for provider not available', 'query' ) );
 	}
 
 
@@ -222,7 +223,7 @@ implements MShop_Service_Provider_Interface
 		{
 			if( $def['required'] === true && ( !isset( $attributes[$key] ) || $attributes[$key] === '' ) )
 			{
-				$errors[$key] = sprintf( 'Required attribute "%1$s" is missing', $key );
+				$errors[$key] = sprintf( 'Required attribute "%1$s" in provider configuration not available', $key );
 				continue;
 			}
 
@@ -258,7 +259,7 @@ implements MShop_Service_Provider_Interface
 						}
 						break;
 					default:
-						throw new MShop_Service_Exception( sprintf( 'Invalid type "%1$s"', $def['type'] ) );
+						throw new MShop_Service_Exception( sprintf( 'Invalid characters in attribute for provider configuration. Attribute is not of type "%1$s".', $def['type'] ) );
 				}
 			}
 

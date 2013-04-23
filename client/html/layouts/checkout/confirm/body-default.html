@@ -1,0 +1,19 @@
+<?php
+
+/**
+ * @copyright Copyright (c) Metaways Infosystems GmbH, 2013
+ * @license LGPLv3, http://www.arcavias.com/en/license
+ */
+
+?>
+<section class="arcavias checkout-confirm">
+<?php if( isset( $this->confirmErrorList ) ) : ?>
+	<ul class="error-list">
+<?php foreach( (array) $this->confirmErrorList as $errmsg ) : ?>
+		<li class="error-item"><?php echo $errmsg; ?></li>
+<?php endforeach; ?>
+	</ul>
+<?php endif; ?>
+	<h1><?php echo $this->translate( 'client/html', 'Confirmation' ); ?></h1>
+<?php echo $this->get( 'confirmBody' ); ?>
+</section>

@@ -117,15 +117,14 @@ class Client_Html_Checkout_Standard_Delivery_Default
 	{
 		$view = $this->getView();
 
-		// only start if there's something to do
-		if( ( $serviceId = $view->param( 'c-delivery-option', null ) ) === null ) {
-			return;
-		}
-
 		try
 		{
-			$context = $this->_getContext();
+			// only start if there's something to do
+			if( ( $serviceId = $view->param( 'c-delivery-option', null ) ) === null ) {
+				return;
+			}
 
+			$context = $this->_getContext();
 			$serviceCtrl = Controller_Frontend_Service_Factory::createController( $context );
 
 			$attributes = $view->param( 'c-delivery/' . $serviceId, array() );
@@ -143,20 +142,19 @@ class Client_Html_Checkout_Standard_Delivery_Default
 				$basketCtrl = Controller_Frontend_Basket_Factory::createController( $context );
 				$basketCtrl->setService( 'delivery', $serviceId, $attributes );
 			}
+			else
+			{
+				$view->standardStepActive = 'delivery';
+			}
 
 			$view->deliveryError = $errors;
 
-
-			foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-				$subclient->process( $view );
-			}
+			$this->_process( $this->_subPartPath, $this->_subPartNames );
 		}
 		catch( Exception $e )
 		{
 			$view->standardStepActive = 'delivery';
-
-			$error = array( 'An error occured while processing your request. Please re-check your input' );
-			$view->standardErrorList = $error + $view->get( 'standardErrorList', array() );
+			throw $e;
 		}
 	}
 
@@ -183,7 +181,7 @@ class Client_Html_Checkout_Standard_Delivery_Default
 
 			foreach( $services as $id => $service )
 			{
-				$serviceAttributes[$id] = $serviceCntl->getServiceAttributes( 'delivery', $id );
+				$serviceAttributes[$id] = $serviceCntl->getServiceAttributes( 'delivery', $id, $basket );
 				$servicePrices[$id] = $serviceCntl->getServicePrice( 'delivery', $id, $basket );
 			}
 

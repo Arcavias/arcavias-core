@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: order.php 1332 2012-10-23 11:28:24Z doleiynyk $
  */
 
 return array (
@@ -15,12 +14,12 @@ return array (
 	),
 
 	'order/base/address' => array (
-		array ( 'baseid' => '19.95', 'type' => 'delivery', 'company' => 'Metaways', 'salutation' => 'mr', 'title' => 'Dr.', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Pickhuben', 'address2' => '2-4', 'address3' => '', 'postal' => '20457', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'de', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332212', 'website' => 'www.metaways.de', 'flag' => null ),
-		array ( 'baseid' => '636.00', 'type' => 'delivery', 'company' => 'Metaways', 'salutation' => 'mrs', 'title' => 'Dr.', 'firstname' => 'Maria', 'lastname' => 'Mustertest', 'address1' => 'Pickhuben', 'address2' => '2', 'address3' => '', 'postal' => '20457', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'de', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332212', 'website' => 'www.metaways.de', 'flag' => null ),
-		array ( 'baseid' => '19.95', 'type' => 'payment', 'company' => null, 'salutation' => 'mr', 'title' => '', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Durchschnitt', 'address2' => '1', 'address3' => '', 'postal' => '20146', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'de', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332213', 'website' => 'www.metaways.net', 'flag' => null ),
-		array ( 'baseid' => '636.00', 'type' => 'payment', 'company' => null, 'salutation' => 'mrs', 'title' => '', 'firstname' => 'Adelheid', 'lastname' => 'Mustertest', 'address1' => 'Königallee', 'address2' => '1', 'address3' => '', 'postal' => '20146', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'de', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332213', 'website' => 'www.metaways.net', 'flag' => null ),
-		array ( 'baseid' => '10.00', 'type' => 'delivery', 'company' => 'Metaways', 'salutation' => 'mrs', 'title' => 'Dr.', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Pickhuben', 'address2' => '2-4', 'address3' => '', 'postal' => '20457', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'de', 'langid' => 'de', 'telephone' => '055544332212', 'email' => 'eshop@metaways.de', 'telefax' => '055544332212', 'website' => 'www.metaways.de', 'flag' => null ),
-		array ( 'baseid' => '10.00', 'type' => 'payment', 'company' => null, 'salutation' => 'mr', 'title' => '', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Durchschnitt', 'address2' => '2', 'address3' => '', 'postal' => '20146', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'de', 'langid' => 'de', 'telephone' => '055544332212', 'email' => 'eshop@metaways.de', 'telefax' => '055544332213', 'website' => 'www.metaways.net', 'flag' => null ),
+		array ( 'baseid' => '19.95', 'type' => 'delivery', 'company' => 'Metaways', 'salutation' => 'mr', 'title' => 'Dr.', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Pickhuben', 'address2' => '2-4', 'address3' => '', 'postal' => '20457', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'DE', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332212', 'website' => 'www.metaways.de', 'flag' => null ),
+		array ( 'baseid' => '636.00', 'type' => 'delivery', 'company' => 'Metaways', 'salutation' => 'mrs', 'title' => 'Dr.', 'firstname' => 'Maria', 'lastname' => 'Mustertest', 'address1' => 'Pickhuben', 'address2' => '2', 'address3' => '', 'postal' => '20457', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'DE', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332212', 'website' => 'www.metaways.de', 'flag' => null ),
+		array ( 'baseid' => '19.95', 'type' => 'payment', 'company' => null, 'salutation' => 'mr', 'title' => '', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Durchschnitt', 'address2' => '1', 'address3' => '', 'postal' => '20146', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'DE', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332213', 'website' => 'www.metaways.net', 'flag' => null ),
+		array ( 'baseid' => '636.00', 'type' => 'payment', 'company' => null, 'salutation' => 'mrs', 'title' => '', 'firstname' => 'Adelheid', 'lastname' => 'Mustertest', 'address1' => 'Königallee', 'address2' => '1', 'address3' => '', 'postal' => '20146', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'DE', 'langid' => 'de', 'telephone' => '055544332211', 'email' => 'eshop@metaways.de', 'telefax' => '055544332213', 'website' => 'www.metaways.net', 'flag' => null ),
+		array ( 'baseid' => '10.00', 'type' => 'delivery', 'company' => 'Metaways', 'salutation' => 'mrs', 'title' => 'Dr.', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Pickhuben', 'address2' => '2-4', 'address3' => '', 'postal' => '20457', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'DE', 'langid' => 'de', 'telephone' => '055544332212', 'email' => 'eshop@metaways.de', 'telefax' => '055544332212', 'website' => 'www.metaways.de', 'flag' => null ),
+		array ( 'baseid' => '10.00', 'type' => 'payment', 'company' => null, 'salutation' => 'mr', 'title' => '', 'firstname' => 'Our', 'lastname' => 'Unittest', 'address1' => 'Durchschnitt', 'address2' => '2', 'address3' => '', 'postal' => '20146', 'city' => 'Hamburg', 'state' => 'Hamburg', 'countryid' => 'DE', 'langid' => 'de', 'telephone' => '055544332212', 'email' => 'eshop@metaways.de', 'telefax' => '055544332213', 'website' => 'www.metaways.net', 'flag' => null ),
 	),
 
 	'order/base/product' => array (
@@ -56,12 +55,12 @@ return array (
 	),
 
 	'order/base/service' => array (
-		'OGONE/19.95' => array ( 'baseid' => '19.95', 'type' => 'payment', 'code' => 'OGONE', 'name' => 'ogone', 'price' => '0.00', 'shipping' => '0.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
-		'solucia/19.95' => array ( 'baseid' => '19.95', 'type' => 'delivery', 'code' => 73, 'name' => 'solucia', 'price' => '0.00', 'shipping' => '5.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
-		'OGONE/636.00' => array ( 'baseid' => '636.00', 'type' => 'payment', 'code' => 'OGONE', 'name' => 'ogone', 'price' => '0.00', 'shipping' => '0.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
-		'solucia/636.00' => array ( 'baseid' => '636.00', 'type' => 'delivery', 'code' => 73, 'name' => 'solucia', 'price' => '0.00', 'shipping' => '5.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
-		'paypal/10.00' => array ( 'baseid' => '10.00', 'type' => 'payment', 'code' => 'paypal', 'name' => 'paypal', 'price' => '0.00', 'shipping' => '0.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
-		'solucia/10.00' => array ( 'baseid' => '10.00', 'type' => 'delivery', 'code' => 73, 'name' => 'solucia', 'price' => '0.00', 'shipping' => '5.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
+		'OGONE/19.95' => array ( 'baseid' => '19.95', 'servid' => 'OGONE1', 'type' => 'payment', 'code' => 'OGONE', 'name' => 'ogone', 'price' => '0.00', 'shipping' => '0.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
+		'solucia/19.95' => array ( 'baseid' => '19.95', 'servid' => '73test', 'type' => 'delivery', 'code' => 73, 'name' => 'solucia', 'price' => '0.00', 'shipping' => '5.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
+		'OGONE/636.00' => array ( 'baseid' => '636.00', 'servid' => 'OGONE1', 'type' => 'payment', 'code' => 'OGONE', 'name' => 'ogone', 'price' => '0.00', 'shipping' => '0.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
+		'solucia/636.00' => array ( 'baseid' => '636.00', 'servid' => '73test', 'type' => 'delivery', 'code' => 73, 'name' => 'solucia', 'price' => '0.00', 'shipping' => '5.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
+		'paypal/10.00' => array ( 'baseid' => '10.00', 'servid' => 'paypal1', 'type' => 'payment', 'code' => 'paypal', 'name' => 'paypal', 'price' => '0.00', 'shipping' => '0.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
+		'solucia/10.00' => array ( 'baseid' => '10.00', 'servid' => '73test', 'type' => 'delivery', 'code' => 73, 'name' => 'solucia', 'price' => '0.00', 'shipping' => '5.00', 'rebate' => '0.00', 'taxrate' => '0.00', 'mediaurl' => 'somewhere/thump1.jpg' ),
 	),
 
 	'order/base/service/attr' => array (

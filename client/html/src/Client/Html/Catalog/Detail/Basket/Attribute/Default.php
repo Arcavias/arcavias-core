@@ -94,6 +94,17 @@ class Client_Html_Catalog_Detail_Basket_Attribute_Default
 
 
 	/**
+	 * Processes the input, e.g. store given values.
+	 * A view must be available and this method doesn't generate any output
+	 * besides setting view variables.
+	 */
+	public function process()
+	{
+		$this->_process( $this->_subPartPath, $this->_subPartNames );
+	}
+
+
+	/**
 	 * Sets the necessary parameter values in the view.
 	 *
 	 * @param MW_View_Interface $view The view object which generates the HTML output
@@ -102,24 +113,26 @@ class Client_Html_Catalog_Detail_Basket_Attribute_Default
 	{
 		if( !isset( $this->_cache ) )
 		{
-			$configurables = $view->detailProductItem->getRefItems( 'attribute' );
-
 			$attributeManager = MShop_Attribute_Manager_Factory::createManager( $this->_getContext() );
+
+			$configAttributes = $view->detailProductItem->getRefItems( 'attribute', null, 'config' );
+
 			$search = $attributeManager->createSearch( true );
 			$expr = array(
-				$search->compare( '==', 'attribute.id', array_keys( $configurables ) ),
+				$search->compare( '==', 'attribute.id', array_keys( $configAttributes ) ),
 				$search->getConditions(),
 			);
 			$search->setConditions( $search->combine( '&&', $expr ) );
 
 			$attributeTypes = array();
-			$attrDomains = array( 'text', 'price' );
+			$attrDomains = array( 'text', 'price', 'media' );
 
 			foreach( $attributeManager->searchItems( $search, $attrDomains ) as $id => $attribute ) {
 				$attributeTypes[ $attribute->getType() ][$id] = $attribute;
 			}
 
-			$view->attributeItems = $attributeTypes;
+			$view->attributeConfigItems = $attributeTypes;
+			$view->attributeHiddenItems = $view->detailProductItem->getRefItems( 'attribute', null, 'hidden' );
 
 			$this->_cache = $view;
 		}

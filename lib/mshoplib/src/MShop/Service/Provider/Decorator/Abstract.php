@@ -92,11 +92,12 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 	 * Returns the configuration attribute definitions of the provider to generate a list of available fields and
 	 * rules for the value of each field in the frontend.
 	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket object
 	 * @return array List of attribute definitions implementing MW_Common_Critera_Attribute_Interface
 	 */
-	public function getConfigFE()
+	public function getConfigFE( MShop_Order_Item_Base_Interface $basket )
 	{
-		return $this->_object->getConfigFE();
+		return $this->_object->getConfigFE( $basket );
 	}
 
 	/**
@@ -200,7 +201,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 	public function __call( $name, array $param )
 	{
 		if ( ( $result = call_user_func_array( array( $this->_object, $name ), $param) ) === false ) {
-			throw new MShop_Service_Exception( 'Unable to call method "%1$s"', $name );
+			throw new MShop_Service_Exception( sprintf( 'Method "%1$s" for provider not available', $name ) );
 		}
 
 		return $result;

@@ -19,7 +19,7 @@ class Client_Html_Checkout_Standard_Default
 	implements Client_Html_Interface
 {
 	private $_subPartPath = 'client/html/checkout/standard/default/subparts';
-	private $_subPartNames = array( 'address', 'delivery', 'payment'/*, 'summary'*/ );
+	private $_subPartNames = array( 'address', 'delivery', 'payment', 'summary', 'order' );
 
 
 	/**
@@ -29,13 +29,43 @@ class Client_Html_Checkout_Standard_Default
 	 */
 	public function getBody()
 	{
-		$view = $this->_setViewParams( $this->getView() );
+		try
+		{
+			$view = $this->_setViewParams( $this->getView() );
 
-		$html = '';
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$html .= $subclient->setView( $view )->getBody();
+			$html = '';
+			foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
+				$html .= $subclient->setView( $view )->getBody();
+			}
+			$view->standardBody = $html;
 		}
-		$view->standardBody = $html;
+		catch( Client_Html_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'client/html', $e->getMessage() ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
+		catch( Controller_Frontend_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
+		catch( MShop_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
+		catch( Exception $e )
+		{
+			$context = $this->_getContext();
+			$context->getLogger()->log( $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+
+			$view = $this->getView();
+			$error = array( $context->getI18n()->dt( 'client/html', 'A non-recoverable error occured' ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
 
 		$tplconf = 'client/html/checkout/standard/default/template-body';
 		$default = 'checkout/standard/body-default.html';
@@ -51,13 +81,21 @@ class Client_Html_Checkout_Standard_Default
 	 */
 	public function getHeader()
 	{
-		$view = $this->_setViewParams( $this->getView() );
+		try
+		{
+			$view = $this->_setViewParams( $this->getView() );
 
-		$html = '';
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$html .= $subclient->setView( $view )->getHeader();
+			$html = '';
+			foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
+				$html .= $subclient->setView( $view )->getHeader();
+			}
+			$view->standardHeader = $html;
 		}
-		$view->standardHeader = $html;
+		catch( Exception $e )
+		{
+			$this->_getContext()->getLogger()->log( $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
+			return '';
+		}
 
 		$tplconf = 'client/html/checkout/standard/default/template-header';
 		$default = 'checkout/standard/header-default.html';
@@ -98,10 +136,36 @@ class Client_Html_Checkout_Standard_Default
 	 */
 	public function process()
 	{
-		$view = $this->getView();
+		try
+		{
+			$this->_process( $this->_subPartPath, $this->_subPartNames );
+		}
+		catch( Client_Html_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'client/html', $e->getMessage() ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
+		catch( Controller_Frontend_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
+		catch( MShop_Exception $e )
+		{
+			$view = $this->getView();
+			$error = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
+		}
+		catch( Exception $e )
+		{
+			$context = $this->_getContext();
+			$context->getLogger()->log( $e->getMessage() . PHP_EOL . $e->getTraceAsString() );
 
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$subclient->process( $view );
+			$view = $this->getView();
+			$error = array( $context->getI18n()->dt( 'client/html', 'A non-recoverable error occured' ) );
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
 		}
 	}
 
@@ -116,9 +180,48 @@ class Client_Html_Checkout_Standard_Default
 	{
 		if( !isset( $this->_cache ) )
 		{
-			$view->standardSteps = $this->_subPartNames;
-			$view->standardStepActive = $view->param( 'c-step', 'address' );
-			$view->standardErrorList = array();
+			$context = $this->_getContext();
+
+			$basketCntl = Controller_Frontend_Basket_Factory::createController( $context );
+			$view->standardBasket = $basketCntl->get();
+
+			$basketTarget = $view->config( 'client/html/basket/standard/url/target' );
+			$basketController = $view->config( 'client/html/basket/standard/url/controller', 'basket' );
+			$basketAction = $view->config( 'client/html/basket/standard/url/action', 'index' );
+
+			$checkoutTarget = $view->config( 'client/html/checkout/standard/url/target' );
+			$checkoutController = $view->config( 'client/html/checkout/standard/url/controller', 'checkout' );
+			$checkoutAction = $view->config( 'client/html/checkout/standard/url/action', 'index' );
+
+
+			$steps = (array) $context->getConfig()->get( $this->_subPartPath, $this->_subPartNames );
+			$view->standardSteps = $steps;
+
+			if( !isset( $view->standardStepActive ) ) {
+				$view->standardStepActive = $view->param( 'c-step', reset( $steps ) );
+			}
+			$activeStep = $view->standardStepActive;
+
+
+			$step = null;
+			do {
+				$lastStep = $step;
+			}
+			while( ( $step = array_shift( $steps ) ) !== null && $step !== $activeStep );
+
+
+			if( $lastStep !== null ) {
+				$view->standardUrlBack = $view->url( $checkoutTarget, $checkoutController, $checkoutAction, array( 'c-step' => $lastStep ) );
+			} else {
+				$view->standardUrlBack = $view->url( $basketTarget, $basketController, $basketAction );
+			}
+
+			if( ( $nextStep = array_shift( $steps ) ) !== null ) {
+				$view->standardUrlNext = $view->url( $checkoutTarget, $checkoutController, $checkoutAction, array( 'c-step' => $nextStep ) );
+			} else {
+				$view->standardUrlNext = '';
+			}
+
 
 			$this->_cache = $view;
 		}

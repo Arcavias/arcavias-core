@@ -80,9 +80,8 @@ class Client_Html_Checkout_Standard_Address_DefaultTest extends MW_Unittest_Test
 		$this->_object->setView( $view );
 
 		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( '<div class="checkout-standard-address">', $output );
+		$this->assertStringStartsWith( '<section class="checkout-standard-address">', $output );
 
-		$this->assertEquals( 'de', $view->addressLanguageCurrent );
 		$this->assertGreaterThanOrEqual( 0, count( $view->addressLanguages ) );
 		$this->assertGreaterThanOrEqual( 0, count( $view->addressCountries ) );
 	}

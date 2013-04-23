@@ -62,13 +62,27 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 	}
 
 
-	public function testGetBody()
+	public function testGetHeaderNewAddress()
 	{
 		$view = TestHelper::getView();
+
+		$param = array( 'ca-delivery-option' => 'null' );
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
 		$this->_object->setView( $view );
 
+		$output = $this->_object->getHeader();
+		$this->assertStringStartsWith( '<script type="text/javascript">', $output );
+	}
+
+
+	public function testGetBody()
+	{
+		$view = $this->_object->getView();
+
 		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( '<div class="address-delivery">', $output );
+		$this->assertStringStartsWith( '<div class="checkout-standard-address-delivery">', $output );
 
 		$this->assertGreaterThan( 0, count( $view->deliveryMandatory ) );
 		$this->assertGreaterThan( 0, count( $view->deliveryOptional ) );
@@ -107,7 +121,7 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 		$view = TestHelper::getView();
 
 		$param = array(
-			'ca-delivery-option' => '',
+			'ca-delivery-option' => 'null',
 			'ca-delivery' => array(
 				'order.base.address.salutation' => 'mr',
 				'order.base.address.firstname' => 'test',
@@ -115,7 +129,7 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 				'order.base.address.address1' => 'mystreet 1',
 				'order.base.address.postal' => '20000',
 				'order.base.address.city' => 'hamburg',
-				'order.base.address.langid' => 'en',
+				'order.base.address.languageid' => 'en',
 			),
 		);
 		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
@@ -135,7 +149,7 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 		$view = TestHelper::getView();
 
 		$param = array(
-			'ca-delivery-option' => '',
+			'ca-delivery-option' => 'null',
 			'ca-delivery' => array(
 				'order.base.address.firstname' => 'test',
 				'order.base.address.lastname' => 'user',
@@ -157,7 +171,7 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 		{
 			$this->assertEquals( 2, count( $view->deliveryError ) );
 			$this->assertArrayHasKey( 'order.base.address.salutation', $view->deliveryError );
-			$this->assertArrayHasKey( 'order.base.address.langid', $view->deliveryError );
+			$this->assertArrayHasKey( 'order.base.address.languageid', $view->deliveryError );
 			return;
 		}
 
@@ -167,6 +181,8 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 
 	public function testProcessExistingAddress()
 	{
+		$this->_context->setEditor( 'UTC001' );
+
 		$customerManager = MShop_Customer_Manager_Factory::createManager( $this->_context );
 		$search = $customerManager->createSearch();
 		$search->setConditions( $search->compare( '==', 'customer.code', 'UTC001' ) );
@@ -195,6 +211,7 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 
 		$this->_object->process();
 
+		$this->_context->setEditor( null );
 		$basket = Controller_Frontend_Basket_Factory::createController( $this->_context )->get();
 		$this->assertEquals( 'Metaways', $basket->getAddress( 'delivery' )->getCompany() );
 	}

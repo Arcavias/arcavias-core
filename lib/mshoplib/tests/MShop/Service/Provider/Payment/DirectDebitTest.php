@@ -52,6 +52,8 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 	}
 
 
+
+
 	/**
 	 * Tears down the fixture, for example, closes a network connection.
 	 * This method is called after a test is executed.
@@ -66,31 +68,41 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 
 	public function testGetConfigBE()
 	{
-		$this->assertArrayHasKey( 'url', $this->_object->getConfigBE() );
+		$this->assertEquals( array(), $this->_object->getConfigBE() );
 	}
 
 
 	public function testCheckConfigBE()
 	{
-		$this->assertEquals( array( 'url' => null ), $this->_object->checkConfigBE( array('url' => 'testurl' ) ) );
-	}
-
-
-	public function testCheckConfigBEwrongType()
-	{
-		$result = $this->_object->checkConfigBE( array('url' => 123 ) );
-		$this->assertInternalType( 'string', $result['url'] );
+		$this->assertEquals( array(), $this->_object->checkConfigBE( array('url' => 'testurl' ) ) );
 	}
 
 
 	public function testGetConfigFE()
 	{
-		$config = $this->_object->getConfigFE();
+		$orderManager = MShop_Order_Manager_Factory::createManager( TestHelper::getContext() );
+		$orderBaseManager = $orderManager->getSubManager( 'base' );
+		$search = $orderManager->createSearch();
+		$expr = array(
+			$search->compare( '==', 'order.type', MShop_Order_Item_Abstract::TYPE_WEB ),
+			$search->compare( '==', 'order.statuspayment', MShop_Order_Item_Abstract::PAY_AUTHORIZED )
+		);
+		$search->setConditions( $search->combine( '&&', $expr ) );
+		$orderItems = $orderManager->searchItems( $search );
+
+		if( ( $order = reset( $orderItems ) ) === false ) {
+			throw new Exception( sprintf('No Order found with statuspayment "%1$s" and type "%2$s"', MShop_Order_Item_Abstract::PAY_AUTHORIZED, MShop_Order_Item_Abstract::TYPE_WEB ) );
+		}
+
+		$basket = $orderBaseManager->load( $order->getBaseId() );
+
+		$config = $this->_object->getConfigFE( $basket );
 
 		$this->assertArrayHasKey( 'payment.directdebit.accountowner', $config );
-		$this->assertArrayHasKey( 'payment.directdebit.accountnumber', $config );
+		$this->assertArrayHasKey( 'payment.directdebit.accountno', $config );
 		$this->assertArrayHasKey( 'payment.directdebit.bankcode', $config );
 		$this->assertArrayHasKey( 'payment.directdebit.bankname', $config );
+		$this->assertEquals( 'Our Unittest', $config['payment.directdebit.accountowner']->getDefault() );
 	}
 
 
@@ -98,7 +110,7 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 	{
 		$config = array(
 			'payment.directdebit.accountowner' => 'test user',
-			'payment.directdebit.accountnumber' => '123456789',
+			'payment.directdebit.accountno' => '123456789',
 			'payment.directdebit.bankcode' => '1000000',
 			'payment.directdebit.bankname' => 'Federal reserve',
 		);
@@ -107,7 +119,7 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 
 		$expected = array(
 			'payment.directdebit.accountowner' => null,
-			'payment.directdebit.accountnumber' => null,
+			'payment.directdebit.accountno' => null,
 			'payment.directdebit.bankcode' => null,
 			'payment.directdebit.bankname' => null,
 		);
@@ -120,7 +132,7 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 	{
 		$config = array(
 			'payment.directdebit.accountowner' => 123,
-			'payment.directdebit.accountnumber' => 0.1,
+			'payment.directdebit.accountno' => 0.1,
 			'payment.directdebit.bankcode' => '1000000',
 			'payment.directdebit.bankname' => 'Federal reserve',
 		);
@@ -128,10 +140,10 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 		$result = $this->_object->checkConfigFE( $config );
 
 		$this->assertArrayHasKey( 'payment.directdebit.accountowner', $result );
-		$this->assertArrayHasKey( 'payment.directdebit.accountnumber', $result );
+		$this->assertArrayHasKey( 'payment.directdebit.accountno', $result );
 
 		$this->assertFalse( $result['payment.directdebit.accountowner'] === null );
-		$this->assertFalse( $result['payment.directdebit.accountnumber'] === null );
+		$this->assertFalse( $result['payment.directdebit.accountno'] === null );
 		$this->assertTrue( $result['payment.directdebit.bankcode'] === null );
 		$this->assertTrue( $result['payment.directdebit.bankname'] === null );
 	}

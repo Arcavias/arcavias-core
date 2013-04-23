@@ -36,6 +36,13 @@ class MShop_Catalog_Manager_Default
 			'type'=> 'string',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_STR,
 		),
+		'config' => array(
+			'code' => 'catalog.config',
+			'internalcode' => 'mcat."config"',
+			'label' => 'Catalog site config',
+			'type' => 'string',
+			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
+		),
 		'code' => array(
 			'code'=>'catalog.code',
 			'internalcode'=>'mcat."code"',
@@ -315,10 +322,18 @@ class MShop_Catalog_Manager_Default
 	public function deleteItem( $id )
 	{
 		$siteid = $this->_getContext()->getLocale()->getSiteId();
-
 		$this->_begin();
-		$this->_createTreeManager( $siteid )->deleteNode( $id );
-		$this->_commit();
+
+		try
+		{
+			$this->_createTreeManager( $siteid )->deleteNode( $id );
+			$this->_commit();
+		}
+		catch( Exception $e )
+		{
+			$this->_rollback();
+			throw $e;
+		}
 	}
 
 
@@ -367,13 +382,21 @@ class MShop_Catalog_Manager_Default
 	 */
 	public function insertItem( MShop_Catalog_Item_Interface $item, $parentId = null, $refId = null )
 	{
-		$node = $item->getNode();
 		$siteid = $this->_getContext()->getLocale()->getSiteId();
-
+		$node = $item->getNode();
 		$this->_begin();
-		$this->_createTreeManager( $siteid )->insertNode( $node, $parentId, $refId );
-		$this->_updateUsage( $node->getId(), true );
-		$this->_commit();
+
+		try
+		{
+			$this->_createTreeManager( $siteid )->insertNode( $node, $parentId, $refId );
+			$this->_updateUsage( $node->getId(), $item, true );
+			$this->_commit();
+		}
+		catch( Exception $e )
+		{
+			$this->_rollback();
+			throw $e;
+		}
 	}
 
 
@@ -388,11 +411,21 @@ class MShop_Catalog_Manager_Default
 	public function moveItem( $id, $oldParentId, $newParentId, $refId = null )
 	{
 		$siteid = $this->_getContext()->getLocale()->getSiteId();
+		$item = $this->getItem( $id );
 
 		$this->_begin();
-		$this->_createTreeManager( $siteid )->moveNode( $id, $oldParentId, $newParentId, $refId );
-		$this->_updateUsage( $id );
-		$this->_commit();
+
+		try
+		{
+			$this->_createTreeManager( $siteid )->moveNode( $id, $oldParentId, $newParentId, $refId );
+			$this->_updateUsage( $id, $item );
+			$this->_commit();
+		}
+		catch( Exception $e )
+		{
+			$this->_rollback();
+			throw $e;
+		}
 	}
 
 
@@ -406,16 +439,24 @@ class MShop_Catalog_Manager_Default
 	{
 		$iface = 'MShop_Catalog_Item_Interface';
 		if( !( $item instanceof $iface ) ) {
-			throw new MShop_Catalog_Exception( sprintf( 'Object does not implement "%1$s"', $iface ) );
+			throw new MShop_Catalog_Exception( sprintf( 'Object is not of required type "%1$s"', $iface ) );
 		}
 
-		$node = $item->getNode();
 		$siteid = $this->_getContext()->getLocale()->getSiteId();
-
+		$node = $item->getNode();
 		$this->_begin();
-		$this->_createTreeManager( $siteid )->saveNode( $node );
-		$this->_updateUsage( $node->getId() );
-		$this->_commit();
+
+		try
+		{
+			$this->_createTreeManager( $siteid )->saveNode( $node );
+			$this->_updateUsage( $node->getId(), $item );
+			$this->_commit();
+		}
+		catch( Exception $e )
+		{
+			$this->_rollback();
+			throw $e;
+		}
 	}
 
 
@@ -544,7 +585,7 @@ class MShop_Catalog_Manager_Default
 			catch( Exception $e ) { ; }
 		}
 
-		throw new MShop_Catalog_Exception( sprintf( 'No catalog node found for ID "%1$s"', $id ) );
+		throw new MShop_Catalog_Exception( sprintf( 'Catalog node for ID "%1$s" not available', $id ) );
 	}
 
 
@@ -627,6 +668,10 @@ class MShop_Catalog_Manager_Default
 	protected function _createItem( MW_Tree_Node_Interface $node = null, array $children = array(),
 		array $listItems = array(), array $refItems = array() )
 	{
+		if( isset( $node->config ) && ( $result = json_decode( $node->config, true ) ) !== null ) {
+			$node->config = $result;
+		}
+
 		return new MShop_Catalog_Item_Default( $node, $children, $listItems, $refItems );
 	}
 
@@ -740,17 +785,14 @@ class MShop_Catalog_Manager_Default
 	/**
 	 * Updates the usage information of a node.
 	 *
-	 * @param MW_Tree_Manager_Interface $node Node item.
 	 * @param integer $id Id of the record
+	 * @param MShop_Common_Item_Interface $item Catalog item
 	 * @param boolean $case True if the record shoud be added or false for an update
-	 */
-	/**
 	 *
-	 * @param type $id
-	 * @param type $case
 	 */
-	private function _updateUsage( $id, $case = false )
+	private function _updateUsage( $id, MShop_Common_Item_Interface $item, $case = false )
 	{
+		$date = date( 'Y-m-d H:i:s' );
 		$context = $this->_getContext();
 		$dbm = $context->getDatabaseManager();
 		$conn = $dbm->acquire();
@@ -766,19 +808,20 @@ class MShop_Catalog_Manager_Default
 			}
 
 			$stmt = $conn->create( $context->getConfig()->get( $path, $path ) );
-			$stmt->bind( 1, date( 'Y-m-d H:i:s', time() ) ); // mtime
-			$stmt->bind( 2, $context->getEditor() );
+			$stmt->bind( 1, json_encode( $item->getConfig() ) );
+			$stmt->bind( 2, $date ); // mtime
+			$stmt->bind( 3, $context->getEditor() );
 
 			if( $case !== true )
 			{
-				$stmt->bind(3, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
-				$stmt->bind(4, $id, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 4, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 5, $id, MW_DB_Statement_Abstract::PARAM_INT );
 			}
 			else
 			{
-				$stmt->bind(3, date( 'Y-m-d H:i:s', time() ) ); // ctime
-				$stmt->bind(4, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
-				$stmt->bind(5, $id, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 4, $date ); // ctime
+				$stmt->bind( 5, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 6, $id, MW_DB_Statement_Abstract::PARAM_INT );
 			}
 
 			$result = $stmt->execute()->finish();

@@ -15,19 +15,19 @@
  * @package MW
  * @subpackage Config
  */
-class MW_Config_Zend implements MW_Config_Interface
+class MW_Config_Zend
+	extends MW_Config_Abstract
+	implements MW_Config_Interface
 {
-	private $_config = null;
-	private $_paths = array();
-	private $_cache = array();
-	private $_negcache = array();
+	private $_config;
+	private $_paths;
 
 
 	/**
 	 * Initialize config object with Zend_Config instance
 	 *
 	 * @param Zend_Config $config Configuration object
-	 * @param string $path Filesystem path to the configuration files
+	 * @param array|string $path Filesystem path or list of paths to the configuration files
 	 */
 	public function __construct( Zend_Config $config, $path = array() )
 	{
@@ -56,14 +56,6 @@ class MW_Config_Zend implements MW_Config_Interface
 	{
 		$path = trim( $path, '/' );
 
-		if( array_key_exists( $path, $this->_negcache ) ) {
-			return $default;
-		}
-
-		if ( array_key_exists($path, $this->_cache) ) {
-			return $this->_cache[$path];
-		}
-
 		$result = $default;
 		$parts = explode( '/', $path );
 
@@ -75,17 +67,13 @@ class MW_Config_Zend implements MW_Config_Interface
 
 			$result = $this->_get( $this->_config, '', $parts );
 		}
-		catch( MW_Config_Exception $e )
-		{
-			$this->_negcache[$path] = true;
+		catch( MW_Config_Exception $e ) {
 			return $default;
 		}
 
 		if ($result instanceof Zend_Config) {
 			$result = $result->toArray();
 		}
-
-		$this->_cache[$path] = $result;
 
 		return $result;
 	}
@@ -100,6 +88,7 @@ class MW_Config_Zend implements MW_Config_Interface
 	public function set( $path, $value )
 	{
 		$path = trim($path, '/');
+
 		$parts = explode('/', $path);
 
 		$config = $this->_config;
@@ -118,12 +107,6 @@ class MW_Config_Zend implements MW_Config_Interface
 		}
 
 		$config->{$parts[$max]} = $value;
-
-		if ( array_key_exists( $path, $this->_negcache ) ) {
-			unset( $this->_negcache[$path] );
-		}
-
-		$this->_cache[$path] = $value;
 	}
 
 
@@ -190,16 +173,4 @@ class MW_Config_Zend implements MW_Config_Interface
 		}
 	}
 
-
-	/**
-	 * Returns the included configuration.
-	 * This methods protects against overwriting local variables also defined in the configuration
-	 *
-	 * @param string $filename Name of the configuration file
-	 * @return array|false Configuration array or false if file is not available
-	 */
-	protected function _include( $filename )
-	{
-		return include $filename;
-	}
 }

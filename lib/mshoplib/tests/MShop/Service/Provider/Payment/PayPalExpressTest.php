@@ -88,9 +88,14 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 	 */
 	protected function tearDown()
 	{
-		$orderManager = MShop_Order_Manager_Factory::createManager( TestHelper::getContext() );
-		$this->_order->setPaymentStatus( MShop_Order_Item_Abstract::PAY_AUTHORIZED );
-		$orderManager->saveItem($this->_order);
+		$iface = 'MShop_Order_Item_Interface';
+
+		if( $this->_order instanceof $iface )
+		{
+			$orderManager = MShop_Order_Manager_Factory::createManager( TestHelper::getContext() );
+			$this->_order->setPaymentStatus( MShop_Order_Item_Abstract::PAY_AUTHORIZED );
+			$orderManager->saveItem($this->_order);
+		}
 
 		unset( $this->_object );
 		unset( $this->_serviceItem );
@@ -148,9 +153,9 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 		}
 
 		$this->assertInstanceOf( 'MShop_Common_Item_Helper_Form_Interface', $helperForm );
-		$this->assertEquals( 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&token=', $helperForm->getUrl() );
+		$this->assertEquals( 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&token=UT-99999999', $helperForm->getUrl() );
 		$this->assertEquals( 'GET', $helperForm->getMethod() );
-		$this->assertEquals( $values, $helperForm->getValues() );
+		$this->assertEquals( array(), $helperForm->getValues() );
 
 		foreach( $testData AS $key => $value ) {
 			$this->assertEquals( $attributeList[ $key ]->getValue(), $testData[ $key ] );

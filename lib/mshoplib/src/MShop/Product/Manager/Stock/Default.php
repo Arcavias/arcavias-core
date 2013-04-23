@@ -113,7 +113,7 @@ class MShop_Product_Manager_Stock_Default
 	{
 		$iface = 'MShop_Product_Item_Stock_Interface';
 		if( !( $item instanceof $iface ) ) {
-			throw new MShop_Product_Exception( sprintf( 'Object does not implement "%1$s"', $iface ) );
+			throw new MShop_Product_Exception( sprintf( 'Object is not of required type "%1$s"', $iface ) );
 		}
 
 		if( !$item->isModified() ) { return; }
@@ -354,14 +354,7 @@ class MShop_Product_Manager_Stock_Default
 			$stmt->bind( 2, date( 'Y-m-d H:i:s' ) ); //mtime
 			$stmt->bind( 3, $context->getEditor() );
 
-			$result = $stmt->execute();
-
-			if ($result->affectedRows() !== 1 ) {
-				$msg = 'Possible problem while changing stock level for product "%1$s" and warehouse "%2$s" by "%3$s": Affected stocks are "%4$s"';
-				$context->getLogger()->log( sprintf( $msg, $productCode, $warehouseCode, $amount, $result->affectedRows() ), MW_Logger_Abstract::WARN );
-			}
-
-			$result->finish();
+			$result = $stmt->execute()->finish();
 
 			$dbm->release( $conn );
 		}
