@@ -1293,6 +1293,119 @@
 	content: ": ";
 }
 
+/* Checkout confirm email */ 
+	.email-confirm-main-head {
+		font-size: 0.75em;
+		font-family: Arial,Verdana,Helvetica,sans-serif;
+	}
+	.email-confirm-main-address h2,
+	.email-confirm-main-service h2,
+	.email-confirm-main-detail h2{
+		color: #004266;
+		font-size: 1.2em;
+		padding: 0px 0px 0px 10px;
+		margin: 10px 0px 10px 0px;
+	}
+	.email-confirm-main-address h3,
+	.email-confirm-main-service h3,
+	.email-confirm-main-service h4,
+	.email-confirm-main-detail h3 {
+		color: #004266;
+		font-size: 1em;
+		padding: 0px 0px 0px 0px;
+		margin: 5px 0px 5px 0px;
+	}
+	.email-confirm-main-address,
+	.email-confirm-main-service,
+	.email-confirm-main-detail {
+		border: 1px solid #689DB9;
+		border-radius: 5px 5px 5px 5px;
+		margin: 0 0 8px;
+		width: 100%;
+		min-width: 300px;
+		font-family: Arial,Verdana,Helvetica,sans-serif;
+		font-size: 0.75em;
+	}
+	.email-confirm-main-address .item-address,
+	.email-confirm-main-service .item-service {
+		display: inline-block;
+		vertical-align: top;
+		width: 49%;
+		min-width: 238px;
+		margin: 0% 0.5% 0% 0.5%;
+	}
+	.email-confirm-main-address .item-address .header,
+	.email-confirm-main-service .item-service .header {
+		background-color: #F2F7FA;
+		border-bottom: 1px solid #689DB9;
+		padding: 5px 10px;
+	}
+	.email-confirm-main-address .item-address .content,
+	.email-confirm-main-service .item-service .item {
+		margin: 10px 10px 0;
+	}
+	
+	.email-confirm-main-service{
+			clear: left;
+	}
+
+	.email-confirm-main-detail .basket {
+		width: 99%;
+		margin: 0% 0.5% 0% 0.5%;
+	}
+	.email-confirm-main-detail .basket table {
+		border-collapse: collapse;
+		width: 100%;
+		font-size: 1em;
+	}
+	.email-confirm-main-detail .basket thead {
+		background-color: #EFF0F1;
+		font-weight: bold;
+	}
+	.email-confirm-main-detail .basket thead th {
+		padding: 5px;
+		color: #858585;
+		text-align: right;
+	}
+	.email-confirm-main-detail .basket thead th.quantity,
+	.email-confirm-main-detail .basket thead th.unitprice,
+	.email-confirm-main-detail .basket thead th.price{
+		width: 12%;
+	}
+	
+	.email-confirm-main-detail .basket tfoot td.price,
+	.email-confirm-main-detail .basket tbody td.price,
+	.email-confirm-main-detail .basket tbody td.unitprice,
+	.email-confirm-main-detail .basket tbody td.quantity{
+		text-align: right;
+	}
+	
+	.email-confirm-main-detail .basket tfoot {
+		font-weight: bold;
+		vertical-align: bottom;
+	}
+	.email-confirm-main-detail .basket tfoot td {
+		padding: 0px 0px 0px 5px;
+	}
+	
+	.email-confirm-main-detail .basket tfoot td.price{
+		padding: 0px 5px 0px 0px;
+	}
+	
+	.email-confirm-main-detail .basket tbody td {
+		padding: 5px 5px 5px 5px;
+		vertical-align: top;
+	}
+	.email-confirm-main-detail .basket tbody td.quantity,
+	.email-confirm-main-detail .basket tbody td.unitprice,
+	.email-confirm-main-detail .basket tbody td.price {
+		white-space: nowrap;
+	}
+	.email-confirm-main-footer {
+		font-size: 0.75em;
+		font-family: Arial,Verdana,Helvetica,sans-serif;
+	}
+
 /* Order history */
 .account-history-list .history-item {
 	display: inline-block;
@@ -1331,7 +1444,6 @@
 	float: right;
 	margin: 5px 10px;
 }
-
 
 
 @media only screen and (max-width: 630px) and (orientation: portrait) {
