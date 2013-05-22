@@ -5,10 +5,10 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  */
 
-class Client_Html_Checkout_Confirm_DefaultTest extends MW_Unittest_Testcase
+class Client_Html_Checkout_Update_FactoryTest extends MW_Unittest_Testcase
 {
-	private $_object;
 	private $_context;
+	private $_templatePaths;
 
 
 	/**
@@ -21,7 +21,7 @@ class Client_Html_Checkout_Confirm_DefaultTest extends MW_Unittest_Testcase
 	{
 		require_once 'PHPUnit/TextUI/TestRunner.php';
 
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Checkout_Confirm_DefaultTest');
+		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Checkout_Update_FactoryTest');
 		$result = PHPUnit_TextUI_TestRunner::run($suite);
 	}
 
@@ -35,11 +35,7 @@ class Client_Html_Checkout_Confirm_DefaultTest extends MW_Unittest_Testcase
 	protected function setUp()
 	{
 		$this->_context = TestHelper::getContext();
-		$this->_context->setEditor( 'UTC001' );
-
-		$paths = TestHelper::getHtmlTemplatePaths();
-		$this->_object = new Client_Html_Checkout_Confirm_Default( $this->_context, $paths );
-		$this->_object->setView( TestHelper::getView() );
+		$this->_templatePaths = TestHelper::getHtmlTemplatePaths();
 	}
 
 
@@ -55,35 +51,31 @@ class Client_Html_Checkout_Confirm_DefaultTest extends MW_Unittest_Testcase
 	}
 
 
-	public function testGetHeader()
+	public function testCreateClient()
 	{
-		$this->_object->getHeader();
+		$client = Client_Html_Checkout_Update_Factory::createClient( $this->_context, $this->_templatePaths );
+		$this->assertInstanceOf( 'Client_Html_Interface', $client );
 	}
 
 
-	public function testGetBody()
+	public function testCreateClientName()
 	{
-		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( '<section class="arcavias checkout-confirm">', $output );
+		$client = Client_Html_Checkout_Update_Factory::createClient( $this->_context, $this->_templatePaths, 'Default' );
+		$this->assertInstanceOf( 'Client_Html_Interface', $client );
 	}
 
 
-	public function testGetSubClientInvalid()
-	{
-		$this->setExpectedException( 'Client_Html_Exception' );
-		$this->_object->getSubClient( 'invalid', 'invalid' );
-	}
-
-
-	public function testGetSubClientInvalidName()
+	public function testCreateClientNameInvalid()
 	{
 		$this->setExpectedException( 'Client_Html_Exception' );
-		$this->_object->getSubClient( '$$$', '$$$' );
+		Client_Html_Checkout_Update_Factory::createClient( $this->_context, $this->_templatePaths, '$$$' );
 	}
 
 
-	public function testProcess()
+	public function testCreateClientNameNotFound()
 	{
-		$this->_object->process();
+		$this->setExpectedException( 'Client_Html_Exception' );
+		Client_Html_Checkout_Update_Factory::createClient( $this->_context, $this->_templatePaths, 'notfound' );
 	}
+
 }
