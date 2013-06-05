@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ListsChangeIdNotNull.php 865 2012-06-28 14:42:53Z nsendetzky $
  */
 
 
@@ -58,11 +57,11 @@ class MW_Setup_Task_ListsChangeIdNotNull extends MW_Setup_Task_Abstract
 	{
 		$this->_msg( 'Changing list ids to NOT NULL', 0 );
 		$this->_status('');
-		
+
 		foreach( $stmts as $tablename => $stmt )
 		{
 			$this->_msg(sprintf('Checking table "%1$s": ', $tablename), 1);
-			
+
 			if( $this->_schema->tableExists( $tablename ) === true
 				&& $this->_schema->getColumnDetails( $tablename, 'id' )->isNullable() === true )
 			{

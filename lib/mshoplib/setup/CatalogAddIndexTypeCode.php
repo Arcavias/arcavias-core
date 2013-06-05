@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: CatalogAddIndexTypeCode.php 1057 2012-07-31 11:31:27Z doleiynyk $
  */
 
 
@@ -20,8 +19,8 @@ class MW_Setup_Task_CatalogAddIndexTypeCode extends MW_Setup_Task_Abstract
 			'ALTER TABLE "mshop_catalog_index_attribute" ADD "code" VARCHAR(32) NOT NULL AFTER "type"',
 		)
 	);
-	
-	
+
+
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
@@ -31,8 +30,8 @@ class MW_Setup_Task_CatalogAddIndexTypeCode extends MW_Setup_Task_Abstract
 	{
 		return array();
 	}
-	
-	
+
+
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
@@ -42,8 +41,8 @@ class MW_Setup_Task_CatalogAddIndexTypeCode extends MW_Setup_Task_Abstract
 	{
 		return array('TablesCreateMShop');
 	}
-	
-	
+
+
 	/**
 	 * Executes the task for MySQL databases.
 	 */
@@ -51,7 +50,7 @@ class MW_Setup_Task_CatalogAddIndexTypeCode extends MW_Setup_Task_Abstract
 	{
 		$this->_process( $this->_mysql );
 	}
-	
+
 	/**
 	 * Add column to table if it doesn't exist.
 	 *
@@ -61,19 +60,19 @@ class MW_Setup_Task_CatalogAddIndexTypeCode extends MW_Setup_Task_Abstract
 	{
 		$this->_msg( 'Adding reference ID columns to catalog index tables', 0 );
 		$this->_status( '' );
-	
+
 		if( $this->_schema->tableExists( 'mshop_catalog_index_attribute' ) === true )
 		{
 			foreach( $stmts as $id => $sql )
 			{
 				$this->_msg( sprintf( 'Checking table "%1$s" for column "%2$s"', 'mshop_catalog_index_attribute', $id ), 1 );
-				
+
 				if( $this->_schema->columnExists( 'mshop_catalog_index_attribute', $id ) === false )
 				{
 					$this->_executeList( $sql );
 					$this->_status( 'added' );
-				} 
-				else 
+				}
+				else
 				{
 					$this->_status( 'OK' );
 				}

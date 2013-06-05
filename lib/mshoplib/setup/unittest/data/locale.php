@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: locale.php 1124 2012-08-14 15:47:22Z doleiynyk $
  */
 
 return array (
@@ -15,7 +14,7 @@ return array (
 		array( 'siteid' => 'unittest', 'langid' => 'de', 'currencyid' => 'EUR', 'pos' => 0, 'status' => 0 ),
 		array( 'siteid' => 'unittest', 'langid' => 'en', 'currencyid' => 'EUR', 'pos' => 1, 'status' => 0 ),
 	),
-	
+
 	'locale/currency' => array(
 		'EUR' => array( 'id' => 'EUR', 'label' => 'Euro', 'status' => 1 ),
 		'CHF' => array( 'id' => 'CHF', 'label' => 'Swiss franc', 'status' => 0 ),

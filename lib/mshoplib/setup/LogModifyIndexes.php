@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: LogModifyIndexes.php 896 2012-07-04 12:25:26Z nsendetzky $
  */
 
 
@@ -20,8 +19,8 @@ class MW_Setup_Task_LogModifyIndexes extends MW_Setup_Task_Abstract
 			)
 		),
 	);
-	
-	
+
+
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
@@ -31,8 +30,8 @@ class MW_Setup_Task_LogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		return array();
 	}
-	
-	
+
+
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
@@ -42,8 +41,8 @@ class MW_Setup_Task_LogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		return array('TablesCreateMAdmin');
 	}
-	
-	
+
+
 	/**
 	 * Executes the task for MySQL databases.
 	 */
@@ -51,8 +50,8 @@ class MW_Setup_Task_LogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		$this->_process( $this->_mysql );
 	}
-	
-	
+
+
 	/**
 	 * Adds and modifies indexes in madmin_log table.
 	 *
@@ -62,13 +61,13 @@ class MW_Setup_Task_LogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		$this->_msg( sprintf( 'Modifying indexes in madmin_log table' ), 0 );
 		$this->_status('');
-		
+
 		foreach( $stmts['delete'] AS $table => $indexes )
 		{
 			foreach ( $indexes AS $index => $stmt )
 			{
 				$this->_msg(sprintf('Checking index "%1$s": ', $index), 1);
-				
+
 				if( $this->_schema->tableExists( $table ) === true
 					&& $this->_schema->indexExists( $table, $index ) === true )
 				{
@@ -81,7 +80,7 @@ class MW_Setup_Task_LogModifyIndexes extends MW_Setup_Task_Abstract
 				}
 			}
 		}
-		
+
 	}
-	
+
 }

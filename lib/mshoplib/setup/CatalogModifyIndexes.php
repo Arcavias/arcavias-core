@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: CatalogModifyIndexes.php 865 2012-06-28 14:42:53Z nsendetzky $
  */
 
 
@@ -25,18 +24,18 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 		),
 		'delete' => array (
 			'mshop_catalog' => array (
-				'idx_mscat_nleft_nright' => 'ALTER TABLE "mshop_catalog" DROP INDEX "idx_mscat_nleft_nright"' 
+				'idx_mscat_nleft_nright' => 'ALTER TABLE "mshop_catalog" DROP INDEX "idx_mscat_nleft_nright"'
 			),
 			'mshop_catalog_list' => array (
-				'unq_mscatli_pid_sid_tid_rid_dm' => 'ALTER TABLE "mshop_catalog_list" DROP INDEX "unq_mscatli_pid_sid_tid_rid_dm"' 
+				'unq_mscatli_pid_sid_tid_rid_dm' => 'ALTER TABLE "mshop_catalog_list" DROP INDEX "unq_mscatli_pid_sid_tid_rid_dm"'
 			),
 			'mshop_catalog_site' => array (
 				'unq_mscatsi_pid_sid' => 'ALTER TABLE "mshop_catalog_site" DROP INDEX "unq_mscatsi_pid_sid"'
 			)
 		)
 	);
-	
-	
+
+
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
@@ -46,8 +45,8 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		return array();
 	}
-	
-	
+
+
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
@@ -57,8 +56,8 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		return array( 'TablesCreateMShop' );
 	}
-	
-	
+
+
 	/**
 	 * Executes the task for MySQL databases.
 	 */
@@ -66,8 +65,8 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		$this->_process( $this->_mysql );
 	}
-	
-	
+
+
 	/**
 	 * Adds and modifies indexes in the mshop_catalog table.
 	 *
@@ -77,13 +76,13 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 	{
 		$this->_msg( sprintf( 'Modifying indexes in mshop_catalog tables' ), 0 );
 		$this->_status('');
-		
+
 		foreach( $stmts['add'] AS $table => $indexes )
 		{
 			foreach ( $indexes AS $index => $stmt )
 			{
 				$this->_msg(sprintf('Checking index "%1$s": ', $index), 1);
-				
+
 				if( $this->_schema->tableExists( $table ) === true
 					&& $this->_schema->indexExists( $table, $index ) !== true )
 				{
@@ -96,13 +95,13 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 				}
 			}
 		}
-		
+
 		foreach( $stmts['delete'] AS $table => $indexes )
 		{
 			foreach ( $indexes AS $index => $stmt )
 			{
 				$this->_msg(sprintf('Checking index "%1$s": ', $index), 1);
-				
+
 				if( $this->_schema->tableExists( $table ) === true
 					&& $this->_schema->indexExists( $table, $index ) === true )
 				{
@@ -115,7 +114,7 @@ class MW_Setup_Task_CatalogModifyIndexes extends MW_Setup_Task_Abstract
 				}
 			}
 		}
-		
+
 	}
 
 }

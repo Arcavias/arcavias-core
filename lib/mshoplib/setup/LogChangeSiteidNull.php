@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: LogChangeSiteidNull.php 896 2012-07-04 12:25:26Z nsendetzky $
  */
 
 
@@ -50,12 +49,12 @@ class MW_Setup_Task_LogChangeSiteidNull extends MW_Setup_Task_Abstract
 	protected function _process( $stmt )
 	{
 		$table = 'madmin_log';
-		
+
 		$this->_msg( 'Changing site ID to NULL in madmin_log', 0 );
 		$this->_status('');
 
 		$this->_msg(sprintf('Changing table "%1$s": ', $table), 1);
-		
+
 		if( $this->_schema->tableExists($table) &&
 			!$this->_schema->getColumnDetails( $table, 'siteid' )->isNullable() )
 		{
@@ -64,7 +63,7 @@ class MW_Setup_Task_LogChangeSiteidNull extends MW_Setup_Task_Abstract
 		} else {
 			$this->_status( 'OK' );
 		}
-		
+
 	}
 
 }
