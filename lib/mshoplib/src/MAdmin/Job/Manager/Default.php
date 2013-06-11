@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MAdmin
  * @subpackage Job
- * @version $Id: Default.php 14711 2012-01-05 12:52:13Z nsendetzky $
  */
 
 

@@ -4,7 +4,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Catalog
- * @version $Id: Default.php 1334 2012-10-24 16:17:46Z doleiynyk $
  */
 
 /**
