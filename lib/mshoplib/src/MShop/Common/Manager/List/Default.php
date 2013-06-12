@@ -168,6 +168,7 @@ class MShop_Common_Manager_List_Default
 	 * Creates common list item object for the given common list item id.
 	 *
 	 * @param Integer $id Id of common list item object
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Common_Item_List_Interface Common list item object
 	 */
 	public function getItem( $id, array $ref = array() )

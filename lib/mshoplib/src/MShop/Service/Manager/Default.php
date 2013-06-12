@@ -393,6 +393,7 @@ class MShop_Service_Manager_Default
 	 * Returns the service item specified by the given id.
 	 *
 	 * @param int $id Unique identifier of the service item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Service_Item_Interface
 	 */
 	public function getItem( $id, array $ref = array() )

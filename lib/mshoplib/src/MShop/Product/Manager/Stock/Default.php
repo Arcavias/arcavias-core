@@ -183,6 +183,7 @@ class MShop_Product_Manager_Stock_Default
 	 * Creates a stock item object for the given item id.
 	 *
 	 * @param Integer $id Id of stock item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Product_Item_Stock_Interface Product stock item
 	 */
 	public function getItem( $id, array $ref = array() )

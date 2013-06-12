@@ -219,6 +219,7 @@ class MShop_Order_Manager_Base_Product_Default
 	 * Returns order base product for the given product ID.
 	 *
 	 * @param integer $id Product ids to create product object for
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Order_Item_Base_Product_Interface
 	 */
 	public function getItem( $id, array $ref = array() )

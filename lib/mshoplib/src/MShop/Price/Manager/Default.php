@@ -419,6 +419,7 @@ class MShop_Price_Manager_Default
 	 * Returns the price item object specificed by its ID.
 	 *
 	 * @param integer $id Unique price ID referencing an existing price
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Price_Item_Interface $item Price item object
 	 * @throws MShop_Price_Exception If price couldn't be found
 	 */

@@ -424,6 +424,7 @@ class MShop_Text_Manager_Default
 	 * Returns the text item object specified by the given ID.
 	 *
 	 * @param integer $id Id of text item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Text_Item_Interface Text item
 	 */
 	public function getItem( $id, array $ref = array() )

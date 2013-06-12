@@ -151,6 +151,7 @@ class MShop_Locale_Manager_Default
 	 * Returns the item specified by its ID.
 	 *
 	 * @param integer $id Id of item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Common_Item_Interface Item object
 	 */
 	public function getItem( $id, array $ref = array() )

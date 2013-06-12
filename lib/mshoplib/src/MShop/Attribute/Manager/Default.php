@@ -374,6 +374,7 @@ class MShop_Attribute_Manager_Default
 	 * Returns the attributes item specified by its ID.
 	 *
 	 * @param integer $attributeId Unique ID of the attribute item in the storage
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Attribute_Item_Interface Returns the attribute item of the given id
 	 * @throws MShop_Attribute_Exception If attribute couldn't be found
 	 */

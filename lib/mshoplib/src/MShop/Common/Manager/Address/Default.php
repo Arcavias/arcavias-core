@@ -106,6 +106,8 @@ class MShop_Common_Manager_Address_Default
 	 * Returns the common address item object specificed by its ID.
 	 *
 	 * @param integer $id Unique common address ID referencing an existing address
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Common_Item_Address_Interface Returns the address item of the given id
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

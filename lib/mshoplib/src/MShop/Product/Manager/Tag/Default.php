@@ -236,6 +236,7 @@ class MShop_Product_Manager_Tag_Default
 	 * Returns product tag item with given Id.
 	 *
 	 * @param Integer $id Id of product tag item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Product_Item_Tag_Interface Product tag item
 	 */
 	public function getItem( $id, array $ref = array() )

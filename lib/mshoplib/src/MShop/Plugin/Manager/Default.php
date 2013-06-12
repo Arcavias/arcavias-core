@@ -279,6 +279,8 @@ class MShop_Plugin_Manager_Default
 	/**
 	 * Returns plugin item specified by the given ID.
 	 *
+	 * @param integer $id Unique id of the plugin item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Plugin_Item_Interface Plugin item
 	 * @throws MShop_Plugin_Exception If plugin isn't found
 	 */

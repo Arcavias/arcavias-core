@@ -401,6 +401,7 @@ class MShop_Media_Manager_Default
 	 * Returns an item for the given ID.
 	 *
 	 * @param integer $id ID of the item that should be retrieved
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Media_Item_Interface Item object
 	 */
 	public function getItem( $id, array $ref = array() )

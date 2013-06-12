@@ -129,6 +129,7 @@ class MShop_Order_Manager_Base_Service_Attribute_Default
 	 * Returns the attribute object for the given ID.
 	 *
 	 * @param integer $id Attribute ID
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Order_Item_Base_Service_Attribute_Interface Service attribute object
 	 */
 	public function getItem( $id, array $ref = array() )

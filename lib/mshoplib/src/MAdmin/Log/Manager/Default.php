@@ -198,6 +198,7 @@ class MAdmin_Log_Manager_Default
 	 * Creates the log object for the given log id.
 	 *
 	 * @param integer $id Log ID to fetch log object for
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MAdmin_Log_Item_Interface
 	 */
 	public function getItem( $id, array $ref = array() )

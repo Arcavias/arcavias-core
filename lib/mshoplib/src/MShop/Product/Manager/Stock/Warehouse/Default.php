@@ -188,6 +188,7 @@ class MShop_Product_Manager_Stock_Warehouse_Default
 	 * Creates a warehouse item object for the given item id.
 	 *
 	 * @param Integer $id Id of warehouse item
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Product_Item_Warehouse_Interface Product warehouse item
 	 */
 	public function getItem( $id, array $ref = array() )

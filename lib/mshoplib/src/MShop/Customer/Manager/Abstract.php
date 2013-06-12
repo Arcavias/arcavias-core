@@ -49,6 +49,8 @@ abstract class MShop_Customer_Manager_Abstract
 	 * Returns the customer item object specificed by its ID.
 	 *
 	 * @param integer $id Unique customer ID referencing an existing customer
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Customer_Item_Interface Returns the customer item of the given id
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

@@ -464,6 +464,7 @@ class MShop_Product_Manager_Default
 	 * Returns the product item for the given product ID.
 	 *
 	 * @param integer $id Unique ID to search for
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Product_Item_Interface Product item
 	 */
 	public function getItem( $id, array $ref = array() )

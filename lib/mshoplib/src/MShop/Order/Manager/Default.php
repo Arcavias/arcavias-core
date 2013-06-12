@@ -249,6 +249,7 @@ class MShop_Order_Manager_Default
 	 * Returns an order invoice item built from database values.
 	 *
 	 * @param integer $id Unique id of the order invoice
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Order_Item_Interface order Invoice item
 	 */
 	public function getItem( $id, array $ref = array())

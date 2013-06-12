@@ -170,6 +170,7 @@ class MShop_Locale_Manager_Language_Default
 	 * Create a Language object from a given Language ID/Key.
 	 *
 	 * @param string $id Language id to create the Language object
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Locale_Item_Language_Interface Language object
 	 * @throws MW_DB_Exception If language object couldn't be fetched
 	 * @throws MShop_Locale_Exception On failures with the language item object

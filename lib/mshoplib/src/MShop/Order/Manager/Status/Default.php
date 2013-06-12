@@ -172,6 +172,7 @@ class MShop_Order_Manager_Status_Default
 	* Returns the order status item specified by its ID.
 	*
 	* @param integer $id Id of item
+	* @param array $ref List of domains to fetch list items and referenced items for
 	* @return MShop_Order_Item_Status_Interface Item object
 	*/
 	public function getItem( $id, array $ref = array() )

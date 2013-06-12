@@ -175,6 +175,7 @@ class MShop_Locale_Manager_Currency_Default
 	 * Returns the currency object with the given currency ID.
 	 *
 	 * @param string $id Currency ID indentifying the currency object
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Locale_Item_Currency_Interface Currency object
 	 * @throws MShop_Locale_Exception If no currency object was found
 	 */

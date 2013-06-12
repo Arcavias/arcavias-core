@@ -204,6 +204,7 @@ class MAdmin_Job_Manager_Default
 	 * Creates the job object for the given job id.
 	 *
 	 * @param integer $id Job ID to fetch job object for
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MAdmin_Job_Item_Interface
 	 */
 	public function getItem( $id, array $ref = array() )
