@@ -68,6 +68,12 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 
 	initComponent : function()
 	{
+//		this.addEvents(
+//			'afterLoad'
+//		);
+//		
+//		this.on('afterLoad', this.afterLoad );
+		
 		this.initStore();
 
 		this.listTypeStore = MShop.GlobalStoreMgr.get( this.recordName + '_Type', 'Product' );
@@ -75,7 +81,7 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 
 		MShop.panel.AbstractUsedByListUi.superclass.initComponent.call( this );
 	},
-
+	
 	initStore: function()
 	{
 		this.store = new Ext.data.DirectStore( Ext.apply( {
@@ -97,10 +103,16 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 			root: 'items',
 			totalProperty: 'total',
 			idProperty: this.idProperty,
+			baseParams: {
+				start: 0,
+				limit: 2
+			},
 			sortInfo: this.sortInfo
 		}, this.storeConfig ) );
 
+		this.store.addEvents( 'afterload' );
 		this.store.on( 'beforeload', this.onBeforeLoad, this );
+		this.store.on( 'afterload', this.afterLoad, this ); //execute after list items were fetched
 		this.store.on( 'exception', this.onStoreException, this );
 		this.store.on( 'beforewrite', this.onBeforeWrite, this );
 	},
@@ -115,18 +127,28 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 
 		if ( !this.store.autoLoad ) {
 			this.store.load();
+			this.store.fireEvent('afterload', this.store);
 		}
-
+		
 		this.grid = new Ext.grid.GridPanel( Ext.apply( {
 			border: false,
 			store: this.store,
 			autoExpandColumn: this.autoExpandColumn,
-			columns: this.getColumns()
+			columns: this.getColumns(),
+			bbar: {
+				xtype: 'MShop.elements.pagingtoolbar',
+				store: this.store
+			}
 		}, this.gridConfig ) );
 
 		this.grid.on( 'rowdblclick', this.onOpenEditWindow.createDelegate( this, ['edit']), this );
 		this.add( this.grid );
 	},
+//	
+//	afterLoad: function( store )
+//	{
+//		console.log('abstract');
+//	},
 
 	onBeforeLoad: function( store, options )
 	{
@@ -154,9 +176,6 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 					'==' : refIdFilter
 			} ]
 		};
-		
-		options.params.start = 0;
-		options.params.limit = 0x7fffffff;
 	},
 
 	onBeforeWrite: function( store, action, records, options )
@@ -173,6 +192,7 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 		this.store.un( 'beforeload', this.onBeforeLoad, this );
 		this.store.un( 'beforewrite', this.onBeforeWrite, this );
 		this.store.un( 'exception', this.onStoreException, this );
+		this.store.un( 'afterload', this.afterLoad, this );
 
 		MShop.panel.AbstractUsedByListUi.superclass.onDestroy.apply( this, arguments );
 	},

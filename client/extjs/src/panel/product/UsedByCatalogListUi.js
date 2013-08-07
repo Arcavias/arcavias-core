@@ -28,12 +28,81 @@ MShop.panel.product.UsedByCatalogListUi = Ext.extend( MShop.panel.AbstractUsedBy
 	initComponent : function()
 	{
 		MShop.panel.product.UsedByCatalogListUi.superclass.initComponent.call( this );
-
+		this.initCatalogStore();
 		this.title = _( 'Category' );
-
-		this.catalogStore = MShop.GlobalStoreMgr.get( 'Catalog' );
 	},
-
+	
+	initCatalogStore: function() {
+//		
+//		var storeConfig = {};
+//		storeConfig.idProperty = 'catalog.id';
+//		
+//		this.catalogStore = new Ext.data.DirectStore(Ext.apply({
+//            autoLoad: false,
+//            remoteSort : false,
+//            hasMultiSort: true,
+//            fields: MShop.Schema.getRecord('Catalog'),
+//            api: {
+//                read    : MShop.API['Catalog'].searchItems,
+//                create  : MShop.API['Catalog'].saveItems,
+//                update  : MShop.API['Catalog'].saveItems,
+//                destroy : MShop.API['Catalog'].deleteItems
+//            },
+//            writer: new Ext.data.JsonWriter({
+//                writeAllFields: true,
+//                encode: false
+//            }),
+//            paramsAsHash: true,
+//            root: 'items',
+//            totalProperty: 'total',
+//            baseParams: {
+//                site: MShop.config.site["locale.site.code"]
+//            }
+//        }, storeConfig));
+//        
+//        var options = {};
+//        options.params = {};
+//        options.params.start = 0;
+//		options.params.limit = 0x7fffffff;
+//        
+//        this.catalogStore.load(options);
+	},
+	
+	afterLoad: function( store ) {
+		var storeConfig = {};
+		storeConfig.idProperty = 'catalog.id';
+		
+		this.catalogStore = new Ext.data.DirectStore(Ext.apply({
+            autoLoad: false,
+            remoteSort : false,
+            hasMultiSort: true,
+            fields: MShop.Schema.getRecord('Catalog'),
+            api: {
+                read    : MShop.API['Catalog'].searchItems,
+                create  : MShop.API['Catalog'].saveItems,
+                update  : MShop.API['Catalog'].saveItems,
+                destroy : MShop.API['Catalog'].deleteItems
+            },
+            writer: new Ext.data.JsonWriter({
+                writeAllFields: true,
+                encode: false
+            }),
+            paramsAsHash: true,
+            root: 'items',
+            totalProperty: 'total',
+            baseParams: {
+                site: MShop.config.site["locale.site.code"]
+            }
+        }, storeConfig));
+        
+        var options = {};
+        options.params = {};
+        options.params.start = 0;
+		options.params.limit = 0x7fffffff;
+        
+        this.catalogStore.load(options);
+	},
+	
 	onOpenEditWindow: function( action ) {
 		var record = this.grid.getSelectionModel().getSelected();
 		var parentRecord = this.catalogStore.getById( record.data[this.parentIdProperty] );

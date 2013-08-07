@@ -248,29 +248,4 @@ class Controller_ExtJS_Catalog_Default
 	{
 		return MShop_Catalog_Manager_Factory::createManager( $this->_context );
 	}
-
-
-	/**
-	 * Retrieves all items matching the given criteria.
-	 *
-	 * @param stdClass $params Associative array containing the parameters
-	 * @return array List of associative arrays with item properties, total number of items and success property
-	 */
-	public function searchItems( stdClass $params )
-	{
-		$this->_checkParams( $params, array( 'site' ) );
-		$this->_setLocale( $params->site );
-
-		$total = 0;
-		$search = $this->_initCriteria( $this->_getManager()->createSearch(), $params );
-		$search->setSlice( 0, 0x7fffffff );
-		$items = $this->_getManager()->searchItems( $search, array(), $total );
-
-
-		return array(
-				'items' => $this->_toArray( $items ),
-				'total' => $total,
-				'success' => true,
-		);
-	}
 }

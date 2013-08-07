@@ -12,7 +12,7 @@ MShop.elements.PagingToolbar = function(config) {
 		/**
 		 * @cfg {Number} page size (defaults to 50)
 		 */
-		pageSize: 50
+		pageSize: 2
 	});
 
 	MShop.elements.PagingToolbar.superclass.constructor.call(this, config);
@@ -48,6 +48,7 @@ MShop.elements.PagingToolbar = function(config) {
 		if(this.fireEvent('beforechange', this, o) !== false){
 			this.nextCursor = start;
 			this.store.load({params:o});
+			this.store.fireEvent('afterload', this.store);
 		}
 	},
 
