@@ -220,7 +220,7 @@ MShop.panel.AbstractItemUi = Ext.extend(Ext.Window, {
 	onAfterSave: function() {
 		this.isSaveing = false;
 		this.saveMask.hide();
-
+		this.store.fireEvent('reload', this.listUI, this.store );
 		this.close();
 	}
 });

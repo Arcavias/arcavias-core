@@ -368,10 +368,10 @@ abstract class Controller_ExtJS_Abstract
 	 * 	list of pairs. Each list of pairs contains the key "items" with the list of object properties and the key
 	 * 	"total" with the total number of items that are available in the storage
 	 */
-	protected function _getDomainItems( array $lists )
+	protected function _getDomainItems( array $lists, $parents = array() )
 	{
 		$result = array();
-
+		$items = array();
 		foreach( $lists as $domain => $ids )
 		{
 			$manager = $this->_getDomainManager( $domain );
@@ -389,6 +389,28 @@ abstract class Controller_ExtJS_Abstract
 
 			$result[ implode( '_', $parts ) ] = array(
 				'items' => $this->_toArray( $items ),
+				'total' => $total,
+			);
+		}
+		
+		foreach( $parents as $domain => $ids )
+		{
+			$manager = $this->_getDomainManager( $domain );
+			
+			$total = 0;
+			$criteria = $manager->createSearch();
+			$criteria->setConditions( $criteria->compare( '==', str_replace( '/', '.', $domain ) . '.id', $ids ) );
+			$criteria->setSlice(0, count($ids));
+			
+			$items = $manager->searchItems( $criteria, array(), $total );
+			
+			$parts = explode( '/', $domain );
+			foreach( $parts as $key => $part ) {
+				$parts[$key] = ucwords( $part );
+			}
+			
+			$result[ implode( '_', $parts ) ] = array(
+				'parentitems' => $this->_toArray( $items ),
 				'total' => $total,
 			);
 		}

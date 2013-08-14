@@ -13,6 +13,8 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 	idProperty : 'product.list.id',
 	siteidProperty : 'product.list.siteid',
 	itemUiXType : 'MShop.panel.product.itemui',
+	parentItemRecordName: 'Product',
+	parentItemIdProperty: 'product.id',
 
 	autoExpandColumn : 'product-list-autoexpand-column',
 
@@ -31,6 +33,24 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 
 		this.title = _( 'Used by' );
 	},
+	
+//	onOpenEditWindow: function( action ) {
+//		var record = this.grid.getSelectionModel().getSelected();
+//		var parentRecord = this.parentStore.getById( record.data[this.parentIdProperty] );
+//
+//		this.parentStore.reader.meta.root = 'items';
+//		delete this.parentStore.reader.ef;
+//		
+//		var itemUi = Ext.ComponentMgr.create( {
+//			xtype: this.itemUiXType,
+//			domain: this.domain,
+//			record: action === 'add' ? null : parentRecord,
+//			store: this.parentStore,
+//			listUI: this
+//		} );
+//
+//		itemUi.show();
+//	},
 
 	getColumns : function()
 	{
@@ -105,28 +125,28 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				header : _( 'Status' ),
 				sortable : false,
 				width : 50,
-				renderer : this.statusColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.status" ], true)
+				renderer : this.statusColumnRenderer.createDelegate(this, [this.parentStore, "product.status" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'product.list.parentid',
 				header : _( 'Product type' ),
 				sortable : false,
 				width : 100,
-				renderer : this.productTypeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, this.productTypeStore, "product.typeid", "product.type.label" ], true)
+				renderer : this.productTypeColumnRenderer.createDelegate(this, [this.parentStore, this.productTypeStore, "product.typeid", "product.type.label" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'product.list.parentid',
 				header : _( 'Product code' ),
 				sortable : false,
 				width : 100,
-				renderer : this.listTypeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.code" ], true)
+				renderer : this.listTypeColumnRenderer.createDelegate(this, [this.parentStore, "product.code" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'product.list.parentid',
 				header : _( 'Product label' ),
 				sortable : false,
 				id : 'product-list-autoexpand-column',
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.label" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.label" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'product.list.parentid',
@@ -134,7 +154,7 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 100,
 				hidden : true,
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.suppliercode" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.suppliercode" ], true)
 			}, {
 				xtype : 'datecolumn',
 				dataIndex : 'product.list.parentid',
@@ -143,7 +163,7 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 120,
 				hidden : true,
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.datestart" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.datestart" ], true)
 			}, {
 				xtype : 'datecolumn',
 				dataIndex : 'product.list.parentid',
@@ -152,7 +172,7 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 120,
 				hidden : true,
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.dateend" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.dateend" ], true)
 			}, {
 				xtype : 'datecolumn',
 				dataIndex : 'product.list.parentid',
@@ -161,7 +181,7 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 120,
 				hidden : true,
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.mtime" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.mtime" ], true)
 			}, {
 				xtype : 'datecolumn',
 				dataIndex : 'product.list.parentid',
@@ -170,7 +190,7 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 120,
 				hidden : true,
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.ctime" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.ctime" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'product.list.parentid',
@@ -178,7 +198,7 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 100,
 				hidden : true,
-				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.ParentItemUi.store, "product.editor" ], true)
+				renderer : MShop.panel.AbstractListUi.prototype.typeColumnRenderer.createDelegate(this, [this.parentStore, "product.editor" ], true)
 			}
 		];
 	}

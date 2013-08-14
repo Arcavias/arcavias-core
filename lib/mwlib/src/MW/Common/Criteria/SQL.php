@@ -20,7 +20,7 @@ class MW_Common_Criteria_SQL extends MW_Common_Criteria_Abstract
 	private $_conditions;
 	private $_sortations = array();
 	private $_sliceStart = 0;
-	private $_sliceSize = 1;
+	private $_sliceSize = 100;
 	private $_conn = null;
 
 
