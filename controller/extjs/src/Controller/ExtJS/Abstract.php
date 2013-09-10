@@ -372,6 +372,7 @@ abstract class Controller_ExtJS_Abstract
 	{
 		$result = array();
 		$items = array();
+
 		foreach( $lists as $domain => $ids )
 		{
 			$manager = $this->_getDomainManager( $domain );
@@ -392,23 +393,23 @@ abstract class Controller_ExtJS_Abstract
 				'total' => $total,
 			);
 		}
-		
+
 		foreach( $parents as $domain => $ids )
 		{
 			$manager = $this->_getDomainManager( $domain );
-			
+
 			$total = 0;
 			$criteria = $manager->createSearch();
 			$criteria->setConditions( $criteria->compare( '==', str_replace( '/', '.', $domain ) . '.id', $ids ) );
 			$criteria->setSlice(0, count($ids));
-			
+
 			$items = $manager->searchItems( $criteria, array(), $total );
-			
+
 			$parts = explode( '/', $domain );
 			foreach( $parts as $key => $part ) {
 				$parts[$key] = ucwords( $part );
 			}
-			
+
 			$result[ implode( '_', $parts ) ] = array(
 				'parentitems' => $this->_toArray( $items ),
 				'total' => $total,

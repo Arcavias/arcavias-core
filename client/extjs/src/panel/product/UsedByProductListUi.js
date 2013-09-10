@@ -34,24 +34,6 @@ MShop.panel.product.UsedByProductListUi = Ext.extend( MShop.panel.AbstractUsedBy
 		this.title = _( 'Used by' );
 	},
 	
-//	onOpenEditWindow: function( action ) {
-//		var record = this.grid.getSelectionModel().getSelected();
-//		var parentRecord = this.parentStore.getById( record.data[this.parentIdProperty] );
-//
-//		this.parentStore.reader.meta.root = 'items';
-//		delete this.parentStore.reader.ef;
-//		
-//		var itemUi = Ext.ComponentMgr.create( {
-//			xtype: this.itemUiXType,
-//			domain: this.domain,
-//			record: action === 'add' ? null : parentRecord,
-//			store: this.parentStore,
-//			listUI: this
-//		} );
-//
-//		itemUi.show();
-//	},
-
 	getColumns : function()
 	{
 		return [

@@ -188,7 +188,6 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 			this.setDomainProperty( store, action, records, options );
 		}
 	},
-	
 		
 	onLoaded: function( store, records, options)
 	{
