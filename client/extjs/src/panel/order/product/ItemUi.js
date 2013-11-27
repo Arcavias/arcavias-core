@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -60,6 +59,10 @@ MShop.panel.order.product.ItemUi = Ext.extend( MShop.panel.AbstractItemUi, {
 							name : 'order.base.product.id'
 						}, {
 							xtype : 'displayfield',
+							fieldLabel : _( 'Product ID' ),
+							name : 'order.base.product.productid'
+						}, {
+							xtype : 'displayfield',
 							fieldLabel : _( 'Order Product ID' ),
 							name : 'order.base.product.orderproductid'
 						}, {
@@ -84,8 +87,8 @@ MShop.panel.order.product.ItemUi = Ext.extend( MShop.panel.AbstractItemUi, {
 							name : 'order.base.product.price'
 						}, {
 							xtype : 'displayfield',
-							fieldLabel : _( 'Shipping' ),
-							name : 'order.base.product.shipping'
+							fieldLabel : _( 'Costs' ),
+							name : 'order.base.product.costs'
 						}, {
 							xtype : 'displayfield',
 							fieldLabel : _( 'Rebate' ),

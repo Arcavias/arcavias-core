@@ -3,10 +3,16 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14509 2011-12-20 16:06:38Z nsendetzky $
  */
 
 return array(
+	'aggregate' => '
+		SELECT :key AS "key", COUNT(*) AS "count"
+		FROM "mshop_product" mpro
+		:joins
+		WHERE :cond
+		GROUP BY :key
+	',
 	'item' => array(
 		'search' => '
 			SELECT DISTINCT mpro."id"

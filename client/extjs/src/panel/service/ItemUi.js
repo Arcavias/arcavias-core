@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14740 2012-01-09 10:41:19Z nsendetzky $
  */
 
 
@@ -16,7 +15,7 @@ MShop.panel.service.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 
 	initComponent : function() {
 		this.title = _('Service item details');
-		var that = this;
+		
 		this.items = [ {
 			xtype : 'tabpanel',
 			activeTab : 0,
@@ -76,6 +75,7 @@ MShop.panel.service.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 							fieldLabel : _('Code'),
 							name : 'service.code',
 							allowBlank : false,
+							maxLength : 32,
 							emptyText : _('Unique service code (required)')
 						}, {
 							xtype : 'textfield',

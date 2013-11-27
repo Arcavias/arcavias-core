@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14341 2011-12-14 16:00:50Z nsendetzky $
  */
 
 
@@ -116,8 +115,8 @@ MShop.panel.price.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 							value : '0.00'
 						}, {
 							xtype : 'ux.decimalfield',
-							fieldLabel : 'Shipping costs per item',
-							name : 'price.shipping',
+							fieldLabel : 'Costs per item',
+							name : 'price.costs',
 							allowBlank : false,
 							value : '0.00'
 						}, {

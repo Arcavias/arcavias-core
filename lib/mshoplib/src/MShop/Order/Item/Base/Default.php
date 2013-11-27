@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Default.php 14432 2011-12-19 09:30:25Z nsendetzky $
  */
 
 
@@ -162,7 +161,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	 */
 	public function getCustomerId()
 	{
-		return ( isset( $this->_values['customerid'] ) ? (string) $this->_values['customerid'] : null );
+		return ( isset( $this->_values['customerid'] ) ? (string) $this->_values['customerid'] : '' );
 	}
 
 
@@ -175,12 +174,12 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	{
 		if ( $customerid === $this->getCustomerId() ) { return; }
 
-		$this->_notifyListeners( 'setUserId.before', $customerid );
+		$this->_notifyListeners( 'setCustomerId.before', $customerid );
 
 		$this->_values['customerid'] = (string) $customerid;
 		$this->_modified = true;
 
-		$this->_notifyListeners( 'setUserId.after', $customerid );
+		$this->_notifyListeners( 'setCustomerId.after', $customerid );
 	}
 
 
@@ -247,7 +246,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	 * @param MShop_Order_Item_Base_Product_Interface $item Order product item to be added
 	 * @param integer|null $position position of the new order product item
 	 */
-	public function addProduct( MShop_Order_Item_Base_Product_Interface $item, $position=null )
+	public function addProduct( MShop_Order_Item_Base_Product_Interface $item, $position = null )
 	{
 		$this->_checkProduct( $item );
 		$this->_checkPrice( $item->getPrice() );
@@ -256,15 +255,16 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 
 		try
 		{
-			$product = $this->_getSameProduct( $item );
-			$product->setQuantity( $product->getQuantity() + $item->getQuantity() );
+			$quantity = $item->getQuantity();
+			$item = $this->_getSameProduct( $item );
+			$item->setQuantity( $item->getQuantity() + $quantity );
 		}
 		catch( MShop_Order_Exception $e )
 		{
-			if( is_null( $position ) ) {
-				$this->_products[] = $item;
+			if( $position !== null ) {
+				array_splice( $this->_products, $position, 0, array( $item ) );
 			} else {
-				array_splice($this->_products, $position, 0, array( $item ));
+				$this->_products[] = $item;
 			}
 		}
 
@@ -312,7 +312,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	 * @param string $domain Address domain, usually "billing" or "delivery"
 	 * @return MShop_Order_Item_Base_Address_Interface Order address item for the requested domain
 	 */
-	public function getAddress($domain = MShop_Order_Item_Base_Address_Abstract::TYPE_BILLING)
+	public function getAddress($domain = MShop_Order_Item_Base_Address_Abstract::TYPE_PAYMENT)
 	{
 		if(!isset($this->_addresses[$domain])) {
 			throw new MShop_Order_Exception( sprintf( 'Address for domain "%1$s" not available', $domain ) );
@@ -329,7 +329,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	 * @param string $domain Address domain, usually "billing" or "delivery"
 	 */
 	public function setAddress(MShop_Order_Item_Base_Address_Interface $address,
-		$domain = MShop_Order_Item_Base_Address_Abstract::TYPE_BILLING)
+		$domain = MShop_Order_Item_Base_Address_Abstract::TYPE_PAYMENT)
 	{
 		if ( isset( $this->_addresses[ $domain ] ) && $this->_addresses[ $domain ] === $address ) { return; }
 
@@ -503,14 +503,13 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	{
 		$this->_checkParts( $what );
 
-		$this->_notifyListeners( 'isComplete.before', $what );
+		$this->_notifyListeners( 'check.before', $what );
 
-		if( ( $what & MShop_Order_Item_Base_Abstract::PARTS_PRODUCT ) && ( count($this->_products) < 1 ) )
-		{
+		if( ( $what & MShop_Order_Item_Base_Abstract::PARTS_PRODUCT ) && ( count($this->_products) < 1 ) ) {
 			throw new MShop_Order_Exception( sprintf( 'Basket empty' ) );
 		}
 
-		$this->_notifyListeners( 'isComplete.after', $what );
+		$this->_notifyListeners( 'check.after', $what );
 	}
 
 
@@ -526,16 +525,16 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 
 
 	/**
-	 * Returns a price item with amounts calculated for the products, shipping costs, etc.
+	 * Returns a price item with amounts calculated for the products, costs, etc.
 	 *
-	 * @return MShop_Price_Item_Interface Price item with price, shipping and rebate the customer has to pay
+	 * @return MShop_Price_Item_Interface Price item with price, costs and rebate the customer has to pay
 	 */
 	public function getPrice()
 	{
 		if( $this->_modified !== false )
 		{
 			$this->_price->setValue( '0.00' );
-			$this->_price->setShipping( '0.00' );
+			$this->_price->setCosts( '0.00' );
 			$this->_price->setRebate( '0.00' );
 			$this->_price->setTaxRate( '0.00' );
 
@@ -626,7 +625,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 			'order.base.comment' => $this->getComment(),
 			'order.base.customerid' => $this->getCustomerId(),
 			'order.base.price' => $price->getValue(),
-			'order.base.shipping' => $price->getShipping(),
+			'order.base.costs' => $price->getCosts(),
 			'order.base.rebate' => $price->getRebate(),
 			'order.base.currencyid' => $price->getCurrencyId(),
 			'order.base.status' => $this->getStatus(),
@@ -713,7 +712,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 				continue;
 			}
 
-			if( $product->getPrice()->getShipping() !== $item->getPrice()->getShipping() ) {
+			if( $product->getPrice()->getCosts() !== $item->getPrice()->getCosts() ) {
 				continue;
 			}
 

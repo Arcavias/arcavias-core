@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Catalog
- * @version $Id: Default.php 14874 2012-01-15 17:19:41Z nsendetzky $
  */
 
 
@@ -338,10 +337,25 @@ class MShop_Catalog_Manager_Default
 
 
 	/**
+	 * Removes multiple items specified by ids in the array.
+	 *
+	 * @param array $ids List of IDs
+	 */
+	public function deleteItems( array $ids )
+	{
+		foreach( $ids as $id ) {
+			$this->deleteItem( $id );
+		}
+	}
+
+
+	/**
 	 * Returns the item specified by its ID.
 	 *
-	 * @param integer $id Id of item
-	 * @return MShop_Common_Item_Interface Item object
+	 * @param integer $id Unique ID of the catalog item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Catalog_Item_Interface Returns the catalog item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -470,13 +484,13 @@ class MShop_Catalog_Manager_Default
 	 */
 	public function searchItems( MW_Common_Criteria_Interface $search, array $ref = array(), &$total = null )
 	{
+		$nodeMap = $siteMap = array();
 		$dbm = $this->_getContext()->getDatabaseManager();
 		$conn = $dbm->acquire();
-		$map = array();
 
 		try
 		{
-			$level = MShop_Locale_Manager_Abstract::SITE_ONE;
+			$level = MShop_Locale_Manager_Abstract::SITE_PATH;
 			$cfgPathSearch = 'mshop/catalog/manager/default/item/search-item';
 			$cfgPathCount = 'mshop/catalog/manager/default/item/count';
 			$required = array( 'catalog' );
@@ -484,7 +498,18 @@ class MShop_Catalog_Manager_Default
 			$results = $this->_searchItems( $conn, $search, $cfgPathSearch, $cfgPathCount, $required, $total, $level );
 
 			while( ( $row = $results->fetch() ) !== false ) {
-				$map[ $row['id'] ] = new MW_Tree_Node_Default( $row );
+				$siteMap[ $row['siteid'] ][ $row['id'] ] = new MW_Tree_Node_Default( $row );
+			}
+
+			$sitePath = array_reverse( $this->_getContext()->getLocale()->getSitePath() );
+
+			foreach( $sitePath as $siteId )
+			{
+				if( isset( $siteMap[$siteId] ) && !empty( $siteMap[$siteId] ) )
+				{
+					$nodeMap = $siteMap[$siteId];
+					break;
+				}
 			}
 
 			$dbm->release( $conn );
@@ -495,7 +520,7 @@ class MShop_Catalog_Manager_Default
 			throw $e;
 		}
 
-		return $this->_buildItems( $map, $ref, 'catalog' );
+		return $this->_buildItems( $nodeMap, $ref, 'catalog' );
 	}
 
 
@@ -508,15 +533,20 @@ class MShop_Catalog_Manager_Default
 	 */
 	public function getPath( $id, array $ref = array() )
 	{
-		$itemMap = array();
 		$sitePath = array_reverse( $this->_getContext()->getLocale()->getSitePath() );
 
 		foreach( $sitePath as $siteId )
 		{
-			$path = $this->_createTreeManager( $siteId )->getPath( $id );
+			try {
+				$path = $this->_createTreeManager( $siteId )->getPath( $id );
+			} catch( Exception $e ) {
+				continue;
+			}
 
 			if( !empty( $path ) )
 			{
+				$itemMap = array();
+
 				foreach ( $path as $node ) {
 					$itemMap[ $node->getId() ] = $node;
 				}
@@ -525,7 +555,7 @@ class MShop_Catalog_Manager_Default
 			}
 		}
 
-		return array();
+		throw new MShop_Catalog_Exception( sprintf( 'Catalog path for ID "%1$s" not found', $id ) );
 	}
 
 
@@ -544,45 +574,45 @@ class MShop_Catalog_Manager_Default
 
 		foreach( $sitePath as $siteId )
 		{
-			try
-			{
-				$treeMgr = $this->_createTreeManager( $siteId );
-				$node = $treeMgr->getNode( $id, $level, $criteria );
-
-				$listItems = $listItemMap = $refIdMap = array();
-				$nodeMap = $this->_getNodeMap( $node );
-
-				if( count( $ref ) > 0 ) {
-					$listItems = $this->_getListItems( array_keys( $nodeMap ), $ref, 'catalog' );
-				}
-
-				foreach( $listItems as $listItem )
-				{
-					$domain = $listItem->getDomain();
-					$parentid = $listItem->getParentId();
-
-					$listItemMap[ $parentid ][ $domain ][ $listItem->getId() ] = $listItem;
-					$refIdMap[ $domain ][ $listItem->getRefId() ][] = $parentid;
-				}
-
-				$refItemMap = $this->_getRefItems( $refIdMap );
-
-				$listItems = array();
-				if ( array_key_exists( $id, $listItemMap ) ) {
-					$listItems = $listItemMap[ $id ];
-				}
-
-				$refItems = array();
-				if ( array_key_exists( $id, $refItemMap ) ) {
-					$refItems = $refItemMap[ $id ];
-				}
-
-				$item = $this->_createItem( $node, array(), $listItems, $refItems );
-				$this->_createTree( $node, $item, $listItemMap, $refItemMap );
-
-				return $item;
+			try {
+				$node = $this->_createTreeManager( $siteId )->getNode( $id, $level, $criteria );
+			} catch( Exception $e ) {
+				continue;
 			}
-			catch( Exception $e ) { ; }
+
+			$listItems = $listItemMap = $refIdMap = array();
+			$nodeMap = $this->_getNodeMap( $node );
+
+			if( count( $ref ) > 0 ) {
+				$listItems = $this->_getListItems( array_keys( $nodeMap ), $ref, 'catalog' );
+			}
+
+			foreach( $listItems as $listItem )
+			{
+				$domain = $listItem->getDomain();
+				$parentid = $listItem->getParentId();
+
+				$listItemMap[ $parentid ][ $domain ][ $listItem->getId() ] = $listItem;
+				$refIdMap[ $domain ][ $listItem->getRefId() ][] = $parentid;
+			}
+
+			$refItemMap = $this->_getRefItems( $refIdMap );
+			$nodeid = $node->getId();
+
+			$listItems = array();
+			if ( array_key_exists( $nodeid, $listItemMap ) ) {
+				$listItems = $listItemMap[ $nodeid ];
+			}
+
+			$refItems = array();
+			if ( array_key_exists( $nodeid, $refItemMap ) ) {
+				$refItems = $refItemMap[ $nodeid ];
+			}
+
+			$item = $this->_createItem( $node, array(), $listItems, $refItems );
+			$this->_createTree( $node, $item, $listItemMap, $refItemMap );
+
+			return $item;
 		}
 
 		throw new MShop_Catalog_Exception( sprintf( 'Catalog node for ID "%1$s" not available', $id ) );
@@ -730,6 +760,7 @@ class MShop_Catalog_Manager_Default
 				'move-right' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/move-right' ) ),
 				'search' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/search' ) ),
 				'update' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/update' ) ),
+				'update-parentid' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/update-parentid' ) ),
 				'newid' => $config->get( 'mshop/catalog/manager/default/item/newid' ),
 			);
 

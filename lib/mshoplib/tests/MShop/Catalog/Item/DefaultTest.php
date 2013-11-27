@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14869 2012-01-13 17:30:30Z nsendetzky $
  */
 
 /**
@@ -11,9 +10,9 @@
  */
 class MShop_Catalog_Item_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_values;
-	protected $_listItems;
+	private $_object;
+	private $_values;
+	private $_listItems;
 
 
 	/**
@@ -51,7 +50,8 @@ class MShop_Catalog_Item_DefaultTest extends MW_Unittest_Testcase
 			'siteid' => '99',
 			'mtime' => '2011-01-01 00:00:02',
 			'ctime' => '2011-01-01 00:00:01',
-			'editor' => 'unitTestUser'
+			'editor' => 'unitTestUser',
+			'hasChildren' => true
 		);
 
 		$this->_node = new MW_Tree_Node_Default( $this->_values );
@@ -192,6 +192,7 @@ class MShop_Catalog_Item_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $this->_values['ctime'], $values['catalog.ctime']);
 		$this->assertEquals( $this->_values['mtime'], $values['catalog.mtime']);
 		$this->assertEquals( $this->_values['editor'], $values['catalog.editor']);
+		$this->assertEquals( $this->_values['hasChildren'], $values['catalog.hasChildren']);
 	}
 
 

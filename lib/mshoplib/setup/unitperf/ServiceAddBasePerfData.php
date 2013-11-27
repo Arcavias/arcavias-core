@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ProductAddBasePerfData.php 1316 2012-10-19 19:49:23Z nsendetzky $
  */
 
 
@@ -91,6 +90,8 @@ class MW_Setup_Task_ServiceAddBasePerfData extends MW_Setup_Task_Abstract
 			$item->setId( null );
 			$item->setCode( $code );
 			$item->setLabel( 'Payment service ' . $code );
+			$item->setPosition( $i );
+
 			$manager->saveItem( $item, false );
 		}
 
@@ -123,6 +124,8 @@ class MW_Setup_Task_ServiceAddBasePerfData extends MW_Setup_Task_Abstract
 			$item->setId( null );
 			$item->setCode( $code );
 			$item->setLabel( 'Delivery service ' . $code );
+			$item->setPosition( $i );
+
 			$manager->saveItem( $item, false );
 		}
 

@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14818 2012-01-12 09:53:56Z spopp $
  */
 
 
@@ -13,10 +12,10 @@
  */
 class MShop_Order_Item_Base_Service_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_values;
-	protected $_price;
-	protected $_attribute = array();
+	private $_object;
+	private $_values;
+	private $_price;
+	private $_attribute = array();
 
 
 	public static function main()
@@ -162,7 +161,7 @@ class MShop_Order_Item_Base_Service_DefaultTest extends MW_Unittest_Testcase
 
 	public function testSetPrice()
 	{
-		$this->_price->setShipping( '5.00' );
+		$this->_price->setCosts( '5.00' );
 		$this->_object->setPrice( $this->_price );
 		$this->assertFalse( $this->_object->isModified() );
 		$this->assertSame($this->_price, $this->_object->getPrice());
@@ -181,15 +180,37 @@ class MShop_Order_Item_Base_Service_DefaultTest extends MW_Unittest_Testcase
 		$attrItem002->setCode( 'code_002');
 		$attrItem002->setValue( 'value_002');
 
-		$list = array(
-			$attrItem001,
-			$attrItem002,
-		);
-
-		$this->_object->setAttributes( $list );
+		$this->_object->setAttributes( array( $attrItem001, $attrItem002 ) );
 
 		$result = $this->_object->getAttribute( 'code_001' );
 		$this->assertEquals( 'value_001', $result );
+
+		$result = $this->_object->getAttribute( 'code_003' );
+		$this->assertEquals( null, $result );
+
+		$this->_object->setAttributes( array() );
+
+		$result = $this->_object->getAttribute( 'code_001' );
+		$this->assertEquals( null, $result );
+	}
+
+	public function testGetAttributeItem()
+	{
+		$manager = MShop_Order_Manager_Factory::createManager( TestHelper::getContext() );
+		$attManager = $manager->getSubManager( 'base' )->getSubManager( 'service' )->getSubManager( 'attribute' );
+
+		$attrItem001 = $attManager->createItem();
+		$attrItem001->setCode( 'code_001');
+		$attrItem001->setValue( 'value_001');
+
+		$attrItem002 = $attManager->createItem();
+		$attrItem002->setCode( 'code_002');
+		$attrItem002->setValue( 'value_002');
+
+		$this->_object->setAttributes( array( $attrItem001, $attrItem002 ) );
+
+		$result = $this->_object->getAttributeItem( 'code_001' );
+		$this->assertEquals( 'value_001', $result->getValue() );
 
 		$result = $this->_object->getAttribute( 'code_003' );
 		$this->assertEquals( null, $result );
@@ -254,7 +275,7 @@ class MShop_Order_Item_Base_Service_DefaultTest extends MW_Unittest_Testcase
 
 		$price = $this->_object->getPrice();
 		$this->assertEquals( $price->getValue(), $arrayObject['order.base.service.price'] );
-		$this->assertEquals( $price->getShipping(), $arrayObject['order.base.service.shipping'] );
+		$this->assertEquals( $price->getCosts(), $arrayObject['order.base.service.costs'] );
 		$this->assertEquals( $price->getRebate(), $arrayObject['order.base.service.rebate'] );
 		$this->assertEquals( $price->getTaxRate(), $arrayObject['order.base.service.taxrate'] );
 	}

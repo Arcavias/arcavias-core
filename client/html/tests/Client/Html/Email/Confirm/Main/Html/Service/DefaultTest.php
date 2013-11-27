@@ -7,8 +7,8 @@
 
 class Client_Html_Email_Confirm_Main_Html_Service_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -66,7 +66,7 @@ class Client_Html_Email_Confirm_Main_Html_Service_DefaultTest extends MW_Unittes
 		$this->_object->setView( $this->_getView() );
 
 		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( '<div class="email-confirm-main-service">', $output );
+		$this->assertStringStartsWith( '<div class="common-summary-service container">', $output );
 	}
 
 

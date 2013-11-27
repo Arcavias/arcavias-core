@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id$
  */
 
 
 class Controller_ExtJS_Plugin_Decorator_ExampleTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**

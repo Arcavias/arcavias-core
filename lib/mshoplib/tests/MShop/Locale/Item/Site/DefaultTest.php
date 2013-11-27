@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14852 2012-01-13 12:24:15Z doleiynyk $
  */
 
 /**
@@ -12,8 +11,8 @@
 class MShop_Locale_Item_Site_DefaultTest extends MW_Unittest_Testcase
 {
 
-	protected $_object;
-	protected $_value;
+	private $_object;
+	private $_value;
 
 
 	protected function setUp()

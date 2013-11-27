@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Supplier
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -300,28 +299,14 @@ class MShop_Supplier_Manager_Default
 
 
 	/**
-	 * Deletes a supplier item object from the permanent storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Unique supplier ID referencing an existing supplier
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem($id)
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/supplier/manager/default/item/delete');
-			$stmt->bind(1, $id, MW_DB_Statement_Abstract::PARAM_INT);
-			$result = $stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/supplier/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -329,6 +314,9 @@ class MShop_Supplier_Manager_Default
 	 * Returns the supplier item object specificed by its ID.
 	 *
 	 * @param integer $id Unique supplier ID referencing an existing supplier
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Supplier_Item_Interface Returns the supplier item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

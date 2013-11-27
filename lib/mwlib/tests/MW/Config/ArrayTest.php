@@ -5,7 +5,6 @@
  *
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
- * @version $Id$
  */
 class MW_Config_ArrayTest extends MW_Unittest_Testcase
 {
@@ -13,7 +12,7 @@ class MW_Config_ArrayTest extends MW_Unittest_Testcase
 	 * @var    MW_Config_Array
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
 	/**
 	 * Runs the test methods of this class.

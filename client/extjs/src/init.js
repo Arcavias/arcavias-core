@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: init.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -21,8 +20,11 @@ Ext.onReady(function() {
         'useNamedParams'    : true
     }));
     
-    // init schemas
-    MShop.Schema.register(MShop.config.itemschema, MShop.config.searchschema);
+	// init schemas
+	MShop.Schema.register(MShop.config.itemschema, MShop.config.searchschema);
+    
+	//init configs
+	MShop.Config.init(MShop.config.configuration);
     
     // no endswith textfilters operators
     Ext.ux.AdvancedSearch.TextFilter.prototype.operators = ['equals', 'contains', 'startswith'];

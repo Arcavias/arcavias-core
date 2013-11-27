@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -148,21 +147,21 @@ interface MShop_Order_Item_Base_Product_Interface extends MShop_Common_Item_Inte
 	/**
 	 * Returns the stored price item for the selected product and package.
 	 *
-	 * @return MShop_Price_Item_Interface Price item with price, shipping and rebate
+	 * @return MShop_Price_Item_Interface Price item with price, additional costs and rebate
 	 */
 	public function getPrice();
 
 	/**
 	 * Sets the new price item for the selected product and package.
 	 *
-	 * @param MShop_Price_Item_Interface $price Price item containing price and shipping costs
+	 * @param MShop_Price_Item_Interface $price Price item containing price and additional costs
 	 */
 	public function setPrice( MShop_Price_Item_Interface $price );
 
 	/**
 	 * Returns the price item for the product whose values are multiplied with the quantity.
 	 *
-	 * @return MShop_Price_Item_Interface Price item with price, shipping and rebate
+	 * @return MShop_Price_Item_Interface Price item with price, additional costs and rebate
 	 */
 	public function getSumPrice();
 
@@ -209,9 +208,17 @@ interface MShop_Order_Item_Base_Product_Interface extends MShop_Common_Item_Inte
 	 * Returns the value of the attribute item for the ordered product with the given code.
 	 *
 	 * @param string $code code of the product attribute item.
-	 * @return string|null value of the attribute item for the ordered product and the given code
+	 * @return string|null Value of the attribute item for the ordered product and the given code
 	 */
 	public function getAttribute( $code );
+
+	/**
+	 * Returns the attribute item for the ordered product with the given code.
+	 *
+	 * @param string $code code of the product attribute item.
+	 * @return MShop_Order_Item_Base_Product_Attribute_Interface|null Attribute item for the ordered product and the given code
+	 */
+	public function getAttributeItem( $code );
 
 	/**
 	 * Returns the list of attribute items for the ordered product.

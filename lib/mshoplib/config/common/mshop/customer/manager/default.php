@@ -3,14 +3,14 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14682 2012-01-04 11:30:14Z nsendetzky $
  */
 
 return array(
 	'item' => array(
 		'delete' => '
 			DELETE FROM "mshop_customer"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'insert' => '
 			INSERT INTO "mshop_customer" ("siteid", "label", "code", "company", "salutation", "title",

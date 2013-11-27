@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Catalog
- * @version $Id: Default.php 14869 2012-01-13 17:30:30Z nsendetzky $
  */
 
 
@@ -150,6 +149,8 @@ class MShop_Catalog_Item_Default
 	 */
 	public function setCode( $name )
 	{
+		$this->_checkCode( $name );
+
 		$this->_node->setCode( $name );
 	}
 
@@ -226,6 +227,7 @@ class MShop_Catalog_Item_Default
 			'catalog.ctime' => $this->_node->__get('ctime'),
 			'catalog.mtime' => $this->_node->__get('mtime'),
 			'catalog.editor' => $this->_node->__get('editor'),
+			'catalog.hasChildren' => $this->hasChildren()
 		);
 	}
 
@@ -272,7 +274,11 @@ class MShop_Catalog_Item_Default
 	 */
 	public function hasChildren()
 	{
-		return ( count( $this->_children ) > 0 ? true : false );
+		if( count( $this->_children ) > 0 ) {
+			return true;
+		}
+
+		return $this->_node->hasChildren();
 	}
 
 	/**

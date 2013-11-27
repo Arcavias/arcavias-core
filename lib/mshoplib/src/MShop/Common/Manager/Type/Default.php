@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Default.php 14411 2011-12-17 14:02:37Z nsendetzky $
  */
 
 
@@ -161,27 +160,13 @@ class MShop_Common_Manager_Type_Default
 
 
 	/**
-	 * Deletes the type item object specified by its ID.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Id of the type item object
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_context->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, $this->_prefix . 'delete', $this->_config['delete']);
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$result = $stmt->execute()->finish();
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$this->_deleteItems( $ids, $this->_config['delete'] );
 	}
 
 
@@ -189,7 +174,9 @@ class MShop_Common_Manager_Type_Default
 	 * Returns the type item specified by its ID
 	 *
 	 * @param integer $id Id of type item object
-	 * @return MShop_Common_Item_Type_Interface Type item object
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Common_Item_Type_Interface Returns the type item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -230,8 +217,8 @@ class MShop_Common_Manager_Type_Default
 			}
 
 			$level = MShop_Locale_Manager_Abstract::SITE_ALL;
-			$cfgPathSearch = 'mshop/' . $topdomain . '/manager/' . implode( '/', $domain ) . '/default/item/search';
-			$cfgPathCount =  'mshop/' . $topdomain . '/manager/' . implode( '/', $domain ) . '/default/item/count';
+			$cfgPathSearch = $this->_config['search'];
+			$cfgPathCount =  $this->_config['count'];
 			$required = array( trim( $this->_prefix, '.' ) );
 
 			$results = $this->_searchItems( $conn, $search, $cfgPathSearch, $cfgPathCount, $required, $total, $level );

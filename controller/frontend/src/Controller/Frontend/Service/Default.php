@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage Frontend
- * @version $Id: Default.php 1116 2012-08-13 08:17:32Z nsendetzky $
  */
 
 
@@ -19,24 +18,8 @@ class Controller_Frontend_Service_Default
 	extends Controller_Frontend_Abstract
 	implements Controller_Frontend_Service_Interface
 {
-	private $_serviceManager;
 	private $_items = array();
 	private $_providers = array();
-
-
-	/**
-	 * Initializes the frontend controller.
-	 *
-	 * @param MShop_Context_Item_Interface $context Object storing the required instances for managing databases
-	 *  connections, logger, session, etc.
-	 * @throws Exception If an error occurs
-	 */
-	public function __construct( MShop_Context_Item_Interface $context )
-	{
-		parent::__construct( $context );
-
-		$this->_serviceManager = MShop_Service_Manager_Factory::createManager( $context );
-	}
 
 
 	/**
@@ -55,7 +38,9 @@ class Controller_Frontend_Service_Default
 			return $this->_items[$type];
 		}
 
-		$search = $this->_serviceManager->createSearch( true );
+		$serviceManager = MShop_Factory::createManager( $this->_getContext(), 'service' );
+
+		$search = $serviceManager->createSearch( true );
 		$expr = array(
 			$search->getConditions(),
 			$search->compare( '==', 'service.type.domain', 'service' ),
@@ -64,14 +49,14 @@ class Controller_Frontend_Service_Default
 		$search->setConditions( $search->combine( '&&', $expr ) );
 		$search->setSortations( array( $search->sort( '+', 'service.position' ) ) );
 
-		$this->_items[$type] = $this->_serviceManager->searchItems( $search, $ref );
+		$this->_items[$type] = $serviceManager->searchItems( $search, $ref );
 
 
 		foreach( $this->_items[$type] as $id => $service )
 		{
 			try
 			{
-				$provider = $this->_serviceManager->getProvider( $service );
+				$provider = $serviceManager->getProvider( $service );
 
 				if( $provider->isAvailable( $basket ) ) {
 					$this->_providers[$type][$id] = $provider;
@@ -107,7 +92,9 @@ class Controller_Frontend_Service_Default
 		}
 
 		$item = $this->_getServiceItem( $type, $serviceId );
-		return $this->_serviceManager->getProvider( $item )->getConfigFE( $basket );
+		$serviceManager = MShop_Factory::createManager( $this->_getContext(), 'service' );
+
+		return $serviceManager->getProvider( $item )->getConfigFE( $basket );
 	}
 
 
@@ -129,7 +116,9 @@ class Controller_Frontend_Service_Default
 		}
 
 		$item = $this->_getServiceItem( $type, $serviceId );
-		return $this->_serviceManager->getProvider( $item )->calcPrice( $basket );
+		$serviceManager = MShop_Factory::createManager( $this->_getContext(), 'service' );
+
+		return $serviceManager->getProvider( $item )->calcPrice( $basket );
 	}
 
 
@@ -151,7 +140,9 @@ class Controller_Frontend_Service_Default
 		}
 
 		$item = $this->_getServiceItem( $type, $serviceId );
-		return $this->_serviceManager->getProvider( $item )->checkConfigFE( $attributes );
+		$serviceManager = MShop_Factory::createManager( $this->_getContext(), 'service' );
+
+		return $serviceManager->getProvider( $item )->checkConfigFE( $attributes );
 	}
 
 
@@ -164,7 +155,9 @@ class Controller_Frontend_Service_Default
 	 */
 	protected function _getServiceItem( $type, $serviceId )
 	{
-		$search = $this->_serviceManager->createSearch( true );
+		$serviceManager = MShop_Factory::createManager( $this->_getContext(), 'service' );
+
+		$search = $serviceManager->createSearch( true );
 		$expr = array(
 			$search->getConditions(),
 			$search->compare( '==', 'service.id', $serviceId ),
@@ -173,11 +166,11 @@ class Controller_Frontend_Service_Default
 		);
 		$search->setConditions( $search->combine( '&&', $expr ) );
 
-		$items = $this->_serviceManager->searchItems( $search, array( 'price' ) );
+		$items = $serviceManager->searchItems( $search, array( 'price' ) );
 
 		if( ( $item = reset( $items ) ) === false )
 		{
-			$msg = sprintf( 'No service item for type "%1$s" and ID "%2$s" available', $type, $serviceId );
+			$msg = sprintf( 'Service item for type "%1$s" and ID "%2$s" not found', $type, $serviceId );
 			throw new Controller_Frontend_Service_Exception( $msg );
 		}
 

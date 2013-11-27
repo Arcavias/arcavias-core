@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemPickerUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -107,13 +106,13 @@ MShop.panel.price.ItemPickerUi = Ext.extend( MShop.panel.AbstractListItemPickerU
 			{
 				xtype : 'gridcolumn',
 				dataIndex : conf.listNamePrefix + 'refid',
-				header : _('Shipping'),
+				header : _('Costs'),
 				sortable : false,
 				id : 'refshipping',
 				width : 70,
 				align : 'right',
 				hidden : true,
-				renderer : this.refDecimalColumnRenderer.createDelegate(this, [ "price.shipping" ], true)
+				renderer : this.refDecimalColumnRenderer.createDelegate(this, [ "price.costs" ], true)
 			},
 			{
 				xtype : 'gridcolumn',
@@ -123,7 +122,8 @@ MShop.panel.price.ItemPickerUi = Ext.extend( MShop.panel.AbstractListItemPickerU
 				id : 'reftaxrate',
 				width : 70,
 				align : 'right',
-				hidden : true,
+				hidden : !MShop.Config.get( 'client/extjs/panel/price/itempickerui/taxrate', 
+				MShop.Config.get('client/extjs/panel/price/taxrate', false ) ),
 				renderer : this.refDecimalColumnRenderer.createDelegate(this, [ "price.taxrate" ], true)
 			}
 		];

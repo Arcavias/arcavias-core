@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Service
- * @version $Id: Abstract.php 1116 2012-08-13 08:17:32Z nsendetzky $
  */
 
 
@@ -21,6 +20,7 @@ implements MShop_Service_Provider_Interface
 	private $_context;
 	private $_serviceItem;
 	private $_communication;
+	private $_beGlobalConfig;
 
 
 	/**
@@ -120,6 +120,26 @@ implements MShop_Service_Provider_Interface
 
 
 	/**
+	 * Injects additional global configuration for the backend.
+	 *
+	 * It's used for adding additional backend configuration from the application
+	 * like the URLs to redirect to.
+	 *
+	 * Supported redirect URLs are:
+	 * - payment.url-success
+	 * - payment.url-failure
+	 * - payment.url-cancel
+	 * - payment.url-update
+	 *
+	 * @param array $config Associative list of config keys and their value
+	 */
+	public function injectGlobalConfigBE( array $config )
+	{
+		$this->_beGlobalConfig = $config;
+	}
+
+
+	/**
 	 * Checks if payment provider can be used based on the basket content.
 	 * Checks for country, currency, address, RMS, etc. -> in separate decorators
 	 *
@@ -172,12 +192,12 @@ implements MShop_Service_Provider_Interface
 	 * Updates the orders for which status updates were received via direct requests (like HTTP).
 	 *
 	 * @param mixed $additional Update information whose format depends on the payment provider
-	 * @return boolean True if the update was successful, false if the given parameters are not valid for this provider
+	 * @return MShop_Order_Item_Interface|null Order item if update was successful, null if the given parameters are not valid for this provider
 	 * @throws MShop_Service_Exception If updating one of the orders failed
 	 */
 	public function updateSync( $additional )
 	{
-		return false;
+		return null;
 	}
 
 
@@ -204,6 +224,63 @@ implements MShop_Service_Provider_Interface
 		}
 
 		return $this->_communication;
+	}
+
+
+	/**
+	 * Calculates the last date behind the given timestamp depending on the other paramters.
+	 *
+	 * This method is used to calculate the date for comparing the order date to
+	 * if e.g. credit card payments should be captured or direct debit should be
+	 * checked after the given amount of days from external payment providers.
+	 * This method can calculate with business/working days only if requested
+	 * and use the given list of public holidays to take them into account.
+	 *
+	 * @param integer $timestamp Timestamp to use as starting point for the backward calculation
+	 * @param integer $skipdays Number of days to calculate backwards
+	 * @param boolean $businessOnly True if only business days should be used for calculation, false if not
+	 * @param string $publicHolidays Comma separated list of public holidays in YYYY-MM-DD format
+	 * @return string Date in YYY-MM-DD format to be compared to the order date
+	 * @throws MShop_Service_Exception If the given holiday string is in the wrong format and can't be processed
+	 */
+	protected function _calcDateLimit( $timestamp, $skipdays = 0, $businessOnly = false, $publicHolidays = '' )
+	{
+		$holidays = array();
+
+		if( is_string( $publicHolidays ) && $publicHolidays !== '' )
+		{
+			$holidays = explode( ',', str_replace( ' ', '', $publicHolidays ) );
+
+			if( sort( $holidays ) === false ) {
+				throw new MShop_Service_Exception( sprintf( 'Unable to sort public holidays: "%1$s"', $publicHolidays ) );
+			}
+
+			$holidays = array_flip( $holidays );
+
+			for( $i = 0; $i <= $skipdays; $i++ )
+			{
+				$date = date( 'Y-m-d', $timestamp - $i * 86400 );
+
+				if( isset( $holidays[$date] ) ) {
+					$skipdays++;
+				}
+			}
+		}
+
+		if( $businessOnly === true )
+		{
+			// adds days for weekends
+			for( $i = 0; $i <= $skipdays; $i++ )
+			{
+				$ts = $timestamp - $i * 86400;
+
+				if( date( 'N', $ts ) > 5 && !isset( $holidays[ date( 'Y-m-d', $ts ) ] ) ) {
+					$skipdays++;
+				}
+			}
+		}
+
+		return date( 'Y-m-d', $timestamp - $skipdays * 86400 );
 	}
 
 
@@ -267,6 +344,36 @@ implements MShop_Service_Provider_Interface
 		}
 
 		return $errors;
+	}
+
+
+	/**
+	 * Returns the configuration value that matches one of the given keys.
+	 *
+	 * The config of the service item and (optionally) the global config
+	 * is tested in the order of the keys. The first one that matches will
+	 * be returned.
+	 *
+	 * @param array $keys List of key names that should be tested for in the order to test
+	 * @param mixed $default Returned value if the key wasn't was found
+	 * @return mixed Value of the first key that matches or null if none was found
+	 */
+	protected function _getConfigValue( array $keys, $default = null )
+	{
+		$srvconfig = $this->getServiceItem()->getConfig();
+
+		foreach( $keys as $key )
+		{
+			if( isset( $srvconfig[$key] ) ) {
+				return $srvconfig[$key];
+			}
+
+			if( isset( $this->_beGlobalConfig[$key] ) ) {
+				return $this->_beGlobalConfig[$key];
+			}
+		}
+
+		return $default;
 	}
 
 

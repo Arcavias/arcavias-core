@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14843 2012-01-13 08:11:39Z nsendetzky $
  */
 
 
 class Controller_ExtJS_Text_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 	/**
 	 * Runs the test methods of this class.
@@ -54,7 +53,11 @@ class Controller_ExtJS_Text_DefaultTest extends MW_Unittest_Testcase
 	{
 		$params = (object) array(
 			'site' => 'unittest',
-			'condition' => (object) array( '&&' => array( 0 => (object) array( '~=' => (object) array( 'text.content' => 'Cafe Noire Expresso' ) ) ) ),
+			'condition' => (object) array( '&&' => array(
+					0 => (object) array( '~=' => (object) array( 'text.content' => 'Cafe Noire Expresso' ) ),
+					1 => (object) array( '==' => (object) array( 'text.languageid' => 'de' ) ),
+				)
+			),
 			'sort' => 'text.domain',
 			'dir' => 'ASC',
 			'start' => 0,

@@ -127,9 +127,10 @@ class Client_Html_Checkout_Standard_Address_Billing_Default
 			$basket = $basketCtrl->get();
 
 
-			$type = MShop_Order_Item_Base_Address_Abstract::TYPE_BILLING;
+			$type = MShop_Order_Item_Base_Address_Abstract::TYPE_PAYMENT;
+			$disable = $view->config( 'client/html/common/address/billing/disable-new', false );
 
-			if( ( $option = $view->param( 'ca-billing-option', 'null' ) ) == 'null' ) // new address
+			if( ( $option = $view->param( 'ca-billing-option', 'null' ) ) === 'null' && $disable === false ) // new address
 			{
 				$param = $view->param( 'ca-billing', array() );
 				$list = $view->config( 'client/html/common/address/billing/mandatory', $this->_mandatory );
@@ -170,17 +171,17 @@ class Client_Html_Checkout_Standard_Address_Billing_Default
 				$search = $customerManager->createSearch( true );
 				$expr = array(
 					$search->compare( '==', 'customer.id', $option ),
-					$search->compare( '==', 'customer.code', $context->getEditor() ),
 					$search->getConditions(),
 				);
 				$search->setConditions( $search->combine( '&&', $expr ) );
 
 				$items = $customerManager->searchItems( $search );
-				if( ( $item = reset( $items ) ) === false ) {
-					throw new Client_Html_Exception( sprintf( 'No customer found for ID "%1$s"', $option ) );
+
+				if( ( $item = reset( $items ) ) === false || $option != $context->getUserId() ) {
+					throw new Client_Html_Exception( sprintf( 'Customer with ID "%1$s" not found', $option ) );
 				}
 
-				$basketCtrl->setAddress( $type, $item->getBillingAddress() );
+				$basketCtrl->setAddress( $type, $item->getPaymentAddress() );
 			}
 
 			$this->_process( $this->_subPartPath, $this->_subPartNames );

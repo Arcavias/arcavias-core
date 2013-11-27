@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage ExtJS
- * @version $Id: Default.php 14611 2011-12-28 13:09:10Z doleiynyk $
  */
 
 
@@ -99,13 +98,15 @@ class Controller_ExtJS_Attribute_Default
 
 		foreach( $idList as $manager => $ids )
 		{
-			$refDomainListManager = $this->_getDomainManager( $manager )->getSubManager('list');
+			$refDomainListManager = MShop_Factory::createManager( $this->_getContext(), $manager . '/list' );
+
 			$search = $refDomainListManager->createSearch();
 			$expr = array(
 				$search->compare( '==', $manager.'.list.refid', $ids ),
 				$search->compare( '==', $manager.'.list.domain', 'attribute' )
 			);
 			$search->setConditions( $search->combine( '&&', $expr ) );
+			$search->setSortations( array( $search->sort( '+', $manager.'.list.id' ) ) );
 
 			$start = 0;
 

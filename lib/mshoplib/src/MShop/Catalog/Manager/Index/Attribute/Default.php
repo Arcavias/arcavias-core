@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Catalog
- * @version $Id: Default.php 1334 2012-10-24 16:17:46Z doleiynyk $
  */
 
 /**
@@ -24,7 +23,7 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 	private $_searchConfig = array(
 		'catalog.index.attribute.id' => array(
 			'code'=>'catalog.index.attribute.id',
-			'internalcode'=>':site AND mcatinat."attrid"',
+			'internalcode'=>'mcatinat."attrid"',
 			'internaldeps'=>array( 'LEFT JOIN "mshop_catalog_index_attribute" AS mcatinat ON mcatinat."prodid" = mpro."id"' ),
 			'label'=>'Product index attribute ID',
 			'type'=> 'integer',
@@ -44,8 +43,19 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 			'internalcode'=>'( SELECT COUNT(DISTINCT mcatinat2."attrid")
 				FROM "mshop_catalog_index_attribute" AS mcatinat2
 				WHERE mpro."id" = mcatinat2."prodid" AND :site
-				AND mcatinat2."listtype" = $1 AND mcatinat2."attrid" IN ( $2 ) )',
+				AND mcatinat2."attrid" IN ( $2 ) AND mcatinat2."listtype" = $1 )',
 			'label'=>'Number of product attributes, parameter(<list type code>,<attribute IDs>)',
+			'type'=> 'integer',
+			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
+			'public' => false,
+		),
+		'catalog.index.attributeaggregate' => array(
+			'code'=>'catalog.index.attributeaggregate()',
+			'internalcode'=>'( SELECT COUNT(DISTINCT mcatinat2."attrid")
+				FROM "mshop_catalog_index_attribute" AS mcatinat2
+				WHERE mpro."id" = mcatinat2."prodid" AND :site
+				AND mcatinat2."attrid" IN ( $1 ) )',
+			'label'=>'Number of product attributes, parameter(<attribute IDs>)',
 			'type'=> 'integer',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
 			'public' => false,
@@ -76,11 +86,10 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 		$search->setConditions( $search->combine( '||', $expr ) );
 
 		$string = $search->getConditionString( $types, array( 'siteid' => 'mcatinat."siteid"' ) );
-		$this->_searchConfig['catalog.index.attribute.id']['internalcode'] =
-			str_replace( ':site', $string, $this->_searchConfig['catalog.index.attribute.id']['internalcode'] );
 
 		$this->_replaceSiteMarker( $this->_searchConfig['catalog.index.attribute.code'], 'mcatinat."siteid"', $site );
 		$this->_replaceSiteMarker( $this->_searchConfig['catalog.index.attributecount'], 'mcatinat2."siteid"', $site );
+		$this->_replaceSiteMarker( $this->_searchConfig['catalog.index.attributeaggregate'], 'mcatinat2."siteid"', $site );
 
 
 		$confpath = 'mshop/catalog/manager/index/attribute/default/submanagers';
@@ -88,6 +97,19 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 		foreach( $context->getConfig()->get( $confpath, array() ) as $domain ) {
 			$this->_submanagers[ $domain ] = $this->getSubManager( $domain );
 		}
+	}
+
+
+	/**
+	 * Counts the number products that are available for the values of the given key.
+	 *
+	 * @param MW_Common_Criteria_Interface $search Search criteria
+	 * @param string $key Search key (usually the ID) to aggregate products for
+	 * @return array List of ID values as key and the number of counted products as value
+	 */
+	public function aggregate( MW_Common_Criteria_Interface $search, $key )
+	{
+		return $this->_aggregate( $search, $key, 'mshop/catalog/manager/index/default/aggregate' );
 	}
 
 
@@ -115,57 +137,20 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 
 
 	/**
-	 * Removes an item from the index.
-	 *
-	 * @param integer $id Product ID
-	 */
-	public function deleteItem( $id )
-	{
-		$this->deleteItems( array( $id ) );
-	}
-
-
-	/**
 	 * Removes multiple items from the index.
 	 *
 	 * @param array $ids list of Product IDs
 	 */
 	public function deleteItems( array $ids )
 	{
+		if( empty( $ids ) ) { return; }
+
 		foreach( $this->_submanagers as $submanager ) {
 			$submanager->deleteItems( $ids );
 		}
 
-		$context = $this->_getContext();
-		$siteid = $context->getLocale()->getSiteId();
-
-		$sql = $context->getConfig()->get( 'mshop/catalog/manager/index/attribute/default/item/delete' );
-
-		$search = $this->createSearch();
-		$search->setConditions( $search->compare( '==', 'prodid', $ids ) );
-
-		$types = array( 'prodid' => MW_DB_Statement_Abstract::PARAM_STR );
-		$translations = array( 'prodid' => '"prodid"' );
-
-		$cond = $search->getConditionString( $types, $translations );
-		$sql = str_replace( ':cond', $cond, $sql );
-
-		try
-		{
-			$dbm = $context->getDatabaseManager();
-			$conn = $dbm->acquire();
-
-			$stmt = $conn->create( $sql );
-			$stmt->bind( 1, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->execute()->finish();
-
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/catalog/manager/index/attribute/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ), true, 'prodid' );
 	}
 
 
@@ -174,7 +159,8 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 	 *
 	 * @param integer $id Id of item
 	 * @param array $ref List of domains to fetch list items and referenced items for
-	 * @return MShop_Attribute_Item_Interface Item object
+	 * @return MShop_Product_Item_Interface Returns the product item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -188,13 +174,13 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 	 * @param boolean $withsub Return also attributes of sub-managers if true
 	 * @return array List of items implementing MW_Common_Criteria_Attribute_Interface
 	 */
-	public function getSearchAttributes($withsub = true)
+	public function getSearchAttributes( $withsub = true )
 	{
 		foreach( $this->_searchConfig as $key => $fields ) {
 			$list[$key] = new MW_Common_Criteria_Attribute_Default( $fields );
 		}
 
-		$list = array_merge( $list, $this->_productManager->getSearchAttributes( false ) );
+		$list = array_merge( $list, $this->_productManager->getSearchAttributes( $withsub ) );
 
 		if( $withsub === true )
 		{

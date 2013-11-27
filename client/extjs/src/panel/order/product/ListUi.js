@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ListUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -212,6 +211,12 @@ MShop.panel.order.base.product.ListUi = Ext.extend(Ext.Panel, {
 				hidden: true
 			}, {
 				xtype : 'gridcolumn',
+				dataIndex : 'order.base.product.productid',
+				header : _('Product ID'),
+				width : 50,
+				hidden: true
+			}, {
+				xtype : 'gridcolumn',
 				dataIndex : 'order.base.product.orderproductid',
 				header : _('Order Product ID'),
 				width : 50,
@@ -241,8 +246,8 @@ MShop.panel.order.base.product.ListUi = Ext.extend(Ext.Panel, {
 				header : _('Price')
 			}, {
 				xtype : 'gridcolumn',
-				dataIndex : 'order.base.product.shipping',
-				header : _('Shipping')
+				dataIndex : 'order.base.product.costs',
+				header : _('Costs')
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'order.base.product.rebate',

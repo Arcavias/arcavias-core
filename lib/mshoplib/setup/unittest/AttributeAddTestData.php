@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: AttributeAddTestData.php 1365 2012-10-31 13:54:32Z doleiynyk $
  */
 
 
@@ -30,7 +29,7 @@ class MW_Setup_Task_AttributeAddTestData extends MW_Setup_Task_Abstract
 	 */
 	public function getPostDependencies()
 	{
-		return array();
+		return array( 'CatalogRebuildTestIndex' );
 	}
 
 

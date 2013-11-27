@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Product
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -113,9 +112,9 @@ class MShop_Order_Manager_Base_Product_Default
 			'type'=> 'decimal',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_STR,
 		),
-		'order.base.product.shipping' => array(
-			'code'=>'order.base.product.shipping',
-			'internalcode'=>'mordbapr."shipping"',
+		'order.base.product.costs' => array(
+			'code'=>'order.base.product.costs',
+			'internalcode'=>'mordbapr."costs"',
 			'label'=>'Order base product shipping',
 			'type'=> 'decimal',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_STR,
@@ -220,7 +219,9 @@ class MShop_Order_Manager_Base_Product_Default
 	 * Returns order base product for the given product ID.
 	 *
 	 * @param integer $id Product ids to create product object for
-	 * @return MShop_Order_Item_Base_Product_Interface
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Order_Item_Base_Product_Interface Returns order base product item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -269,7 +270,7 @@ class MShop_Order_Manager_Base_Product_Default
 			$stmt->bind(9, $item->getMediaUrl(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(10, $item->getQuantity(), MW_DB_Statement_Abstract::PARAM_INT);
 			$stmt->bind(11, $price->getValue(), MW_DB_Statement_Abstract::PARAM_STR);
-			$stmt->bind(12, $price->getShipping(), MW_DB_Statement_Abstract::PARAM_STR);
+			$stmt->bind(12, $price->getCosts(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(13, $price->getRebate(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(14, $price->getTaxRate(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(15, $item->getFlags(), MW_DB_Statement_Abstract::PARAM_INT);
@@ -306,29 +307,14 @@ class MShop_Order_Manager_Base_Product_Default
 
 
 	/**
-	 * Deletes an existing order base product from the storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Order item base product id of an existing item in the
-	 * storage that should be deleted
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem($id)
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire( $this->_dbname );
-
-		try
-		{
-			$stmt = $this->_getCachedStatement( $conn, 'mshop/order/manager/base/product/default/item/delete' );
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->execute()->finish();
-
-			$dbm->release( $conn, $this->_dbname );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn, $this->_dbname );
-			throw $e;
-		}
+		$path = 'mshop/order/manager/base/product/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -407,7 +393,7 @@ class MShop_Order_Manager_Base_Product_Default
 					$price = $priceManager->createItem();
 					$price->setValue($row['price']);
 					$price->setRebate($row['rebate']);
-					$price->setShipping($row['shipping']);
+					$price->setCosts($row['costs']);
 					$price->setTaxRate($row['taxrate']);
 					$items[ $row['id'] ] = array( 'price' => $price, 'item' => $row );
 				}

@@ -2,7 +2,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: product-list.php 1316 2012-10-19 19:49:23Z nsendetzky $
  */
 
 return array (
@@ -86,9 +85,11 @@ return array (
 		array( 'parentid' => 'product/U:TESTSUB01', 'typeid' => 'attribute/default', 'domain' => 'attribute', 'refid' => 'attribute/product/color/white', 'start' => null, 'end' => null, 'pos' => 0 ),
 		array( 'parentid' => 'product/U:TESTSUB01', 'typeid' => 'attribute/default', 'domain' => 'attribute', 'refid' => 'attribute/product/size/m', 'start' => null, 'end' => null, 'pos' => 1 ),
 		array( 'parentid' => 'product/U:TESTSUB02', 'typeid' => 'attribute/variant', 'domain' => 'attribute', 'refid' => 'attribute/product/length/30', 'start' => null, 'end' => null, 'pos' => 0 ),
-		array( 'parentid' => 'product/U:TESTSUB02', 'typeid' => 'attribute/variant', 'domain' => 'attribute', 'refid' => 'attribute/product/width/29', 'start' => null, 'end' => null, 'pos' => 1 ),
+		array( 'parentid' => 'product/U:TESTSUB02', 'typeid' => 'attribute/variant', 'domain' => 'attribute', 'refid' => 'attribute/product/width/30', 'start' => null, 'end' => null, 'pos' => 1 ),
 		array( 'parentid' => 'product/U:TESTSUB03', 'typeid' => 'attribute/default', 'domain' => 'attribute', 'refid' => 'attribute/product/color/blue', 'start' => null, 'end' => null, 'pos' => 0 ),
 		array( 'parentid' => 'product/U:TESTSUB03', 'typeid' => 'attribute/default', 'domain' => 'attribute', 'refid' => 'attribute/product/size/l', 'start' => null, 'end' => null, 'pos' => 1 ),
+		array( 'parentid' => 'product/U:TESTSUB04', 'typeid' => 'attribute/variant', 'domain' => 'attribute', 'refid' => 'attribute/product/length/32', 'start' => null, 'end' => null, 'pos' => 0 ),
+		array( 'parentid' => 'product/U:TESTSUB04', 'typeid' => 'attribute/variant', 'domain' => 'attribute', 'refid' => 'attribute/product/width/30', 'start' => null, 'end' => null, 'pos' => 1 ),
 
 		array( 'parentid' => 'product/CNE', 'typeid' => 'price/default', 'domain' => 'price', 'refid' => 'price/product/default/18.00/1.00', 'start' => null, 'end' => null, 'pos' => 0 ),
 		array( 'parentid' => 'product/CNE', 'typeid' => 'price/default', 'domain' => 'price', 'refid' => 'price/product/default/15.00/1.50', 'start' => null, 'end' => null, 'pos' => 1 ),

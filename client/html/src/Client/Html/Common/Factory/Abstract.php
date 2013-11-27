@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Client
  * @subpackage Html
- * @version $Id: Abstract.php 1320 2012-10-19 19:57:38Z nsendetzky $
  */
 
 
@@ -30,13 +29,13 @@ class Client_Html_Common_Factory_Abstract
 	protected static function _createClient( MShop_Context_Item_Interface $context, $classname, $interface, $templatePaths )
 	{
 		if( class_exists( $classname ) === false ) {
-			throw new Client_Html_Exception( sprintf( 'Class "%1$s" not found', $classname ) );
+			throw new Client_Html_Exception( sprintf( 'Class "%1$s" not available', $classname ) );
 		}
 
 		$client =  new $classname( $context, $templatePaths );
 
 		if( !( $client instanceof $interface ) ) {
-			throw new Client_Html_Exception( sprintf( 'Class "%1$s" does not implement "%2$s"', $classname, $interface ) );
+			throw new Client_Html_Exception( sprintf( 'Class "%1$s" does not implement interface "%2$s"', $classname, $interface ) );
 		}
 
 		return $client;

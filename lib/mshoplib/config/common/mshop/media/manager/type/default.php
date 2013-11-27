@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14408 2011-12-17 13:24:46Z nsendetzky $
  */
 
 return array(
@@ -20,7 +19,8 @@ return array(
 		',
 		'delete' => '
 			DELETE FROM "mshop_media_type"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'search' => '
 			SELECT mmedty."id", mmedty."siteid", mmedty."code", mmedty."domain", mmedty."label",
@@ -34,7 +34,7 @@ return array(
 		'count' => '
 			SELECT COUNT(*) AS "count"
 			FROM(
-				SELECT DISTINCT mmedty."id" 
+				SELECT DISTINCT mmedty."id"
 				FROM "mshop_media_type" mmedty
 				:joins
 				WHERE :cond

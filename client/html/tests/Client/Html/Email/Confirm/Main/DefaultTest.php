@@ -7,8 +7,8 @@
 
 class Client_Html_Email_Confirm_Main_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -110,6 +110,7 @@ class Client_Html_Email_Confirm_Main_DefaultTest extends MW_Unittest_Testcase
 
 		$view->confirmOrderItem = $orderItem;
 		$view->confirmOrderBaseItem = $orderManager->getSubManager( 'base' )->load( $orderItem->getBaseId() );
+		$view->summaryBasket = $view->confirmOrderBaseItem;
 
 		return $view;
 	}

@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14701 2012-01-05 08:52:24Z nsendetzky $
  */
 
 
@@ -16,7 +15,7 @@ MShop.panel.locale.ItemUi = Ext.extend( MShop.panel.AbstractItemUi, {
 	initComponent : function()
 	{
 		this.title = _('Locale item details');
-
+		
 		MShop.panel.AbstractItemUi.prototype.setSiteCheck( this );
 
 		this.items = [ {

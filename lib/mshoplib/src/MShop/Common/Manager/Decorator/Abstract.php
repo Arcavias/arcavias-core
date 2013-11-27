@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Abstract.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -19,7 +18,6 @@ abstract class MShop_Common_Manager_Decorator_Abstract
 	extends MShop_Common_Manager_Abstract
 	implements MShop_Common_Manager_Decorator_Interface
 {
-	private $_context;
 	private $_manager;
 
 
@@ -32,8 +30,6 @@ abstract class MShop_Common_Manager_Decorator_Abstract
 	public function __construct( MShop_Context_Item_Interface $context, MShop_Common_Manager_Interface $manager )
 	{
 		parent::__construct( $context );
-
-		$this->_context = $context;
 		$this->_manager = $manager;
 	}
 
@@ -91,9 +87,20 @@ abstract class MShop_Common_Manager_Decorator_Abstract
 
 
 	/**
+	 * Removes multiple items specified by ids in the array.
+	 *
+	 * @param array $ids List of IDs
+	 */
+	public function deleteItems( array $ids )
+	{
+		$this->_manager->deleteItems( $ids );
+	}
+
+
+	/**
 	 * Returns the item specified by its ID
 	 *
-	 * @param integer $id Id of item
+	 * @param integer $id Unique ID of the item
 	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Common_Item_Interface Item object
 	 */
@@ -150,16 +157,6 @@ abstract class MShop_Common_Manager_Decorator_Abstract
 		return $this->_manager->searchItems( $search, $ref, $total );
 	}
 
-
-	/**
-	 * Returns the context object.
-	 *
-	 * @return MShop_Context_Item_Interface Context object
-	 */
-	protected function _getContext()
-	{
-		return $this->_context;
-	}
 
 
 	/**

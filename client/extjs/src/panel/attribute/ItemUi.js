@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14341 2011-12-14 16:00:50Z nsendetzky $
  */
 
 
@@ -87,6 +86,7 @@ MShop.panel.attribute.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 							fieldLabel : _('Code'),
 							name : 'attribute.code',
 							allowBlank : false,
+							maxLength : 32,
 							emptyText : _('Attribute code (required)')
 						}, {
 							xtype : 'textfield',

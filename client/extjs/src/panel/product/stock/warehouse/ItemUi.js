@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14341 2011-12-14 16:00:50Z nsendetzky $
  */
 
 
@@ -16,7 +15,7 @@ MShop.panel.stock.warehouse.ItemUi = Ext.extend( MShop.panel.AbstractItemUi, {
 	initComponent : function() {
 
 		this.title = _( 'Warehouse' );
-		
+
 		MShop.panel.AbstractItemUi.prototype.setSiteCheck( this );
 
 		this.items = [ {
@@ -65,6 +64,7 @@ MShop.panel.stock.warehouse.ItemUi = Ext.extend( MShop.panel.AbstractItemUi, {
 							fieldLabel : 'Warehouse code',
 							name : 'product.stock.warehouse.code',
 							allowBlank : false,
+							maxLength : 32,
 							emptyText : _( 'Warehouse code (required)' )
 						}, {
 							xtype : 'textfield',

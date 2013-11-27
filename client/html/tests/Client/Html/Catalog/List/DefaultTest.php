@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 1352 2012-10-29 16:11:47Z nsendetzky $
  */
 
 class Client_Html_Catalog_List_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -66,6 +65,17 @@ class Client_Html_Catalog_List_DefaultTest extends MW_Unittest_Testcase
 	}
 
 
+	public function testGetHeaderSearch()
+	{
+		$view = $this->_object->getView();
+		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-search-text' => '<b>Search result</b>' ) );
+		$view->addHelper( 'param', $helper );
+
+		$output = $this->_object->getHeader();
+		$this->assertRegexp( '#<title>[^>]*Search result[^<]*</title>#', $output );
+	}
+
+
 	public function testGetBody()
 	{
 		$view = $this->_object->getView();
@@ -110,6 +120,28 @@ class Client_Html_Catalog_List_DefaultTest extends MW_Unittest_Testcase
 	{
 		$view = $this->_object->getView();
 		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-search-text' => 'Kaffee' ) );
+		$view->addHelper( 'param', $helper );
+
+		$output = $this->_object->getBody();
+		$this->assertStringStartsWith( '<section class="arcavias catalog-list">', $output );
+	}
+
+
+	public function testGetBodySearchAttributeList()
+	{
+		$view = $this->_object->getView();
+		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-attr-id' => array( -1, -2 ) ) );
+		$view->addHelper( 'param', $helper );
+
+		$output = $this->_object->getBody();
+		$this->assertStringStartsWith( '<section class="arcavias catalog-list">', $output );
+	}
+
+
+	public function testGetBodySearchAttributeString()
+	{
+		$view = $this->_object->getView();
+		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-attr-id' => '-1 -2' ) );
 		$view->addHelper( 'param', $helper );
 
 		$output = $this->_object->getBody();

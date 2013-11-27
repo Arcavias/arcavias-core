@@ -5,7 +5,6 @@
  *
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php-dist 14265 2011-12-11 16:57:33Z nsendetzky $
  */
 
 
@@ -74,8 +73,9 @@ return array(
 		
 		/*
 		 * ImageMagick "convert" command for converting an image
+		 * The "-flatten" creates only one image even if there are multiple layers
 		 */
-		'convert' => 'convert %1$s -resize %3$sx%4$s %2$s',
+		'convert' => 'convert %1$s -resize %3$sx%4$s -flatten %2$s',
 	),
 	
 	/*

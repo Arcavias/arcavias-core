@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Service
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -379,36 +378,24 @@ class MShop_Service_Manager_Default
 
 
 	/**
-	 * Deletes an existing service from the storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $serviceId Service id of an existing service that should be deleted
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $serviceId )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/service/manager/default/item/delete');
-			$stmt->bind(1, $serviceId, MW_DB_Statement_Abstract::PARAM_INT);
-			$stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch ( Exception $e )
-		{
-			$dbm->release($conn);
-			throw $e;
-		}
+		$path = 'mshop/service/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
 	/**
 	 * Returns the service item specified by the given id.
 	 *
-	 * @param int $id Unique identifier of the service item
-	 * @return MShop_Service_Item_Interface
+	 * @param int $id Unique ID of the service item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Service_Item_Interface Returns the service item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -522,7 +509,7 @@ class MShop_Service_Manager_Default
 				}
 
 				$map[ $row['id'] ] = $row;
-				$typeIds[] = $row['typeid'];
+				$typeIds[ $row['typeid'] ] = null;
 			}
 
 			$dbm->release( $conn );
@@ -533,12 +520,13 @@ class MShop_Service_Manager_Default
 			throw $e;
 		}
 
-		if( count( $typeIds ) > 0 )
+		if( !empty( $typeIds ) )
 		{
 			$typeManager = $this->getSubManager( 'type' );
-			$search = $typeManager->createSearch();
-			$search->setConditions( $search->compare( '==', 'service.type.id', array_unique( $typeIds ) ) );
-			$typeItems = $typeManager->searchItems( $search );
+			$typeSearch = $typeManager->createSearch();
+			$typeSearch->setConditions( $typeSearch->compare( '==', 'service.type.id', array_keys( $typeIds ) ) );
+			$typeSearch->setSlice( 0, $search->getSliceSize() );
+			$typeItems = $typeManager->searchItems( $typeSearch );
 
 			foreach( $map as $id => $row )
 			{

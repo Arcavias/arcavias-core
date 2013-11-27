@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ListUiSmall.js 14341 2011-12-14 16:00:50Z nsendetzky $
  */
 
 
@@ -96,8 +95,8 @@ MShop.panel.price.ListUiSmall = Ext.extend(MShop.panel.AbstractListUi, {
 			align : 'right'
 		}, {
 			xtype : 'numbercolumn',
-			dataIndex : 'price.shipping',
-			header : _('Shipping'),
+			dataIndex : 'price.costs',
+			header : _('Costs'),
 			sortable : true,
 			width : 70,
 			hidden : true,
@@ -109,7 +108,8 @@ MShop.panel.price.ListUiSmall = Ext.extend(MShop.panel.AbstractListUi, {
 			sortable : true,
 			width : 70,
 			align : 'right',
-			hidden : true
+			hidden : !MShop.Config.get( 'client/extjs/panel/price/listuismall/taxrate', 
+			MShop.Config.get('client/extjs/panel/price/taxrate', false ) )
 		}, {
 			xtype : 'gridcolumn',
 			dataIndex : 'price.ctime',

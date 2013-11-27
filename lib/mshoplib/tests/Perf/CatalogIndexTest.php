@@ -3,14 +3,13 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: CatalogIndexTest.php 1116 2012-08-13 08:17:32Z nsendetzky $
  */
 
 class Perf_CatalogIndexTest extends MW_Unittest_Testcase
 {
-	protected $_context;
-	protected $_catItem;
-	protected $_slizeSize = 100;
+	private $_context;
+	private $_catItem;
+	private $_slizeSize = 100;
 
 
 	public static function main()

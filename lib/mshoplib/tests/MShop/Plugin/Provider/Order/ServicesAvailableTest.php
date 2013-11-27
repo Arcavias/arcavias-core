@@ -3,14 +3,13 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/license
- * @version $Id$
  */
 
 class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framework_TestCase
 {
-	protected $_order;
-	protected $_plugin;
-	protected $_service;
+	private $_order;
+	private $_plugin;
+	private $_service;
 
 	/**
 	 * Runs the test methods of this class.
@@ -80,17 +79,17 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 	{
 		// MShop_Order_Item_Base_Abstract::PARTS_SERVICE not set, so update shall not be executed
 		$object = new MShop_Plugin_Provider_Order_ServicesAvailable(TestHelper::getContext(), $this->_plugin);
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after' ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after' ) );
 	}
 
 	public function testUpdateEmptyConfig()
 	{
 		$object = new MShop_Plugin_Provider_Order_ServicesAvailable(TestHelper::getContext(), $this->_plugin );
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
 
 		$this->_order->setService( $this->_service, 'payment' );
 		$this->_order->setService( $this->_service, 'delivery' );
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
 
 	}
 
@@ -103,14 +102,14 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 				'payment' => false
 		) );
 
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
 
 		$this->_plugin->setConfig( array(
 				'delivery' => null,
 				'payment' => null
 		) );
 
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
 
 		$this->_plugin->setConfig( array(
 				'delivery' => true,
@@ -118,7 +117,7 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 		) );
 
 		$this->setExpectedException('MShop_Plugin_Provider_Exception');
-		$object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE );
+		$object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE );
 	}
 
 	public function testUpdateWithServices()
@@ -133,14 +132,14 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 				'payment' => null
 		) );
 
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
 
 		$this->_plugin->setConfig( array(
 				'delivery' => true,
 				'payment' => true
 		) );
 
-		$this->assertTrue( $object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
+		$this->assertTrue( $object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE ) );
 
 		$this->_plugin->setConfig( array(
 				'delivery' => false,
@@ -148,6 +147,6 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 		) );
 
 		$this->setExpectedException('MShop_Plugin_Provider_Exception');
-		$object->update( $this->_order, 'isComplete.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE );
+		$object->update( $this->_order, 'check.after', MShop_Order_Item_Base_Abstract::PARTS_SERVICE );
 	}
 }

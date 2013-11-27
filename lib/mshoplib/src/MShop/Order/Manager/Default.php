@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -80,20 +79,6 @@ class MShop_Order_Manager_Default
 			'type'=> 'integer',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_INT,
 		),
-		'order.flag'=> array(
-			'code'=>'order.flag',
-			'internalcode'=>'mord."flag"',
-			'label'=>'Order flag',
-			'type'=> 'integer',
-			'internaltype'=> MW_DB_Statement_Abstract::PARAM_INT,
-		),
-		'order.emailflag'=> array(
-			'code'=>'order.emailflag',
-			'internalcode'=>'mord."emailflag"',
-			'label'=>'Order email flag',
-			'type'=> 'integer',
-			'internaltype'=> MW_DB_Statement_Abstract::PARAM_INT,
-		),
 		'order.relatedid'=> array(
 			'code'=>'order.relatedid',
 			'internalcode'=>'mord."relatedid"',
@@ -122,6 +107,17 @@ class MShop_Order_Manager_Default
 			'type'=> 'string',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_STR,
 		),
+		'order.containsStatus' => array(
+			'code'=>'order.containsStatus()',
+			'internalcode'=>'( SELECT COUNT(mordst_cs."parentid")
+				FROM "mshop_order_status" AS mordst_cs
+				WHERE mord."id" = mordst_cs."parentid" AND :site
+				AND mordst_cs."type" = $1 AND mordst_cs."value" IN ( $2 ) )',
+			'label'=>'Number of order status items, parameter(<type>,<value>)',
+			'type'=> 'integer',
+			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
+			'public' => false,
+		),
 	);
 
 
@@ -133,6 +129,9 @@ class MShop_Order_Manager_Default
 	public function __construct( MShop_Context_Item_Interface $context )
 	{
 		parent::__construct( $context );
+
+		$sites = $context->getLocale()->getSiteSubTree();
+		$this->_replaceSiteMarker( $this->_searchConfig['order.containsStatus'], 'mordst_cs."siteid"', $sites, ':site' );
 
 		if( $context->getConfig()->get( 'resource/db-order/adapter', null ) !== null ) {
 			$this->_dbname = 'db-order';
@@ -216,17 +215,15 @@ class MShop_Order_Manager_Default
 			$stmt->bind(5, $item->getDateDelivery() );
 			$stmt->bind(6, $item->getDeliveryStatus(), MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind(7, $item->getPaymentStatus(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind(8, $item->getFlag(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind(9, $item->getEmailFlag(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind(10, $item->getRelatedId(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind(11, date('Y-m-d H:i:s', time()));//mtime
-			$stmt->bind(12, $context->getEditor());
+			$stmt->bind(8, $item->getRelatedId(), MW_DB_Statement_Abstract::PARAM_INT );
+			$stmt->bind(9, date('Y-m-d H:i:s', time()));//mtime
+			$stmt->bind(10, $context->getEditor());
 
 			if( $id !== null ) {
-				$stmt->bind(13, $id, MW_DB_Statement_Abstract::PARAM_INT);
+				$stmt->bind(11, $id, MW_DB_Statement_Abstract::PARAM_INT);
 				$item->setId($id); //is not modified anymore
 			} else {
-				$stmt->bind(13, date('Y-m-d H:i:s', time()));//ctime
+				$stmt->bind(11, date('Y-m-d H:i:s', time()));//ctime
 			}
 
 			$result = $stmt->execute()->finish();
@@ -243,6 +240,31 @@ class MShop_Order_Manager_Default
 			$dbm->release( $conn, $this->_dbname );
 			throw $e;
 		}
+
+
+		if( $item->getPaymentStatus() != $item->oldPaymentStatus )
+		{
+			$statusManager = MShop_Factory::createManager( $this->_getContext(), 'order/status' );
+
+			$statusItem = $statusManager->createItem();
+			$statusItem->setParentId( $item->getId() );
+			$statusItem->setType( MShop_Order_Item_Status_Abstract::STATUS_PAYMENT );
+			$statusItem->setValue( $item->getPaymentStatus() );
+
+			$statusManager->saveItem( $statusItem, false );
+		}
+
+		if( $item->getDeliveryStatus() != $item->oldDeliveryStatus )
+		{
+			$statusManager = MShop_Factory::createManager( $this->_getContext(), 'order/status' );
+
+			$statusItem = $statusManager->createItem();
+			$statusItem->setParentId( $item->getId() );
+			$statusItem->setType( MShop_Order_Item_Status_Abstract::STATUS_DELIVERY );
+			$statusItem->setValue( $item->getDeliveryStatus() );
+
+			$statusManager->saveItem( $statusItem, false );
+		}
 	}
 
 
@@ -250,7 +272,9 @@ class MShop_Order_Manager_Default
 	 * Returns an order invoice item built from database values.
 	 *
 	 * @param integer $id Unique id of the order invoice
-	 * @return MShop_Order_Item_Interface order Invoice item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Order_Item_Interface Returns order invoice item of the given id
+	 * @throws MShop_Order_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array())
 	{
@@ -259,29 +283,14 @@ class MShop_Order_Manager_Default
 
 
 	/**
-	 * Deletes an item with given ID.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Unique ID of the invoice
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$context = $this->_getContext();
-		$dbm = $context->getDatabaseManager();
-		$conn = $dbm->acquire( $this->_dbname );
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/order/manager/default/item/delete');
-			$stmt->bind(1, $id, MW_DB_Statement_Abstract::PARAM_INT);
-			$result = $stmt->execute()->finish();
-
-			$dbm->release( $conn, $this->_dbname );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn, $this->_dbname );
-			throw $e;
-		}
+		$path = 'mshop/order/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 

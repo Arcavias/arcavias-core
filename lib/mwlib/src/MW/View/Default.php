@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MW
  * @subpackage View
- * @version $Id$
  */
 
 
@@ -19,16 +18,6 @@ class MW_View_Default implements MW_View_Interface
 {
 	private $_helper = array();
 	private $_values = array();
-
-
-	/**
-	 * Initializes the view instance.
-	 *
-	 * @param array $config
-	 */
-	public function __construct( array $config = array() )
-	{
-	}
 
 
 	/**

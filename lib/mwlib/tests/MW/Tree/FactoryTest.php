@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test class for MW_Tree_Node_DBNestedSet.
+ * Test class for MW_Tree_Factory.
  *
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
@@ -12,9 +12,9 @@ class MW_Tree_FactoryTest extends MW_Unittest_Testcase
 	 * @var    MW_Tree_Factory
 	 * @access protected
 	 */
-	protected $_object;
-	protected $_dbm;
-	protected $_config;
+	private $_object;
+	private $_dbm;
+	private $_config;
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.

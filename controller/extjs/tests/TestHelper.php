@@ -3,23 +3,18 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: TestHelper.php 14830 2012-01-12 16:58:09Z fblasel $
  */
 
 
 class TestHelper
 {
-	private static $_mshop;
+	private static $_arcavias;
 	private static $_context;
 
 
 	public static function bootstrap()
 	{
-		$mshop = self::_getMShop();
-
-		$includepaths = $mshop->getIncludePaths();
-		$includepaths[] = get_include_path();
-		set_include_path( implode( PATH_SEPARATOR, $includepaths ) );
+		self::_getArcavias();
 	}
 
 
@@ -33,31 +28,36 @@ class TestHelper
 	}
 
 
-	private static function _getMShop()
+	private static function _getArcavias()
 	{
-		if( !isset( self::$_mshop ) )
+		if( !isset( self::$_arcavias ) )
 		{
-			require_once dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . DIRECTORY_SEPARATOR . 'MShop.php';
-			spl_autoload_register( 'MShop::autoload' );
+			require_once dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . DIRECTORY_SEPARATOR . 'Arcavias.php';
 
-			self::$_mshop = new MShop( array(), false );
+			self::$_arcavias = new Arcavias();
 		}
 
-		return self::$_mshop;
+		return self::$_arcavias;
+	}
+
+
+	public static function getControllerPaths()
+	{
+		return self::_getArcavias()->getCustomPaths( 'controller/extjs' );
 	}
 
 
 	private static function _createContext( $site )
 	{
 		$ctx = new MShop_Context_Item_Default();
-		$mshop = self::_getMShop();
+		$arcavias = self::_getArcavias();
 
 
-		$paths = $mshop->getConfigPaths( 'mysql' );
+		$paths = $arcavias->getConfigPaths( 'mysql' );
 		$paths[] = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'config';
 
 		$conf = new MW_Config_Array( array(), $paths );
-		$conf = new MW_Config_Decorator_MemoryCache( $conf );
+		$conf = new MW_Config_Decorator_Memory( $conf );
 		$ctx->setConfig( $conf );
 
 
@@ -65,18 +65,15 @@ class TestHelper
 		$ctx->setDatabaseManager( $dbm );
 
 
-		$writer = new Zend_Log_Writer_Stream( $site . '.log' );
-		$zlog = new Zend_Log($writer);
-		$filter = new Zend_Log_Filter_Priority(Zend_Log::DEBUG);
-		$zlog->addFilter($filter);
-
-		$logger = new MW_Logger_Zend( $zlog );
+		$logger = new MW_Logger_File( $site . '.log', MW_Logger_Abstract::DEBUG );
 		$ctx->setLogger( $logger );
 
 
 		$session = new MW_Session_None();
 		$ctx->setSession( $session );
 
+		$i18n = new MW_Translation_None( 'de' );
+		$ctx->setI18n( array( 'de' => $i18n ) );
 
 		$localeManager = MShop_Locale_Manager_Factory::createManager( $ctx );
 		$locale = $localeManager->bootstrap( $site, '', '', false );

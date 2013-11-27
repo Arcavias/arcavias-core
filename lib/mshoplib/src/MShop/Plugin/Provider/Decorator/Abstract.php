@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Plugin
- * @version $Id: Abstract.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -61,5 +60,16 @@ abstract class MShop_Plugin_Provider_Decorator_Abstract
 	public function update( MW_Observer_Publisher_Interface $order, $action, $value = null )
 	{
 		return $this->_object->update( $order, $action, $value );
+	}
+
+
+	/**
+	 * Returns the next provider or decorator.
+	 *
+	 * @return MShop_Plugin_Provider_Interface Provider or decorator object
+	 */
+	protected function _getProvider()
+	{
+		return $this->_object;
 	}
 }

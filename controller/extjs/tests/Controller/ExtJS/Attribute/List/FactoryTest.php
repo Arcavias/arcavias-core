@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id$
  */
 
 
 class Controller_ExtJS_Attribute_List_FactoryTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**

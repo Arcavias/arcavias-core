@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Service
- * @version $Id: PayPalExpress.php 1170 2012-08-29 12:22:00Z doleiynyk $
  */
 
 
@@ -17,83 +16,65 @@
  */
 
 class MShop_Service_Provider_Payment_PayPalExpress
-extends MShop_Service_Provider_Payment_Abstract
-implements MShop_Service_Provider_Payment_Interface
+	extends MShop_Service_Provider_Payment_Abstract
+	implements MShop_Service_Provider_Payment_Interface
 {
-	private $_config;
+	private $_apiendpoint;
 
 	private $_beConfig = array(
-		'ApiUsername' => array(
-			'code' => 'ApiUsername',
-			'internalcode'=> 'username',
+		'paypalexpress.ApiUsername' => array(
+			'code' => 'paypalexpress.ApiUsername',
+			'internalcode'=> 'paypalexpress.ApiUsername',
 			'label'=> 'Username',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> true,
 		),
-		'ApiPassword' => array(
-			'code' => 'ApiPassword',
-			'internalcode'=> 'password',
+		'paypalexpress.ApiPassword' => array(
+			'code' => 'paypalexpress.ApiPassword',
+			'internalcode'=> 'paypalexpress.ApiPassword',
 			'label'=> 'Password',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> true,
 		),
-		'ApiSignature' => array(
-			'code' => 'ApiSignature',
-			'internalcode'=> 'signature',
+		'paypalexpress.ApiSignature' => array(
+			'code' => 'paypalexpress.ApiSignature',
+			'internalcode'=> 'paypalexpress.ApiSignature',
 			'label'=> 'Signature',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> true,
 		),
-		'CancelUrl' => array(
-			'code' => 'CancelUrl',
-			'internalcode'=> 'cancelurl',
-			'label'=> 'CancelUrl',
-			'type'=> 'string',
-			'internaltype'=> 'string',
-			'default'=> '',
-			'required'=> true,
-		),
-		'ReturnUrl' => array(
-			'code' => 'ReturnUrl',
-			'internalcode'=> 'returnurl',
-			'label'=> 'ReturnUrl',
-			'type'=> 'string',
-			'internaltype'=> 'string',
-			'default'=> '',
-			'required'=> true,
-		),
-		'PaymentAction' => array(
-			'code' => 'PaymentAction',
-			'internalcode'=> 'paymentaction',
-			'label'=> 'PaymentAction',
-			'type'=> 'string',
-			'internaltype'=> 'string',
-			'default'=> 'sale',
-			'required'=> true,
-		),
-		'PaypalUrl' => array(
-			'code' => 'PaypalUrl',
-			'internalcode'=> 'paypalurl',
-			'label'=> 'PaypalUrl',
-			'type'=> 'string',
-			'internaltype'=> 'string',
-			'default'=> '',
-			'required'=> true,
-		),
-		'ApiEndpoint' => array(
-			'code' => 'ApiEndpoint',
-			'internalcode'=> 'apiendpoint',
+		'paypalexpress.ApiEndpoint' => array(
+			'code' => 'paypalexpress.ApiEndpoint',
+			'internalcode'=> 'paypalexpress.ApiEndpoint',
 			'label'=> 'APIEndpoint',
 			'type'=> 'string',
 			'internaltype'=> 'string',
-			'default'=> '',
-			'required'=> true,
+			'default'=> 'https://api-3t.paypal.com/nvp',
+			'required'=> false,
+		),
+		'paypalexpress.PaypalUrl' => array(
+			'code' => 'paypalexpress.PaypalUrl',
+			'internalcode'=> 'paypalexpress.PaypalUrl',
+			'label'=> 'PaypalUrl',
+			'type'=> 'string',
+			'internaltype'=> 'string',
+			'default'=> 'https://www.paypal.com/webscr&cmd=_express-checkout&useraction=commit&token=%1$s',
+			'required'=> false,
+		),
+		'paypalexpress.PaymentAction' => array(
+			'code' => 'paypalexpress.PaymentAction',
+			'internalcode'=> 'paypalexpress.PaymentAction',
+			'label'=> 'PaymentAction',
+			'type'=> 'string',
+			'internaltype'=> 'string',
+			'default'=> 'Sale',
+			'required'=> false,
 		),
 	);
 
@@ -103,24 +84,22 @@ implements MShop_Service_Provider_Payment_Interface
 		parent::__construct( $context, $serviceItem );
 
 		$configParameters = array(
-			'ApiUsername',
-			'ApiPassword',
-			'ApiSignature',
-			'ApiEndpoint',
-			'PaypalUrl',
-			'ReturnUrl',
-			'CancelUrl',
-			'PaymentAction'
+			'paypalexpress.ApiUsername',
+			'paypalexpress.ApiPassword',
+			'paypalexpress.ApiSignature',
 		);
 
-		$this->_config = $serviceItem->getConfig();
+		$config = $serviceItem->getConfig();
 
 		foreach( $configParameters as $param )
 		{
-			if( !isset( $this->_config[ $param ] ) ) {
+			if( !isset( $config[ $param ] ) ) {
 				throw new MShop_Service_Exception( sprintf( 'Parameter "%1$s" for configuration not available', $param ) );
 			}
 		}
+
+		$default = 'https://api-3t.paypal.com/nvp';
+		$this->_apiendpoint = $this->_getConfigValue( array( 'paypalexpress.ApiEndpoint' ), $default );
 	}
 
 
@@ -132,7 +111,7 @@ implements MShop_Service_Provider_Payment_Interface
 	 */
 	public function getConfigBE()
 	{
-		$list = array();
+		$list = parent::getConfigBE();
 
 		foreach( $this->_beConfig as $key => $config ) {
 			$list[$key] = new MW_Common_Criteria_Attribute_Default( $config );
@@ -151,7 +130,9 @@ implements MShop_Service_Provider_Payment_Interface
 	 */
 	public function checkConfigBE( array $attributes )
 	{
-		return $this->_checkConfig( $this->_beConfig, $attributes );
+		$errors = parent::checkConfigBE( $attributes );
+
+		return array_merge( $errors, $this->_checkConfig( $this->_beConfig, $attributes ) );
 	}
 
 
@@ -160,8 +141,8 @@ implements MShop_Service_Provider_Payment_Interface
 	 * separately isn't supported or not configured by the shop owner.
 	 *
 	 * @param MShop_Order_Item_Interface $order Order invoice object
-	 * @return MShop_Common_Item_Helper_Form_Interface|null Form object with URL, action and parameters to redirect to
-	 * 	(e.g. to an external server of the payment provider) or null to redirect directly to the confirmation page
+	 * @return MW_Common_Form_Interface Form object with URL, action and parameters to redirect to
+	 * 	(e.g. to an external server of the payment provider or to a local success page)
 	 */
 	public function process( MShop_Order_Item_Interface $order )
 	{
@@ -169,19 +150,23 @@ implements MShop_Service_Provider_Payment_Interface
 		$orderBaseManager = $orderManager->getSubManager( 'base' );
 
 		$orderBaseItem = $orderBaseManager->load( $order->getBaseId() );
+		$orderid = $order->getId();
 
 		$values = $this->_getOrderDetails( $orderBaseItem );
-		$values['METHOD'] = 'SetExpressCheckout';
-		$values[ 'PAYMENTREQUEST_0_INVNUM' ] = $order->getId();
+		$values[ 'METHOD' ] = 'SetExpressCheckout';
+		$values[ 'PAYMENTREQUEST_0_INVNUM' ] = $orderid;
+		$values[ 'RETURNURL' ] = $this->_getConfigValue( array( 'payment.url-success' ) );
+		$values[ 'CANCELURL' ] = $this->_getConfigValue( array( 'payment.url-cancel', 'payment.url-success' ) );
 
-		$urlQuery = '&' . http_build_query( $values, '', '&' );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
+		$urlQuery = http_build_query( $values, '', '&' );
+		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
 		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
-		$params = array ( 'TOKEN' => $rvals['TOKEN'] );
-		$this->_saveAttributes( $params, $orderBaseItem->getService('payment') );
+		$default = 'https://www.paypal.com/webscr&cmd=_express-checkout&useraction=commit&token=%1$s';
+		$paypalUrl = sprintf( $this->_getConfigValue( array( 'paypalexpress.PaypalUrl' ), $default ), $rvals['TOKEN'] );
+		$this->_saveAttributes( array ( 'TOKEN' => $rvals['TOKEN'] ), $orderBaseItem->getService('payment') );
 
-		return new MShop_Common_Item_Helper_Form_Default( $this->_config['PaypalUrl'] . $rvals['TOKEN'], 'GET', array() );
+		return new MShop_Common_Item_Helper_Form_Default( $paypalUrl, 'POST', array() );
 	}
 
 
@@ -208,8 +193,8 @@ implements MShop_Service_Provider_Payment_Interface
 		$values['METHOD'] = 'GetTransactionDetails';
 		$values['TRANSACTIONID'] = $tid;
 
-		$urlQuery = '&' . http_build_query( $values, '', '&' );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
+		$urlQuery = http_build_query( $values, '', '&' );
+		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
 		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
 		$this->_setPaymentStatus( $order, $rvals );
@@ -243,10 +228,10 @@ implements MShop_Service_Provider_Payment_Interface
 		$values['AUTHORIZATIONID'] = $tid;
 		$values['INVNUM'] = $order->getId();
 		$values['CURRENCYCODE'] = $baseItem->getPrice()->getCurrencyId();
-		$values['AMT'] = $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getShipping();
+		$values['AMT'] = $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getCosts();
 
-		$urlQuery = '&' . http_build_query( $values, '', '&' );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
+		$urlQuery = http_build_query( $values, '', '&' );
+		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
 		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
 		$this->_setPaymentStatus( $order, $rvals );
@@ -291,8 +276,8 @@ implements MShop_Service_Provider_Payment_Interface
 		$values['TRANSACTIONID'] = $tid;
 		$values['INVOICEID'] = $order->getId();
 
-		$urlQuery = '&' . http_build_query( $values, '', '&' );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
+		$urlQuery = http_build_query( $values, '', '&' );
+		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
 		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
 		$attributes = array( 'REFUNDTRANSACTIONID' => $rvals['REFUNDTRANSACTIONID'] );
@@ -326,8 +311,8 @@ implements MShop_Service_Provider_Payment_Interface
 		$values['METHOD'] = 'DoVoid';
 		$values['AUTHORIZATIONID'] = $tid;
 
-		$urlQuery = '&' . http_build_query( $values, '', '&' );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
+		$urlQuery = http_build_query( $values, '', '&' );
+		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
 		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
 		$order->setPaymentStatus( MShop_Order_Item_Abstract::PAY_CANCELED );
@@ -339,56 +324,36 @@ implements MShop_Service_Provider_Payment_Interface
 	 * Updates the orders for which status updates were received via direct requests (like HTTP).
 	 *
 	 * @param mixed $additional Update information whose format depends on the payment provider
-	 * @return boolean True if the update was successful, false if the given parameters are not valid for this provider
+	 * @return MShop_Order_Item_Interface|null Order item if update was successful, null if the given parameters are not valid for this provider
 	 * @throws MShop_Service_Exception If updating one of the orders failed
 	 */
 	public function updateSync( $additional )
 	{
-		if( !isset( $additional['TOKEN'] ) ) {
-			return false;
+		if( !isset( $additional['token'] ) || !isset( $additional['PayerID'] ) || !isset( $additional['orderid'] ) ) {
+			return null;
 		}
-
-
-		$values = $this->_getAuthParameter();
-		$values['METHOD'] = 'GetExpressCheckoutDetails';
-		$values['TOKEN'] = $additional['TOKEN'];
-
-		$urlQuery = '&' . http_build_query( $values, '', '&' );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
-
-		$fullResponse = $this->_checkResponse( $additional['TOKEN'], $response, __METHOD__ );
-
-
-		if( !isset( $fullResponse['PAYERID'] ) ) {
-			throw new MShop_Service_Exception( sprintf( 'Paypal express user was not authorized' ) );
-		}
-
 
 		$orderManager = MShop_Order_Manager_Factory::createManager( $this->_getContext() );
 		$orderBaseManager = $orderManager->getSubManager('base');
 
-		$order = $orderManager->getItem( $fullResponse['INVNUM'] );
+		$order = $orderManager->getItem( $additional['orderid'] );
 		$baseid = $order->getBaseId();
 		$baseItem = $orderBaseManager->getItem( $baseid );
 		$serviceItem = $this->_getOrderServiceItem( $baseid );
 
 		$values = $this->_getAuthParameter();
 		$values['METHOD'] = 'DoExpressCheckoutPayment';
-		$values['TOKEN'] = $fullResponse['TOKEN'];
-		$values['PAYERID'] = $fullResponse['PAYERID'];
-		$values['PAYMENTACTION'] = $this->_config['PaymentAction'];
+		$values['TOKEN'] = $additional['token'];
+		$values['PAYERID'] = $additional['PayerID'];
+		$values['PAYMENTACTION'] = $this->_getConfigValue( array( 'paypalexpress.PaymentAction' ), 'Sale' );
 		$values['CURRENCYCODE'] = $baseItem->getPrice()->getCurrencyId();
-		$values['AMT'] = $amount = ( $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getShipping() );
+		$values['AMT'] = $amount = ( $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getCosts() );
 
-		$urlQuery = urldecode( '&' . http_build_query( $values, '', '&' ) );
-		$response = $this->_sendRequest( $this->_config['ApiEndpoint'], $urlQuery );
+		$urlQuery = http_build_query( $values, '', '&' );
+		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
 		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
-
-		$attributes = array(
-			'PAYERID' => $fullResponse['PAYERID'],
-			'EMAIL' => $fullResponse['EMAIL']
-		);
+		$attributes = array( 'PAYERID' => $additional['PayerID'] );
 
 		if( isset( $rvals['TRANSACTIONID'] ) ) {
 			$attributes['TRANSACTIONID'] = $rvals['TRANSACTIONID'];
@@ -398,7 +363,7 @@ implements MShop_Service_Provider_Payment_Interface
 		$this->_setPaymentStatus( $order, $rvals );
 		$orderManager->saveItem( $order );
 
-		return true;
+		return $order;
 	}
 
 
@@ -410,11 +375,12 @@ implements MShop_Service_Provider_Payment_Interface
 	 */
 	public function isImplemented( $what )
 	{
-		switch( $what ) {
-
+		switch( $what )
+		{
 			case MShop_Service_Provider_Payment_Abstract::FEAT_CAPTURE:
 			case MShop_Service_Provider_Payment_Abstract::FEAT_QUERY:
 			case MShop_Service_Provider_Payment_Abstract::FEAT_CANCEL:
+			case MShop_Service_Provider_Payment_Abstract::FEAT_REFUND:
 				return true;
 		}
 
@@ -439,19 +405,20 @@ implements MShop_Service_Provider_Payment_Interface
 		$cid = ( isset( $rvals['CORRELATIONID'] ) ? $rvals['CORRELATIONID'] : '<none>' );
 
 		$logger = $this->_getContext()->getLogger();
-		$logger->log( $method . ' : orderID=' . $orderid . ', CORRELATIONID=' . $cid, MW_Logger_Abstract::INFO );
+		$logger->log( $method . ' : orderID=' . $orderid . ', CORRELATIONID=' . $cid, MW_Logger_Abstract::DEBUG );
 
 		if( $rvals['ACK'] !== 'Success' )
 		{
 			if( $rvals['ACK'] !== 'SuccessWithWarning' )
 			{
 				throw new MShop_Service_Exception( sprintf(
-						'Checking response from Paypal express payment server failed. Error "%1$s" occured for order ID "%2$s" (correlation ID: "%3$s"): %4$s',
-						$rvals['L_ERRORCODE0'], $orderid, $cid, $rvals['L_SHORTMESSAGE0'] ) );
+					'Error in Paypal express response for order with ID "%1$s": %2$s',
+					$orderid, print_r( $rvals, true )
+				) );
 			}
 
 			$str = $method . ' : orderID/token=' . $orderid . ', response=' . print_r( $rvals, true );
-			$logger->log( $str, MW_Logger_Abstract::NOTICE );
+			$logger->log( $str, MW_Logger_Abstract::DEBUG );
 		}
 
 		return $rvals;
@@ -535,7 +502,6 @@ implements MShop_Service_Provider_Payment_Interface
 	{
 		$values = $this->_getAuthParameter();
 
-
 		try
 		{
 			$orderAddressDelivery = $orderBase->getAddress( MShop_Order_Item_Base_Address_Abstract::TYPE_DELIVERY );
@@ -554,45 +520,53 @@ implements MShop_Service_Provider_Payment_Interface
 		$lastPos = 0;
 		foreach( $orderBase->getProducts() as $product )
 		{
-			$values[ 'L_PAYMENTREQUEST_0_NUMBER' . $product->getPosition() ] = $product->getId();
-			$values[ 'L_PAYMENTREQUEST_0_NAME' . $product->getPosition() ] = $product->getName();
-			$values[ 'L_PAYMENTREQUEST_0_QTY' . $product->getPosition() ] = $product->getQuantity();
-			$values[ 'L_PAYMENTREQUEST_0_AMT' . $product->getPosition() ] = $product->getPrice()->getValue();
-			$lastPos = $product->getPosition();
+			$lastPos = $product->getPosition() - 1;
+			$values[ 'L_PAYMENTREQUEST_0_NUMBER' . $lastPos ] = $product->getId();
+			$values[ 'L_PAYMENTREQUEST_0_NAME' . $lastPos ] = $product->getName();
+			$values[ 'L_PAYMENTREQUEST_0_QTY' . $lastPos ] = $product->getQuantity();
+			$values[ 'L_PAYMENTREQUEST_0_AMT' . $lastPos ] = $product->getPrice()->getValue();
 		}
 
 		foreach( $orderBase->getServices() as $service )
 		{
-			$lastPos++;
-			$values[ 'L_PAYMENTREQUEST_0_NUMBER' . $lastPos ] = $service->getId();
-			$values[ 'L_PAYMENTREQUEST_0_NAME' . $lastPos ] = $service->getName();
-			$values[ 'L_PAYMENTREQUEST_0_QTY' . $lastPos ] = '1';
-			$values[ 'L_PAYMENTREQUEST_0_AMT' . $lastPos ] = $service->getPrice()->getValue();
+			if( ( $val = $service->getPrice()->getValue() ) > '0.00' )
+			{
+				$lastPos++;
+				$values[ 'L_PAYMENTREQUEST_0_NAME' . $lastPos ] = $service->getName();
+				$values[ 'L_PAYMENTREQUEST_0_QTY' . $lastPos ] = '1';
+				$values[ 'L_PAYMENTREQUEST_0_AMT' . $lastPos ] = $val;
+			}
 		}
 
+		$paymentCosts = '0.00';
+		$paymentItem = $orderBase->getService('payment');
+		if( ( $paymentCosts = $paymentItem->getPrice()->getCosts() ) > '0.00' )
+		{
+			$lastPos++;
+			$values[ 'L_PAYMENTREQUEST_0_NAME' . $lastPos ] = $this->_getContext()->getI18n()->dt( 'mshop', 'Payment costs' );
+			$values[ 'L_PAYMENTREQUEST_0_QTY' . $lastPos ] = '1';
+			$values[ 'L_PAYMENTREQUEST_0_AMT' . $lastPos ] = $paymentCosts;
+		}
 
 		$price = $orderBase->getPrice();
-		$amount = $price->getValue() + $price->getShipping();
+		$amount = $price->getValue() + $price->getCosts();
 
 		$values['MAXAMT'] = $amount + 0.01; // @todo rounding error?
 		$values['PAYMENTREQUEST_0_AMT'] = number_format( $amount, 2, '.', '' );
-		$values['PAYMENTREQUEST_0_ITEMAMT'] = $price->getValue();
-		$values['PAYMENTREQUEST_0_SHIPPINGAMT'] = $price->getShipping();
+		$values['PAYMENTREQUEST_0_ITEMAMT'] = ( string ) ( $price->getValue() + $paymentCosts );
+		$values['PAYMENTREQUEST_0_SHIPPINGAMT'] = (string) ( $price->getCosts() - $paymentCosts );
 		$values['PAYMENTREQUEST_0_INSURANCEAMT'] = '0.00';
 		$values['PAYMENTREQUEST_0_INSURANCEOPTIONOFFERED'] = 'false';
 		$values['PAYMENTREQUEST_0_SHIPDISCAMT'] = '0.00';
 		$values['PAYMENTREQUEST_0_TAXAMT'] = $price->getTaxRate();
 		$values['PAYMENTREQUEST_0_CURRENCYCODE'] = $orderBase->getPrice()->getCurrencyId();
-		$values['PAYMENTREQUEST_0_PAYMENTACTION'] = $this->_config['PaymentAction'];
-		$values['RETURNURL'] = $this->_config['ReturnUrl'];
-		$values['CANCELURL'] = $this->_config['CancelUrl'];
-
+		$values['PAYMENTREQUEST_0_PAYMENTACTION'] = $this->_getConfigValue( array( 'paypalexpress.PaymentAction' ), 'sale' );
 
 		try
 		{
 			$orderServiceDeliveryItem = $orderBase->getService('delivery');
 
-			$values['L_SHIPPINGOPTIONAMOUNT0'] = $price->getShipping();
+			$values['L_SHIPPINGOPTIONAMOUNT0'] = (string) ( $price->getCosts() - $paymentCosts );
 			$values['L_SHIPPINGOPTIONLABEL0'] = $orderServiceDeliveryItem->getName();
 			$values['L_SHIPPINGOPTIONNAME0'] = $orderServiceDeliveryItem->getCode();
 			$values['L_SHIPPINGOPTIONISDEFAULT0'] = 'true';
@@ -613,9 +587,9 @@ implements MShop_Service_Provider_Payment_Interface
 	{
 		return array(
 			'VERSION' => '87.0',
-			'SIGNATURE' => $this->_config['ApiSignature'],
-			'USER' => $this->_config['ApiUsername'],
-			'PWD' => $this->_config['ApiPassword'],
+			'SIGNATURE' => $this->_getConfigValue( array( 'paypalexpress.ApiSignature' ) ),
+			'USER' => $this->_getConfigValue( array( 'paypalexpress.ApiUsername' ) ),
+			'PWD' => $this->_getConfigValue( array( 'paypalexpress.ApiPassword' ) ),
 		);
 	}
 
@@ -643,6 +617,7 @@ implements MShop_Service_Provider_Payment_Interface
 				$attributeItem = $attributeManager->createItem();
 				$attributeItem->setServiceId( $serviceItem->getId() );
 				$attributeItem->setCode( $code );
+				$attributeItem->setType( 'payment' );
 			}
 			else
 			{

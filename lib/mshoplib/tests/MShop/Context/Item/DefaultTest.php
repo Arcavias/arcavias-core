@@ -3,12 +3,11 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14602 2011-12-27 15:27:08Z gwussow $
  */
 
 class MShop_Context_Item_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 	public static function main()
 	{
@@ -59,6 +58,18 @@ class MShop_Context_Item_DefaultTest extends MW_Unittest_Testcase
 		$config = $this->_object->getSession();
 	}
 
+	public function testGetMail()
+	{
+		$this->setExpectedException('MShop_Exception');
+		$config = $this->_object->getMail();
+	}
+
+	public function testGetView()
+	{
+		$this->setExpectedException('MShop_Exception');
+		$config = $this->_object->getView();
+	}
+
 	public function testSetConfig()
 	{
 		$context = TestHelper::getContext();
@@ -76,7 +87,12 @@ class MShop_Context_Item_DefaultTest extends MW_Unittest_Testcase
 	public function testSetI18n()
 	{
 		$context = TestHelper::getContext();
-		$this->_object->setI18n( $context->getI18n() );
+
+		$locale = MShop_Locale_Manager_Factory::createManager(TestHelper::getContext())->createItem();
+		$locale->setLanguageId( 'en' );
+		$this->_object->setLocale( $locale );
+
+		$this->_object->setI18n( array( 'en' => $context->getI18n() ) );
 		$this->assertSame( $context->getI18n(), $this->_object->getI18n() );
 	}
 
@@ -99,6 +115,20 @@ class MShop_Context_Item_DefaultTest extends MW_Unittest_Testcase
 		$context = TestHelper::getContext();
 		$this->_object->setSession( $context->getSession() );
 		$this->assertSame( $context->getSession(), $this->_object->getSession() );
+	}
+
+	/**
+	 * @todo Implement test for setMail() as soon as a default implementation is available
+	 */
+	public function testSetMail()
+	{
+	}
+
+	public function testSetView()
+	{
+		$view = new MW_View_Default();
+		$this->_object->setView( $view );
+		$this->assertInstanceOf( 'MW_View_Interface', $this->_object->getView() );
 	}
 
 	public function testGetSetEditor()

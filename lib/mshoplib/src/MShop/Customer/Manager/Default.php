@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Customer
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -559,7 +558,7 @@ class MShop_Customer_Manager_Default extends MShop_Customer_Manager_Abstract
 	/**
 	 * Initializes a new customer manager object using the given context object.
 	 *
-	 * @param MShop_Context_Interface $_context Context object with required objects
+	 * @param MShop_Context_Interface $context Context object with required objects
 	 */
 	public function __construct( MShop_Context_Item_Interface $context )
 	{
@@ -628,28 +627,14 @@ class MShop_Customer_Manager_Default extends MShop_Customer_Manager_Abstract
 
 
 	/**
-	 * Deletes a customer item object from the permanent storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Unique customer ID referencing an existing customer
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/customer/manager/default/item/delete');
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$result = $stmt->execute()->finish();
-
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/customer/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -683,7 +668,7 @@ class MShop_Customer_Manager_Default extends MShop_Customer_Manager_Abstract
 			$sql = $config->get( $path, $path );
 
 			$stmt = $conn->create( $sql );
-			$billingAddress = $item->getBillingAddress();
+			$billingAddress = $item->getPaymentAddress();
 
 			$stmt->bind( 1, $context->getLocale()->getSiteId(), MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind( 2, $item->getLabel() );

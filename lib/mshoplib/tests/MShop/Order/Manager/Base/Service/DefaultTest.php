@@ -11,14 +11,14 @@
  */
 class MShop_Order_Manager_Base_Service_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_context;
-	protected $_object;
+	private $_context;
+	private $_object;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	public static function main()
 	{
@@ -76,13 +76,13 @@ class MShop_Order_Manager_Base_Service_DefaultTest extends MW_Unittest_Testcase
 		$expr[] = $search->compare( '!=', 'order.base.service.id', null );
 		$expr[] = $search->compare( '==', 'order.base.service.siteid', $siteid );
 		$expr[] = $search->compare( '!=', 'order.base.service.baseid', null );
-		$expr[] = $search->compare( '==', 'order.base.service.serviceid', 'OGONE1' );
+		$expr[] = $search->compare( '!=', 'order.base.service.serviceid', null );
 		$expr[] = $search->compare( '==', 'order.base.service.type', 'payment' );
 		$expr[] = $search->compare( '==', 'order.base.service.code', 'OGONE' );
 		$expr[] = $search->compare( '==', 'order.base.service.name', 'ogone' );
 		$expr[] = $search->compare( '==', 'order.base.service.mediaurl', 'somewhere/thump1.jpg' );
 		$expr[] = $search->compare( '==', 'order.base.service.price', '0.00' );
-		$expr[] = $search->compare( '==', 'order.base.service.shipping', '0.00' );
+		$expr[] = $search->compare( '==', 'order.base.service.costs', '0.00' );
 		$expr[] = $search->compare( '==', 'order.base.service.rebate', '0.00' );
 		$expr[] = $search->compare( '==', 'order.base.service.taxrate', '0.00' );
 		$expr[] = $search->compare( '>=', 'order.base.service.mtime', '1970-01-01 00:00:00' );
@@ -115,7 +115,7 @@ class MShop_Order_Manager_Base_Service_DefaultTest extends MW_Unittest_Testcase
 		$results = $this->_object->searchItems($search, array(), $total);
 
 		$this->assertEquals(1, count( $results ) );
-		$this->assertEquals( 2, $total );
+		$this->assertEquals( 3, $total );
 
 		foreach($results as $itemId => $item) {
 			$this->assertEquals( $itemId, $item->getId() );

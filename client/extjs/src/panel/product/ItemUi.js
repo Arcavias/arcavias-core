@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14663 2012-01-03 16:38:02Z nsendetzky $
  */
 
 
@@ -89,6 +88,7 @@ MShop.panel.product.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 							fieldLabel : _('Code'),
 							name : 'product.code',
 							allowBlank : false,
+							maxLength : 32,
 							emptyText : _('EAN, SKU or article numer (required)')
 						}, {
 							xtype : 'textarea',

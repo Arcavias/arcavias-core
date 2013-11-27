@@ -2,7 +2,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: service.php 1163 2012-08-28 09:25:31Z doleiynyk $
  */
 
 return array (
@@ -29,7 +28,7 @@ return array (
 			'label' => 'unitlabel',
 			'provider' => 'Default',
 			'config' => array(
-				'url' => 'deliveryurl'
+				'default.url' => 'deliveryurl'
 			),
 			'status' => 1
 		),
@@ -40,7 +39,7 @@ return array (
 			'label' => 'unitpaymentlabel',
 			'provider' => 'PrePay',
 			'config' => array(
-				'url' => 'paymenturl'
+				'payment.url-success' => 'paymenturl'
 			),
 			'status' => 1
 		),
@@ -60,14 +59,14 @@ return array (
 			'label' => 'PayPalExpress',
 			'provider' => 'PayPalExpress',
 			'config' => array(
-				'ApiUsername' => 'unit_1340199666_biz_api1.yahoo.de',
-				'ApiPassword' => '1340199685',
-				'ApiSignature' => 'A34BfbVoMVoHt7Sf8BlufLXS8tKcAVxmJoDiDUgBjWi455pJoZXGoJ87',
-				'CancelUrl' => 'http://cancelurl.com',
-				'ReturnUrl' => 'http://returnurl.com',
-				'PaymentAction' => 'authorization',
-				'PaypalUrl' => 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&token=',
-				'ApiEndpoint' => 'https://api-3t.sandbox.paypal.com/nvp'
+				'paypalexpress.ApiUsername' => 'sellerde_api1.metaways.de',
+				'paypalexpress.ApiPassword' => '1370351234',
+				'paypalexpress.ApiSignature' => 'AAZZBfWatx5wyxGsFzOqsM--jPYmApZPsklH4pTAnza8AaIJIyhUd3t.',
+				'paypalexpress.PaymentAction' => 'authorization',
+				'paypalexpress.PaypalUrl' => 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&useraction=commit&token=%1$s',
+				'paypalexpress.ApiEndpoint' => 'https://api-3t.sandbox.paypal.com/nvp',
+				'payment.url-return' => 'http://returnurl.com/updatesync.php',
+				'payment.url-cancel' => 'http://cancelurl.com',
 			),
 			'status' => 1
 		),

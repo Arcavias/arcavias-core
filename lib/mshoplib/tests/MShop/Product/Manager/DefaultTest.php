@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14843 2012-01-13 08:11:39Z nsendetzky $
  */
 
 
@@ -12,13 +11,13 @@
  */
 class MShop_Product_Manager_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	 * Runs the test methods of this class.
@@ -321,6 +320,33 @@ class MShop_Product_Manager_DefaultTest extends MW_Unittest_Testcase
 			$this->assertEquals( 3, count( $product->getRefItems( 'media' ) ) );
 		}
 
+	}
+
+
+	public function testSearchItemsLimit()
+	{
+		$start = 0;
+		$numproducts = 0;
+
+		$search = $this->_object->createSearch();
+		$search->setConditions( $search->compare( '==', 'product.editor', 'core:unittest' ) );
+		$search->setSlice( $start, 5 );
+
+		do
+		{
+			$result = $this->_object->searchItems( $search );
+
+			foreach ( $result as $item ) {
+				$numproducts++;
+			}
+
+			$count = count( $result );
+			$start += $count;
+			$search->setSlice( $start, 5 );
+		}
+		while( $count > 0 );
+
+		$this->assertEquals( 21, $numproducts );
 	}
 
 

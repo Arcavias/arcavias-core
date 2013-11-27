@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14411 2011-12-17 14:02:37Z nsendetzky $
  */
 
 
 class Controller_ExtJS_Order_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -71,7 +70,7 @@ class Controller_ExtJS_Order_DefaultTest extends MW_Unittest_Testcase
 		$result = $this->_object->searchItems( $params );
 
 		$this->assertEquals( 1, count( $result['items'] ) );
-		$this->assertEquals( 1, $result['total'] );
+		$this->assertEquals( 2, $result['total'] );
 		$this->assertEquals( 'web', $result['items'][0]->{'order.type'} );
 	}
 

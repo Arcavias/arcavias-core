@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14411 2011-12-17 14:02:37Z nsendetzky $
  */
 
 
 class Controller_ExtJS_Locale_Site_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -179,6 +178,7 @@ class Controller_ExtJS_Locale_Site_DefaultTest extends MW_Unittest_Testcase
 			'items' => null,
 			'oldparentid' => null,
 			'newparentid' => null,
+			'refid' => null
 		);
 
 		$this->setExpectedException( 'MShop_Locale_Exception' );

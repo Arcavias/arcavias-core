@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
  * @package MW
  * @subpackage Common
- * @version $Id: SQL.php 16606 2012-10-19 12:50:23Z nsendetzky $
  */
 
 
@@ -122,7 +121,7 @@ class MW_Common_Criteria_Expression_Compare_SQL extends MW_Common_Criteria_Expre
 	protected function _createValueList( $type, array $values )
 	{
 		if( empty( $values ) ) {
-			return '';
+			return '(NULL)';
 		}
 
 		$operator = $this->getOperator();

@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14341 2011-12-14 16:00:50Z nsendetzky $
  */
 
 
@@ -17,7 +16,7 @@ MShop.panel.text.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 	initComponent : function() {
 	
 		this.title = _('Text item details');
-
+		
 		MShop.panel.AbstractItemUi.prototype.setSiteCheck( this );
 
 		this.items = [ {
@@ -83,7 +82,7 @@ MShop.panel.text.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 							fieldLabel : _('Label'),
 							name : 'text.label'
 						}, {
-							xtype : 'htmleditor',
+							xtype : MShop.Config.get('client/extjs/common/editor', 'htmleditor'),
 							fieldLabel : 'Content',
 							name : 'text.content',
 							enableFont : false

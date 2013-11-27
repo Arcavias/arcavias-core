@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ManualTest.php 14843 2012-01-13 08:11:39Z nsendetzky $
  */
 
 
@@ -17,7 +16,7 @@ class MShop_Service_Provider_Delivery_ManualTest extends PHPUnit_Framework_TestC
 	 * @var    MShop_Service_Provider_Delivery_Manual
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
 
 	/**

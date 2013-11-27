@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Client
  * @subpackage Html
- * @version $Id: Default.php 1324 2012-10-21 13:17:19Z nsendetzky $
  */
 
 
@@ -20,7 +19,7 @@ class Client_Html_Basket_Standard_Default
 	implements Client_Html_Interface
 {
 	private $_subPartPath = 'client/html/basket/standard/default/subparts';
-	private $_subPartNames = array( 'main' );
+	private $_subPartNames = array( 'detail' );
 	private $_controller;
 
 
@@ -238,6 +237,15 @@ class Client_Html_Basket_Standard_Default
 			$error = array( $this->_getContext()->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
 			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
 		}
+		catch( MShop_Plugin_Provider_Exception $e )
+		{
+			$errors = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$errors = array_merge( $errors, $this->_translatePluginErrorCodes( $e->getErrorCodes() ) );
+
+			$view = $this->getView();
+			$view->summaryErrorCodes = $e->getErrorCodes();
+			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $errors;
+		}
 		catch( MShop_Exception $e )
 		{
 			$view = $this->getView();
@@ -266,49 +274,7 @@ class Client_Html_Basket_Standard_Default
 	{
 		if( !isset( $this->_cache ) )
 		{
-			$prices = array();
-			$taxrates = array();
-			$basket = $this->_controller->get();
-
-
-			foreach( $basket->getProducts() as $product )
-			{
-				$price = $product->getPrice();
-
-				if( isset( $taxrates[ $price->getTaxrate() ] ) ) {
-					$taxrates[ $price->getTaxrate() ] += ( $price->getValue() + $price->getShipping() ) * $product->getQuantity();
-				} else {
-					$taxrates[ $price->getTaxrate() ] = ( $price->getValue() + $price->getShipping() ) * $product->getQuantity();
-				}
-			}
-
-			try
-			{
-				$price = $basket->getService( 'delivery' )->getPrice();
-
-				if( isset( $taxrates[ $price->getTaxrate() ] ) ) {
-					$taxrates[ $price->getTaxrate() ] += $price->getValue() + $price->getShipping();
-				} else {
-					$taxrates[ $price->getTaxrate() ] = $price->getValue() + $price->getShipping();
-				}
-			}
-			catch( Exception $e ) { ; }
-
-			try
-			{
-				$price = $basket->getService( 'payment' )->getPrice();
-
-				if( isset( $taxrates[ $price->getTaxrate() ] ) ) {
-					$taxrates[ $price->getTaxrate() ] += $price->getValue() + $price->getShipping();
-				} else {
-					$taxrates[ $price->getTaxrate() ] = $price->getValue() + $price->getShipping();
-				}
-			}
-			catch( Exception $e ) { ; }
-
-
-			$view->standardBasket = $basket;
-			$view->standardTaxRates = $taxrates;
+			$view->standardBasket = $this->_controller->get();
 
 			$this->_cache = $view;
 		}

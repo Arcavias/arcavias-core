@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Abstract.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -25,7 +24,7 @@ abstract class MShop_Order_Item_Base_Address_Abstract extends MShop_Common_Item_
 	/**
 	 * Billing address.
 	 */
-	const TYPE_BILLING = 'payment';
+	const TYPE_PAYMENT = 'payment';
 
 
 	/**
@@ -39,7 +38,7 @@ abstract class MShop_Order_Item_Base_Address_Abstract extends MShop_Common_Item_
 		switch( $value )
 		{
 			case MShop_Order_Item_Base_Address_Abstract::TYPE_DELIVERY:
-			case MShop_Order_Item_Base_Address_Abstract::TYPE_BILLING:
+			case MShop_Order_Item_Base_Address_Abstract::TYPE_PAYMENT:
 				return;
 			default:
 				throw new MShop_Order_Exception( sprintf( 'Address type "%1$s" not within allowed range', $value ) );

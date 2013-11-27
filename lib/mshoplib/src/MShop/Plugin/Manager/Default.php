@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Plugin
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -65,6 +64,13 @@ class MShop_Plugin_Manager_Default
 			'internalcode' => 'mplu."config"',
 			'type' => 'string',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
+		),
+		'plugin.position' => array(
+			'label' => 'Plugin position',
+			'code' => 'plugin.position',
+			'internalcode' => 'mplu."pos"',
+			'type' => 'integer',
+			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
 		),
 		'plugin.status' => array(
 			'label' => 'Plugin status',
@@ -201,6 +207,8 @@ class MShop_Plugin_Manager_Default
 		$expr[] = $search->getConditions();
 
 		$search->setConditions( $search->combine( '&&', $expr ) );
+		$search->setSortations( array( $search->sort( '+', 'plugin.position' ) ) );
+
 		$pluginItems = $this->searchItems( $search );
 
 		$interface = 'MShop_Plugin_Provider_Interface';
@@ -271,8 +279,10 @@ class MShop_Plugin_Manager_Default
 	/**
 	 * Returns plugin item specified by the given ID.
 	 *
-	 * @return MShop_Plugin_Item_Interface Plugin item
-	 * @throws MShop_Plugin_Exception If plugin isn't found
+	 * @param integer $id Unique ID of the plugin item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Plugin_Item_Interface Returns the plugin item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -303,24 +313,26 @@ class MShop_Plugin_Manager_Default
 		try
 		{
 			$id = $item->getId();
+			$date = date( 'Y-m-d H:i:s' );
 
 			$path = 'mshop/plugin/manager/default/item/';
 			$path .= ( $id === null ) ? 'insert' : 'update';
 
 			$stmt = $this->_getCachedStatement( $conn, $path );
-			$stmt->bind(1, $context->getLocale()->getSiteId(), MW_DB_Statement_Abstract::PARAM_INT);
-			$stmt->bind(2, $item->getTypeId() );
-			$stmt->bind(3, $item->getLabel() );
-			$stmt->bind(4, $item->getProvider() );
-			$stmt->bind(5, json_encode( $item->getConfig() ) );
-			$stmt->bind(6, $item->getStatus(), MW_DB_Statement_Abstract::PARAM_INT);
-			$stmt->bind(7, date('Y-m-d H:i:s', time()));//mtime
-			$stmt->bind(8, $context->getEditor());
+			$stmt->bind( 1, $context->getLocale()->getSiteId(), MW_DB_Statement_Abstract::PARAM_INT );
+			$stmt->bind( 2, $item->getTypeId() );
+			$stmt->bind( 3, $item->getLabel() );
+			$stmt->bind( 4, $item->getProvider() );
+			$stmt->bind( 5, json_encode( $item->getConfig() ) );
+			$stmt->bind( 6, $item->getPosition(), MW_DB_Statement_Abstract::PARAM_INT );
+			$stmt->bind( 7, $item->getStatus(), MW_DB_Statement_Abstract::PARAM_INT );
+			$stmt->bind( 8, $date );//mtime
+			$stmt->bind( 9, $context->getEditor() );
 
 			if( $id !== null ) {
-				$stmt->bind(9, $id, MW_DB_Statement_Abstract::PARAM_INT);
+				$stmt->bind( 10, $id, MW_DB_Statement_Abstract::PARAM_INT );
 			} else {
-				$stmt->bind(9, date('Y-m-d H:i:s', time()));//ctime
+				$stmt->bind( 10, $date );//ctime
 			}
 
 			$result = $stmt->execute()->finish();
@@ -348,32 +360,14 @@ class MShop_Plugin_Manager_Default
 
 
 	/**
-	 * Deletes a plugin from the storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Unique ID of the plugin in the storage
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement( $conn, 'mshop/plugin/manager/default/item/delete' );
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$result = $stmt->execute()->finish();
-
-			if( isset( $this->_plugins[$id] ) ) {
-				unset( $this->_plugins[$id] );
-			}
-
-			$dbm->release($conn);
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/plugin/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -408,7 +402,7 @@ class MShop_Plugin_Manager_Default
 				}
 
 				$map[ $row['id'] ] = $row;
-				$typeIds[] = $row['typeid'];
+				$typeIds[ $row['typeid'] ] = null;
 			}
 
 			$dbm->release( $conn );
@@ -419,12 +413,13 @@ class MShop_Plugin_Manager_Default
 			throw $e;
 		}
 
-		if( count( $typeIds ) > 0 )
+		if( !empty( $typeIds ) )
 		{
 			$typeManager = $this->getSubManager( 'type' );
-			$search = $typeManager->createSearch();
-			$search->setConditions( $search->compare( '==', 'plugin.type.id', array_unique( $typeIds ) ) );
-			$typeItems = $typeManager->searchItems( $search );
+			$typeSearch = $typeManager->createSearch();
+			$typeSearch->setConditions( $typeSearch->compare( '==', 'plugin.type.id', array_keys( $typeIds ) ) );
+			$typeSearch->setSlice( 0, $search->getSliceSize() );
+			$typeItems = $typeManager->searchItems( $typeSearch );
 
 			foreach( $map as $id => $row )
 			{

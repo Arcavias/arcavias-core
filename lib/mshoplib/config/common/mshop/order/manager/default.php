@@ -3,30 +3,29 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 return array(
 	'item' => array(
 		'insert' => '
-			INSERT INTO "mshop_order" ("baseid", "siteid", "type", "datepayment", "datedelivery", "statusdelivery", "statuspayment", "flag",
-				"emailflag", "relatedid", "mtime", "editor", "ctime" )
-			VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
+			INSERT INTO "mshop_order" ("baseid", "siteid", "type", "datepayment", "datedelivery", "statusdelivery", "statuspayment",
+				"relatedid", "mtime", "editor", "ctime" )
+			VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )
 		',
 		'update' => '
 			UPDATE "mshop_order"
 			SET "baseid" = ?, "siteid" = ?, "type" = ?, "datepayment" = ?, "datedelivery" = ?, "statusdelivery" = ?, "statuspayment" = ?,
-				"flag" = ?, "emailflag" = ?, "relatedid" = ?, "mtime" = ?, "editor" = ?
+				"relatedid" = ?, "mtime" = ?, "editor" = ?
 			WHERE "id" = ?
 		',
 		'delete' => '
 			DELETE FROM "mshop_order"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'search' => '
 			SELECT DISTINCT mord."id", mord."baseid", mord."siteid", mord."type", mord."datepayment", mord."datedelivery",
-				mord."statuspayment", mord."statusdelivery", mord."relatedid", mord."mtime", mord."flag", mord."emailflag",
-				mord."editor", mord."ctime"
+				mord."statuspayment", mord."statusdelivery", mord."relatedid", mord."ctime", mord."mtime", mord."editor"
 			FROM "mshop_order" AS mord
 			:joins
 			WHERE :cond

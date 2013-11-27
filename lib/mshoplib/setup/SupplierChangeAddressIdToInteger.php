@@ -3,10 +3,7 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: SupplierChangeAddressIdToInteger.php 865 2012-06-28 14:42:53Z nsendetzky $
  */
-
-require_once 'MW/Setup/Task/Abstract.php';
 
 
 /**

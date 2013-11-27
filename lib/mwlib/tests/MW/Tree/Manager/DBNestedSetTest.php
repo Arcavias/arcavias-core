@@ -8,8 +8,8 @@
  */
 class MW_Tree_Manager_DBNestedSetTest extends MW_Unittest_Testcase
 {
-	protected $_dbm;
-	protected $_config;
+	private $_dbm;
+	private $_config;
 
 
 	/**
@@ -20,7 +20,7 @@ class MW_Tree_Manager_DBNestedSetTest extends MW_Unittest_Testcase
 	 */
 	protected function setUp()
 	{
-		if( MW_TestHelper::getConfig()->get( 'resource/db/adapter', false ) === false ) {
+		if( TestHelper::getConfig()->get( 'resource/db/adapter', false ) === false ) {
 			$this->markTestSkipped( 'No database configured' );
 		}
 
@@ -29,12 +29,14 @@ class MW_Tree_Manager_DBNestedSetTest extends MW_Unittest_Testcase
 
 		$this->_config['search'] = array(
 			'id' => array( 'label' => 'Tree node ID', 'code' => 'tree.id', 'internalcode' => 'id', 'type' => 'integer', 'internaltype' => MW_DB_Statement_Abstract::PARAM_INT ),
+			'parentid' => array( 'label' => 'Tree node parent id', 'code' => 'tree.parentid', 'internalcode' => 'parentid', 'type' => 'integer', 'internaltype' => MW_DB_Statement_Abstract::PARAM_INT ),
 			'label' => array( 'label' => 'Tree node name', 'code' => 'tree.label', 'internalcode' => 'label', 'type' => 'string', 'internaltype' => MW_DB_Statement_Abstract::PARAM_STR ),
 			'code' => array( 'label' => 'Tree node code', 'code' => 'tree.code', 'internalcode' => 'code', 'type' => 'string', 'internaltype' => MW_DB_Statement_Abstract::PARAM_STR ),
 			'status' => array( 'label' => 'Tree node status', 'code' => 'tree.status', 'internalcode' => 'status', 'type' => 'boolean', 'internaltype' => MW_DB_Statement_Abstract::PARAM_BOOL ),
 			'level' => array( 'label' => 'Tree node level', 'code' => 'tree.level', 'internalcode' => 'level', 'type' => 'integer', 'internaltype' => MW_DB_Statement_Abstract::PARAM_INT ),
 			'left' => array( 'label' => 'Tree node left number', 'code' => 'tree.left', 'internalcode' => 'nleft', 'type' => 'integer', 'internaltype' => MW_DB_Statement_Abstract::PARAM_INT ),
 			'right' => array( 'label' => 'Tree node right number', 'code' => 'tree.right', 'internalcode' => 'nright', 'type' => 'integer', 'internaltype' => MW_DB_Statement_Abstract::PARAM_INT ),
+
 		);
 
 		$this->_config['sql'] = array(
@@ -74,6 +76,9 @@ class MW_Tree_Manager_DBNestedSetTest extends MW_Unittest_Testcase
 			'update' => '
 				UPDATE "mw_tree_test" SET label = ?, code = ?, status = ? WHERE id = ?
 			',
+			'update-parentid' => '
+				UPDATE "mw_tree_test" SET parentid = ? WHERE id = ?
+			',
 			'newid' => '
 				SELECT LAST_INSERT_ID()
 			',
@@ -82,7 +87,7 @@ class MW_Tree_Manager_DBNestedSetTest extends MW_Unittest_Testcase
 			'transrollback' => 'ROLLBACK',
 		);
 
-		$this->_dbm = MW_TestHelper::getDBManager();
+		$this->_dbm = TestHelper::getDBManager();
 		$conn = $this->_dbm->acquire();
 
 		$sql = 'DROP TABLE IF EXISTS "mw_tree_test"';
@@ -147,7 +152,7 @@ class MW_Tree_Manager_DBNestedSetTest extends MW_Unittest_Testcase
 	{
 		$sql = 'DROP TABLE "mw_tree_test"';
 
-		$this->_dbm = MW_TestHelper::getDBManager();
+		$this->_dbm = TestHelper::getDBManager();
 		$conn = $this->_dbm->acquire();
 		$conn->create( $sql )->execute()->finish();
 		$this->_dbm->release( $conn );

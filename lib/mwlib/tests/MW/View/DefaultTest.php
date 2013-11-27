@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
- * @version $Id$
  */
 
 
@@ -12,8 +11,8 @@
  */
 class MW_View_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_translate;
+	private $_object;
+	private $_translate;
 
 
 	/**

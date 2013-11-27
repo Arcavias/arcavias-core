@@ -14,8 +14,8 @@
 			"path": "lib/extjs/resources/css/"
 		}]
 	}, {
-		"name": "MShop Admin Core CSS",
-		"file": "resources/css/mshop-core.css",
+		"name": "Arcavias Admin Core CSS",
+		"file": "resources/css/arcavias-core.css",
 		"isDebug": true,
 		"fileIncludes": [{
 			"text": "main.css",
@@ -40,7 +40,7 @@
 		}]
 	}, {
 		"name": "Arcavias Core",
-		"file": "js/mshop-core.js",
+		"file": "js/arcavias-core.js",
 		"isDebug": true,
 		"fileIncludes": [{
 			"text": "Filter.js",
@@ -100,6 +100,9 @@
 			"text": "Schema.js",
 			"path": "src/"
 		}, {
+			"text": "Config.js",
+			"path": "src/"
+		}, {
 			"text": "pagingtoolbar.js",
 			"path": "src/elements/"
 		}, {
@@ -124,6 +127,9 @@
 			"text": "status.js",
 			"path": "src/elements/"
 		}, {
+			"text": "domain.js",
+			"path": "src/elements/"
+		}, {
 			"text": "AbstractListUi.js",
 			"path": "src/panel/"
 		}, {
@@ -137,6 +143,9 @@
 			"path": "src/panel/"
 		}, {
 			"text": "AbstractListItemPickerUi.js",
+			"path": "src/panel/"
+		}, {
+			"text": "AbstractTreeUi.js",
 			"path": "src/panel/"
 		}, {
 			"text": "ListUiSmall.js",
@@ -396,6 +405,21 @@
 		}, {
 			"text": "ConfigUi.js",
 			"path": "src/panel/locale/site/"
+		}, {
+			"text": "ListUi.js",
+			"path": "src/panel/type/text/"
+		}, {
+			"text": "ItemUi.js",
+			"path": "src/panel/type/text/"
+		}, {
+			"text": "ListUi.js",
+			"path": "src/panel/type/media/"
+		}, {
+			"text": "ItemUi.js",
+			"path": "src/panel/type/media/"
+		}, {
+			"text": "TabUi.js",
+			"path": "src/panel/type/"
 		}]
 	}],
 	"resources" : []

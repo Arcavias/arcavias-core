@@ -7,8 +7,8 @@
 
 class Client_Html_Checkout_Standard_Address_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -56,8 +56,7 @@ class Client_Html_Checkout_Standard_Address_DefaultTest extends MW_Unittest_Test
 
 	public function testGetHeader()
 	{
-		$output = $this->_object->getHeader();
-		$this->assertStringStartsWith( '<script type="text/javascript">', $output );
+		$this->_object->getHeader();
 	}
 
 

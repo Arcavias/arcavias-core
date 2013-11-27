@@ -7,14 +7,16 @@
 
 
 return array(
-	'name' => 'Arcavias',
-	'description' => 'Arcavias core system with admin interface',
-	'author' => 'Metaways Infosystems GmbH',
-	'email' => 'application@metaways.de',
-	'version' => '2013-03',
-	'depends' => array(
-	),
-	'conflicts' => array(
+	'name' => 'arcavias-core',
+	'depends' => array(),
+	'include' => array(
+		'lib/mshoplib/src',
+		'lib/mwlib/src',
+		'client/html/src',
+		'controller/frontend/src',
+		'controller/extjs/src',
+		'controller/jobs/src',
+		'lib/mwlib/lib',
 	),
 	'config' => array(
 		'mysql' => array(
@@ -23,17 +25,8 @@ return array(
 			'controller/frontend/config/controller',
 			'controller/extjs/config/controller',
 			'config',
+			'client/extjs/config',
 		),
-	),
-	'include' => array(
-		'lib/mshoplib/src',
-		'lib/mwlib/src',
-		'client/html/src',
-		'controller/frontend/src',
-		'controller/extjs/src',
-		'lib/zendlib',
-		'lib/phpexcel',
-		'lib/mwlib/lib'
 	),
 	'i18n' => array(
 		'client/html' => 'client/html/i18n',
@@ -42,6 +35,7 @@ return array(
 		'client/html/currency' => 'client/html/i18n/currency',
 		'client/html/language' => 'client/html/i18n/language',
 		'controller/frontend' => 'controller/frontend/i18n',
+		'mshop/code' => 'lib/mshoplib/i18n/code',
 		'mshop' => 'lib/mshoplib/i18n',
 	),
 	'setup' => array(
@@ -53,6 +47,12 @@ return array(
 		),
 		'client/html' => array(
 			'client/html/layouts',
+		),
+		'controller/extjs' => array(
+			'controller/extjs/src',
+		),
+		'controller/jobs' => array(
+			'controller/jobs/src',
 		),
 	),
 );

@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: PriceAddTestData.php 1365 2012-10-31 13:54:32Z doleiynyk $
  */
 
 
@@ -30,7 +29,7 @@ class MW_Setup_Task_PriceAddTestData extends MW_Setup_Task_Abstract
 	 */
 	public function getPostDependencies()
 	{
-		return array();
+		return array( 'CatalogRebuildTestIndex' );
 	}
 
 
@@ -111,7 +110,7 @@ class MW_Setup_Task_PriceAddTestData extends MW_Setup_Task_Abstract
 			$price->setLabel( $dataset['label'] );
 			$price->setQuantity( $dataset['quantity'] );
 			$price->setValue( $dataset['value'] );
-			$price->setShipping( $dataset['shipping'] );
+			$price->setCosts( $dataset['shipping'] );
 			$price->setRebate( $dataset['rebate'] );
 			$price->setTaxRate( $dataset['taxrate'] );
 			$price->setStatus( $dataset['status'] );

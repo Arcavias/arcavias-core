@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ProductLimitTest.php 14602 2011-12-27 15:27:08Z gwussow $
  */
 
 /**
@@ -11,10 +10,10 @@
  */
 class MShop_Plugin_Provider_Order_ProductLimitTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_plugin;
-	protected $_order;
-	protected $_products;
+	private $_object;
+	private $_plugin;
+	private $_order;
+	private $_products;
 
 
 	/**

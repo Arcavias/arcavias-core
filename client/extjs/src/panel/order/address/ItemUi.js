@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -44,6 +43,10 @@ MShop.panel.order.base.address.ItemUi = Ext.extend(Ext.Panel, {
 					xtype : 'displayfield',
 					fieldLabel : _( 'ID' ),
 					name : 'order.base.address.id'
+				}, {
+					xtype : 'displayfield',
+					fieldLabel : _( 'Address ID' ),
+					name : 'order.base.address.addressid'
 				}, {
 					xtype: 'displayfield',
 					fieldLabel: 'Company',

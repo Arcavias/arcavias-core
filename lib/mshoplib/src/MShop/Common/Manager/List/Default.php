@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Default.php 14874 2012-01-15 17:19:41Z nsendetzky $
  */
 
 
@@ -155,37 +154,23 @@ class MShop_Common_Manager_List_Default
 
 
 	/**
-	 * Deletes the common list item object regarding to the given common list Id.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param Integer $id Id of the common list item object
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$sql = $this->_config['delete'];
-
-			$stmt = $this->_getCachedStatement( $conn, $this->_prefix . 'delete', $sql );
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$result = $stmt->execute()->finish();
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$this->_deleteItems( $ids, $this->_config['delete'] );
 	}
 
 
 	/**
 	 * Creates common list item object for the given common list item id.
 	 *
-	 * @param Integer $id Id of common list item object
-	 * @return MShop_Common_Item_List_Interface Common list item object
+	 * @param integer $id Id of common list item object
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Common_Item_List_Interface Returns common list item object of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -359,8 +344,8 @@ class MShop_Common_Manager_List_Default
 			}
 
 			$level = MShop_Locale_Manager_Abstract::SITE_ALL;
-			$cfgPathSearch = 'mshop/' . $topdomain . '/manager/' . implode( '/', $domain ) . '/default/item/search';
-			$cfgPathCount =  'mshop/' . $topdomain . '/manager/' . implode( '/', $domain ) . '/default/item/count';
+			$cfgPathSearch = $this->_config['search'];
+			$cfgPathCount =  $this->_config['count'];
 
 			$name = trim( $this->_prefix, '.' );
 			$required = array( $name );
@@ -370,7 +355,7 @@ class MShop_Common_Manager_List_Default
 			while( ( $row = $results->fetch() ) !== false )
 			{
 				$map[ $row['id'] ] = $row;
-				$typeIds[] = $row['typeid'];
+				$typeIds[ $row['typeid'] ] = null;
 			}
 
 			$dbm->release( $conn );
@@ -381,11 +366,13 @@ class MShop_Common_Manager_List_Default
 			throw $e;
 		}
 
-		if( count( $typeIds ) > 0 )
+		if( !empty( $typeIds ) )
 		{
-			$search = $this->_typeManager->createSearch();
-			$search->setConditions( $search->compare( '==', $name . '.type.id', array_unique( $typeIds ) ) );
-			$typeItems = $this->_typeManager->searchItems( $search );
+			$typeManager = $this->getSubManager( 'type' );
+			$typeSearch = $typeManager->createSearch();
+			$typeSearch->setConditions( $typeSearch->compare( '==', $name . '.type.id', array_keys( $typeIds ) ) );
+			$typeSearch->setSlice( 0, $search->getSliceSize() );
+			$typeItems = $typeManager->searchItems( $typeSearch );
 
 			foreach( $map as $id => $row )
 			{
@@ -454,7 +441,9 @@ class MShop_Common_Manager_List_Default
 		switch( $manager )
 		{
 			case 'type':
-				return $this->_typeManager;
+				if( isset( $this->_typeManager ) ) {
+					return $this->_typeManager;
+				}
 			default:
 				return $this->_getSubManager( 'common', 'list/' . $manager, $name );
 		}

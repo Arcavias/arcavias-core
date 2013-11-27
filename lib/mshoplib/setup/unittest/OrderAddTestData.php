@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: OrderAddTestData.php 1365 2012-10-31 13:54:32Z doleiynyk $
  */
 
 
@@ -146,6 +145,7 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 
 			$orderAddr->setId( null );
 			$orderAddr->setBaseId( $bases['ids'][ $dataset['baseid'] ] );
+			$orderAddr->setAddressId( ( isset( $dataset['addrid'] ) ? $dataset['addrid'] : '' ) );
 			$orderAddr->setType( $dataset['type'] );
 			$orderAddr->setCompany( $dataset['company'] );
 			$orderAddr->setSalutation( $dataset['salutation'] );
@@ -189,6 +189,23 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 		$orderBaseServiceAttrManager = $orderBaseServiceManager->getSubManager( 'attribute', 'Default' );
 		$priceManager = MShop_Price_Manager_Factory::createManager( $this->_additional, 'Default' );
 
+		$serviceManager = MShop_Service_Manager_Factory::createManager( $this->_additional, 'Default' );
+		$services = array();
+		foreach( $testdata['order/base/service'] as $key => $dataset ) {
+			if( isset( $dataset['servid'] ) ) {
+				$services[$key] = $dataset['servid'];
+			}
+		}
+
+		$search = $serviceManager->createSearch();
+		$search->setConditions( $search->compare( '==', 'service.code', $services ) );
+		$servicesResult = $serviceManager->searchItems( $search );
+
+		$servIds = array();
+		foreach( $servicesResult as $id => $service ) {
+			$servIds[$service->getCode()] = $id;
+		}
+
 		$ordServices = array ();
 		$ordServ = $orderBaseServiceManager->createItem();
 
@@ -207,14 +224,18 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 			$priceItem = $priceManager->createItem();
 			$ordServ->setId(null);
 			$ordServ->setBaseId( $bases['ids'][ $dataset['baseid'] ] );
-			$ordServ->setServiceId( $dataset['servid'] );
+
+			if( isset( $dataset['servid'] ) ) {
+				$ordServ->setServiceId( $servIds[$dataset['servid']] );
+			}
+
 			$ordServ->setType($dataset['type']);
 			$ordServ->setCode($dataset['code']);
 			$ordServ->setName($dataset['name']);
 			$ordServ->setMediaUrl($dataset['mediaurl']);
 
 			$priceItem->setValue( $dataset['price'] );
-			$priceItem->setShipping( $dataset['shipping'] );
+			$priceItem->setCosts( $dataset['shipping'] );
 			$priceItem->setRebate( $dataset['rebate'] );
 			$priceItem->setTaxRate( $dataset['taxrate'] );
 			$ordServ->setPrice( $priceItem );
@@ -237,6 +258,7 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 			$ordServAttr->setCode( $dataset['code'] );
 			$ordServAttr->setValue( $dataset['value'] );
 			$ordServAttr->setName( $dataset['name'] );
+			$ordServAttr->setType( $dataset['type'] );
 
 			$orderBaseServiceAttrManager->saveItem( $ordServAttr, false );
 		}
@@ -274,8 +296,11 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 		$productsResult = $productManager->searchItems( $search );
 
 		$prodIds = array();
-		foreach( $productsResult as $id => $product ) {
+		$prodTypes = array();
+		foreach( $productsResult as $id => $product )
+		{
 			$prodIds[$product->getCode()] = $id;
+			$prodTypes[$product->getCode()] = $product->getType();
 		}
 
 		$ordProds = $prices = array();
@@ -318,7 +343,7 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 
 			$priceItem = $priceManager->createItem();
 			$priceItem->setValue( $dataset['price'] );
-			$priceItem->setShipping( $dataset['shipping'] );
+			$priceItem->setCosts( $dataset['shipping'] );
 			$priceItem->setRebate( $dataset['rebate'] );
 			$priceItem->setTaxRate( $dataset['taxrate'] );
 			$ordProdItem->setPrice( $priceItem );
@@ -340,6 +365,10 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 			$ordProdAttr->setCode( $dataset['code'] );
 			$ordProdAttr->setValue( $dataset['value'] );
 			$ordProdAttr->setName( $dataset['name'] );
+
+			if( isset( $dataset['type'] ) ) {
+				$ordProdAttr->setType( $prodTypes[$dataset['type']] );
+			}
 
 			$orderBaseProductAttrManager->saveItem( $ordProdAttr, false );
 		}
@@ -380,8 +409,6 @@ class MW_Setup_Task_OrderAddTestData extends MW_Setup_Task_Abstract
 			$ordItem->setDatePayment( $dataset['datepayment'] );
 			$ordItem->setDeliveryStatus( $dataset['statusdelivery'] );
 			$ordItem->setPaymentStatus( $dataset['statuspayment'] );
-			$ordItem->setFlag( $dataset['flag'] );
-			$ordItem->setEmailFlag( $dataset['emailflag'] );
 			$ordItem->setRelatedId( $dataset['relatedid'] );
 
 			$orderManager->saveItem( $ordItem );

@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14797 2012-01-11 11:27:16Z nsendetzky $
  */
 
 /**
@@ -12,13 +11,13 @@
 class MShop_Locale_Manager_DefaultTest extends MW_Unittest_Testcase
 {
 
-	protected $_object;
+	private $_object;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	public static function main()
 	{

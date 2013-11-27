@@ -2,11 +2,14 @@
 
 <phpunit bootstrap="bootstrap.php">
 	<testsuites>
-		<testsuite name="MShop suite">
+		<testsuite name="Arcavias suite">
 			<directory>MShop/</directory>
 		</testsuite>
 		<testsuite name="MAdmin suite">
 			<directory>MAdmin/</directory>
 		</testsuite>
 	</testsuites>
+	<logging>
+		<log type="junit" target="core_lib-mshoplib_test.junit.xml" />
+	</logging>
 </phpunit>

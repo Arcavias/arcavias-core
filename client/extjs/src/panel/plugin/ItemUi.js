@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14341 2011-12-14 16:00:50Z nsendetzky $
  */
 
 
@@ -12,12 +11,11 @@ MShop.panel.plugin.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 	maximized : true,
 	layout : 'fit',
 	modal : true,
-	
-	
-	initComponent : function() {
 
+
+	initComponent : function() {
 		this.title = _('Plugin item details');
-		var that = this;
+		
 		this.items = [ {
 			xtype : 'tabpanel',
 			activeTab : 0,
@@ -96,6 +94,13 @@ MShop.panel.plugin.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 							maxLength : 255,
 							emptyText : _('Internal plugin name (required)')
 						}, {
+							xtype : 'numberfield',
+							fieldLabel : _('Position'),
+							name : 'plugin.position',
+							allowDecimals : false,
+							allowBlank : false,
+							value : 0
+						}, {
 							xtype : 'displayfield',
 							fieldLabel : _('Created'),
 							name : 'plugin.ctime'
@@ -123,7 +128,7 @@ MShop.panel.plugin.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 		MShop.panel.plugin.ItemUi.superclass.initComponent.call(this);
 	},
 
-	
+
 	afterRender : function()
 	{
 		var label = this.record ? this.record.data['plugin.label'] : 'new';
@@ -139,12 +144,12 @@ MShop.panel.plugin.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 		var config = {};
 		var editorGrid = this.findByType( 'MShop.panel.plugin.configui' );
 		var first = editorGrid.shift();
-		
+
 		if( first ) {
 			Ext.each( first.data, function( item, index ) {
 				Ext.iterate( item, function( key, value, object ) {
 					if( key.trim() !== '' ) {
-						config[key] = value.trim();
+						config[key] = value;
 					}
 				}, this);
 			});

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Product
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -169,36 +168,24 @@ class MShop_Product_Manager_Stock_Default
 
 
 	/**
-	 * Delete a stock item by given Id
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param Integer $id Id of the stock item to delete
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/product/manager/stock/default/item/delete');
-			$stmt->bind(1, $id, MW_DB_Statement_Abstract::PARAM_INT);
-			$result = $stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/product/manager/stock/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
 	/**
 	 * Creates a stock item object for the given item id.
 	 *
-	 * @param Integer $id Id of stock item
-	 * @return MShop_Product_Item_Stock_Interface Product stock item
+	 * @param integer $id Id of the stock item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Product_Item_Stock_Interface Returns the product stock item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -319,7 +306,8 @@ class MShop_Product_Manager_Stock_Default
 		$warehouseManager = $this->getSubManager( 'warehouse' );
 		$search = $warehouseManager->createSearch();
 		$search->setConditions( $search->compare( '==', 'product.stock.warehouse.code', $warehouseCode ) );
-		$warehouseIds = array_keys( $warehouseManager->searchItems( $search ) );
+		$warehouseItems = $warehouseManager->searchItems( $search );
+		$warehouseIds = ( !empty( $warehouseItems ) ? array_keys( $warehouseItems ) : null );
 
 		$search = $this->createSearch();
 		$expr = array(

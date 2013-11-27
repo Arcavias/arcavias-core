@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 1333 2012-10-23 17:52:13Z doleiynyk $
  */
 
 
@@ -12,7 +11,7 @@
  */
 class MShop_Catalog_Manager_Index_Attribute_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -61,6 +60,33 @@ class MShop_Catalog_Manager_Index_Attribute_DefaultTest extends MW_Unittest_Test
 	public function testCreateSearch()
 	{
 		$this->assertInstanceOf( 'MW_Common_Criteria_Interface', $this->_object->createSearch() );
+	}
+
+
+	public function testAggregate()
+	{
+		$manager = MShop_Factory::createManager( TestHelper::getContext(), 'attribute' );
+
+		$search = $manager->createSearch();
+		$expr = array(
+			$search->compare( '==', 'attribute.code', 'white' ),
+			$search->compare( '==', 'attribute.type.code', 'color' ),
+		);
+		$search->setConditions( $search->combine( '&&', $expr ) );
+
+		$items = $manager->searchItems( $search );
+
+		if( ( $item = reset( $items ) ) === false ) {
+			throw new Exception( 'No attribute item found' );
+		}
+
+
+		$search = $this->_object->createSearch( true );
+		$result = $this->_object->aggregate( $search, 'catalog.index.attribute.id' );
+
+		$this->assertEquals( 11, count( $result ) );
+		$this->assertArrayHasKey( $item->getId(), $result );
+		$this->assertEquals( $result[ $item->getId() ], 3 );
 	}
 
 
@@ -191,10 +217,15 @@ class MShop_Catalog_Manager_Index_Attribute_DefaultTest extends MW_Unittest_Test
 
 		$attrIds = array( (int) $attrLengthItem->getId(), (int) $attrWidthItem->getId() );
 		$func = $search->createFunction( 'catalog.index.attributecount', array( 'variant', $attrIds ) );
-		$search->setConditions( $search->compare( '==', $func, 1 ) ); // count attributes
-
+		$search->setConditions( $search->compare( '==', $func, 2 ) ); // count attributes
 		$result = $this->_object->searchItems( $search, array() );
-		$this->assertEquals( 0, count( $result ) );
+
+		if( ( $product = reset( $result ) ) === false ) {
+			throw new Exception( 'No product found' );
+		}
+
+		$this->assertEquals( 1, count( $result ) );
+		$this->assertEquals( 'CNE', $product->getCode() );
 
 
 		$func = $search->createFunction( 'catalog.index.attribute.code', array( 'default', 'size' ) );

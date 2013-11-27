@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php
  */
 
 
@@ -12,8 +11,8 @@
  */
 class MShop_Common_Item_Type_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_values;
+	private $_object;
+	private $_values;
 
 
 	/**

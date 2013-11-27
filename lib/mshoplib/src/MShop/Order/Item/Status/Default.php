@@ -1,10 +1,9 @@
-<?php 
+<?php
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Default.php 14852 2012-01-13 12:24:15Z doleiynyk $
  */
 
 
@@ -14,18 +13,20 @@
  * @package MShop
  * @subpackage Order
  */
-class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract implements MShop_Order_Item_Status_Interface
+class MShop_Order_Item_Status_Default
+	extends MShop_Order_Item_Status_Abstract
+	implements MShop_Order_Item_Status_Interface
 {
 	private $_values;
-	
+
 	public function __construct( array $values = array( ) )
 	{
 		parent::__construct('order.status.', $values);
-				
-		$this->_values = $values;		
+
+		$this->_values = $values;
 	}
-	
-	
+
+
 	/**
 	* Returns the parentid of the order status.
 	*
@@ -35,7 +36,7 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 	{
 		return ( isset( $this->_values['parentid'] ) ? (int) $this->_values['parentid'] : null );
 	}
-	
+
 	/**
 	 * Sets the parentid of the order status.
 	 *
@@ -46,13 +47,13 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 		if ( $parentid == $this->getParentId() ) {
 			return;
 		}
-		
+
 		$this->_values['parentid'] = (int) $parentid;
-		
+
 		$this->setModified();
 	}
-	
-	
+
+
 	/**
 	 * Returns the type of the order status.
 	 *
@@ -62,7 +63,7 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 	{
 		return ( isset( $this->_values['type'] ) ? (string) $this->_values['type'] : '' );
 	}
-	
+
 	/**
 	 * Sets the type of the order status.
 	 *
@@ -73,12 +74,12 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 		if ( $type == $this->getType() ) {
 			return;
 		}
-		
+
 		$this->_values['type'] = (string) $type;
-		
+
 		$this->setModified();
 	}
-	
+
 	/**
 	 * Returns the value of the order status.
 	 *
@@ -88,7 +89,7 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 	{
 		return ( isset( $this->_values['value'] ) ? (string) $this->_values['value'] : '' );
 	}
-	
+
 	/**
 	 * Sets the value of the order status.
 	 *
@@ -99,14 +100,14 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 		if ( $value == $this->getValue() ) {
 			return;
 		}
-		
+
 		$this->_values['value'] = (string) $value;
-		
+
 		$this->setModified();
 	}
-	
-	
-	
+
+
+
 	/**
 	* Returns the item values as array.
 	*
@@ -114,16 +115,16 @@ class MShop_Order_Item_Status_Default extends MShop_Common_Item_Abstract impleme
 	*/
 	public function toArray()
 	{
-		
+
 		$list = parent::toArray();
-		
+
 		$list['order.status.parentid'] = $this->getParentId();
 		$list['order.status.type'] = $this->getType();
 		$list['order.status.value'] = $this->getValue();
-		
-		
-		
+
+
+
 		return $list;
 	}
-	
+
 }

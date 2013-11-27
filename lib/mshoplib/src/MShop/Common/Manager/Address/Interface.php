@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -17,12 +16,4 @@
 interface MShop_Common_Manager_Address_Interface
 	extends MShop_Common_Manager_Interface
 {
-	/**
-	 * Initializes a new common address manager object using the given context object.
-	 *
-	 * @param MShop_Context_Interface $_context Context object with required objects
-	 */
-	public function __construct( MShop_Context_Item_Interface $context,
-		array $config = array(), array $searchConfig = array() );
-
 }

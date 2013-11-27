@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: AbstractListUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -112,7 +111,7 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 		this.grid.on('rowcontextmenu', this.onGridContextMenu, this);
 		this.grid.on('rowdblclick', this.onOpenEditWindow.createDelegate(this, ['edit']), this);
 		this.grid.getSelectionModel().on('selectionchange', this.onGridSelectionChange, this, {buffer: 10});
-
+		
 		MShop.panel.AbstractListUi.superclass.initComponent.apply(this, arguments);
 
 		Ext.apply(this.grid, {
@@ -142,6 +141,12 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 			disabled: true,
 			handler: this.onOpenEditWindow.createDelegate(this, ['edit'])
 		});
+		
+		this.actionCopy = new Ext.Action({
+			text: _('Copy'),
+			disabled: true,
+			handler: this.onOpenEditWindow.createDelegate(this, ['copy'])
+		});
 
 		this.actionDelete = new Ext.Action({
 			text: _('Delete'),
@@ -167,6 +172,7 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 		this.tbar = [
 			this.actionAdd,
 			this.actionEdit,
+			this.actionCopy,
 			this.actionDelete,
 			this.actionExport,
 			this.importButton
@@ -216,6 +222,7 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 				items: [
 					this.actionAdd,
 					this.actionEdit,
+					this.actionCopy,
 					this.actionDelete,
 					this.actionExport
 				]
@@ -227,7 +234,7 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 
 	onBeforeLoad: function(store, options) {
 		this.setSiteParam(store);
-
+		
 		if (this.domain) {
 			this.setDomainFilter(store, options);
 		}
@@ -313,6 +320,7 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 	onGridSelectionChange: function(sm) {
 		var numSelected = sm.getCount();
 		this.actionEdit.setDisabled(numSelected !== 1);
+		this.actionCopy.setDisabled(numSelected !== 1);
 		this.actionDelete.setDisabled(numSelected === 0);
 		this.actionExport.setDisabled(this.exportMethod === null);
 	},
@@ -321,20 +329,43 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 		var itemUi = Ext.ComponentMgr.create({
 			xtype: this.itemUiXType,
 			domain: this.domain,
-			record: action === 'add' ? null : this.grid.getSelectionModel().getSelected(),
+			record: this.getRecord(action),
 			store: this.store,
-			listUI: this
+			listUI: this,
+			isNewRecord: action === 'copy' ? true : false
 		});
 
 		itemUi.show();
 	},
+	
+	getRecord: function( action ) {
+		if( action == 'add' ) {
+			return null;
+		} 
+		else if( action == 'copy' )
+		{
+			var record = new this.store.recordType();
+			var edit = this.grid.getSelectionModel().getSelected().copy();
+			record.data = edit.data;
+			record.data[ this.idProperty ] = null;
+			
+			return record;
+		}
+		return this.grid.getSelectionModel().getSelected();
+	},
 
 	onStoreException: function(proxy, type, action, options, response) {
-		var title = _('Error');
-		var msg = response && response.error ? response.error.message : _('No error information available');
-		var code = response && response.error ? response.error.code : 0;
-
-		Ext.Msg.alert([title, ' (', code, ')'].join(''), msg);
+		var title = _( 'Error' );
+		var msg, code;
+		
+		if( response.error !== undefined ) {
+			msg = response && response.error ? response.error.message : _( 'No error information available' );
+			code = response && response.error ? response.error.code : 0;
+		} else {
+			msg = response && response.xhr.responseText[0].error ? response.xhr.responseText[0].error : _( 'No error information available' );
+			code = response && response.xhr.responseText[0].tid ? response.xhr.responseText[0].tid : 0;
+		}
+		Ext.Msg.alert(title + ' (' + code + ')', msg);
 	},
 
 	setSiteParam: function(store) {

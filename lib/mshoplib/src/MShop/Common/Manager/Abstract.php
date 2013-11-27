@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Abstract.php 1355 2012-10-30 11:18:18Z nsendetzky $
  */
 
 
@@ -19,7 +18,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 {
 	private $_context;
 	private $_stmts = array();
-	protected $_keySeparator = '.';
+	private $_keySeparator = '.';
 
 
 	/**
@@ -30,6 +29,55 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	public function __construct( MShop_Context_Item_Interface $context )
 	{
 		$this->_context = $context;
+	}
+
+
+	/**
+	 * Counts the number products that are available for the values of the given key.
+	 *
+	 * @param MW_Common_Criteria_Interface $search Search criteria
+	 * @param string $key Search key (usually the ID) to aggregate products for
+	 * @return array List of ID values as key and the number of counted products as value
+	 */
+	protected function _aggregate( MW_Common_Criteria_Interface $search, $key, $cfgPath, $required = array() )
+	{
+		$list = array();
+		$context = $this->_getContext();
+		$dbm = $context->getDatabaseManager();
+		$conn = $dbm->acquire();
+
+		try
+		{
+			$reqkey = '';
+			$search = clone $search;
+			$attrList = $this->getSearchAttributes();
+
+			if( !isset( $attrList[$key] ) ) {
+				throw new MShop_Exception( sprintf( 'Unknown search key "%1$s"', $key ) );
+			}
+
+			$expr = array( $search->getConditions(), $search->compare( '!=', $key, null ) );
+			$search->setConditions( $search->combine( '&&', $expr ) );
+
+			$level = MShop_Locale_Manager_Abstract::SITE_ALL;
+			$total = null;
+
+			$sql = str_replace( ':key', $attrList[$key]->getInternalCode(), $context->getConfig()->get( $cfgPath ) );
+			$results = $this->_searchItems( $conn, $search, $sql, '', $required, $total, $level );
+
+			while( ( $row = $results->fetch() ) !== false ) {
+				$list[ $row['key'] ] = $row['count'];
+			}
+
+			$dbm->release( $conn );
+		}
+		catch( Exception $e )
+		{
+			$dbm->release( $conn );
+			throw $e;
+		}
+
+		return $list;
 	}
 
 
@@ -49,6 +97,17 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		$dbm->release( $conn );
 
 		return $object;
+	}
+
+
+	/**
+	 * Deletes an item from storage.
+	 *
+	 * @param integer $itemId Unique ID of the item in the storage
+	 */
+	public function deleteItem( $itemId )
+	{
+		$this->deleteItems( array( $itemId ) );
 	}
 
 
@@ -91,47 +150,6 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		$dbm->release( $conn );
 
 		return $object;
-	}
-
-
-	/**
-	 * Returns a new manager depending on given domain.
-	 *
-	 * @param string $domain Name of the domain, e.g. text, media, etc.
-	 * @return mixed Manager of the given Domain
-	 * @throws MShop_Common_Exception if manager couldn't be instanciated
-	 */
-	protected function _createDomainManager( $domain )
-	{
-		$domain = strtolower( $domain );
-		$parts = explode( '/', $domain );
-
-		if( count( $parts ) < 1 ) {
-			throw new Controller_ExtJS_Exception( sprintf( 'Invalid characters in domain name "%1$s"', $domain ) );
-		}
-
-		foreach( $parts as $part )
-		{
-			if( ctype_alnum( $part ) === false ) {
-				throw new Controller_ExtJS_Exception( sprintf( 'Invalid characters in domain name "%1$s"', $domain ) );
-			}
-		}
-
-		$classname = 'MShop_' . ucfirst( array_shift( $parts ) ) . '_Manager_Factory';
-
-		if( class_exists( $classname ) === false ) {
-			throw new MShop_Exception( sprintf( 'Class "%1$s" not available', $classname ) );
-		}
-
-		if( ( $manager = call_user_func_array( $classname . '::createManager', array( $this->_context ) ) ) === false ) {
-			throw new MShop_Exception( sprintf( 'Domain manager for class "%1$s" not available', $classname ) );
-		}
-
-		foreach( $parts as $part ) {
-			$manager = $manager->getSubManager( $part );
-		}
-
-		return $manager;
 	}
 
 
@@ -376,7 +394,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	 * @param MW_Common_Criteria_Expression_Interface|null Criteria object
 	 * @return array List of shortend criteria names
 	 */
-	protected function _getCriteriaKeys( array $prefix, MW_Common_Criteria_Expression_Interface $expr = null )
+	private function _getCriteriaKeys( array $prefix, MW_Common_Criteria_Expression_Interface $expr = null )
 	{
 		if( $expr === null ) { return array(); }
 
@@ -411,6 +429,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		$result = array();
 		$noprefix = true;
 		$strlen = strlen( $string );
+		$sep = $this->_getKeySeparator();
 
 		foreach( $prefix as $key )
 		{
@@ -418,7 +437,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 
 			if( strncmp( $string, $key, $len ) === 0 )
 			{
-				if( $strlen > $len && ( $pos = strrpos( $string, $this->_keySeparator ) ) !== false )
+				if( $strlen > $len && ( $pos = strrpos( $string, $sep ) ) !== false )
 				{
 					$result[] = $string = substr( $string, 0, $pos );
 					$result = array_merge( $result, $this->_cutNameTail( $prefix, $string ) );
@@ -431,7 +450,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 
 		if( $noprefix )
 		{
-			if( ( $pos = strrpos( $string, $this->_keySeparator ) ) !== false ) {
+			if( ( $pos = strrpos( $string, $sep ) ) !== false ) {
 				$result[] = $string = substr( $string, 0, $pos );
 			} else {
 				$result[] = $string;
@@ -574,7 +593,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	 * Creates the items with address item, list items and referenced items.
 	 *
 	 * @param array $map Associative list of IDs as keys and the associative array of values
-	 * @param array $domains List of domain names whose referenced items should be attached
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @param string $prefix Domain prefix
 	 * @return array List of items implementing MShop_Common_Item_Interface
 	 */
@@ -656,7 +675,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		{
 			try
 			{
-				$manager = $this->_createDomainManager( $domain );
+				$manager = MShop_Factory::createManager( $this->_context, $domain );
 
 				$search = $manager->createSearch( true );
 				$expr = array(
@@ -704,6 +723,17 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		}
 
 		return $item;
+	}
+
+
+	/**
+	 * Returns the used separator inside the search keys.
+	 *
+	 * @return string Separator string (default: ".")
+	 */
+	protected function _getKeySeparator()
+	{
+		return $this->_keySeparator;
 	}
 
 
@@ -771,6 +801,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 			$keys = array_merge( $keys, $this->_getCriteriaKeys( $required, $sortation ) );
 		}
 
+		$sep = $this->_getKeySeparator();
 		$basekey = array_shift( $required );
 		$keys = array_unique( array_merge( $required, $keys ) );
 		sort( $keys );
@@ -779,7 +810,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		{
 			if( $key !== $basekey )
 			{
-				$name = $key . $this->_keySeparator . 'id';
+				$name = $key . $sep . 'id';
 
 				if( isset( $attributes[$name] ) && $attributes[$name] instanceof $iface ) {
 					$joins = array_merge( $joins, $attributes[$name]->getInternalDeps() );
@@ -789,7 +820,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 				}
 			}
 
-			$name = $key . $this->_keySeparator . 'siteid';
+			$name = $key . $sep . 'siteid';
 
 			if( isset( $attributes[$name] ) ) {
 				$cond[] = $search->compare( '==', $name, $siteIds );
@@ -856,6 +887,52 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 
 
 	/**
+	 * Deletes items specified by ids in array.
+	 *
+	 * @param array $ids List of IDs
+	 * @param string $sql Sql statement
+	 * @param boolean $siteidcheck If siteid is used in the statement
+	 */
+	protected function _deleteItems( array $ids, $sql, $siteidcheck = true, $name = 'id' )
+	{
+		if( empty( $ids ) ) { return; }
+
+		$context = $this->_getContext();
+
+		$search = $this->createSearch();
+		$search->setConditions( $search->compare( '==', $name, $ids ) );
+
+		$types = array( $name => MW_DB_Statement_Abstract::PARAM_STR );
+		$translations = array( $name => '"' . $name . '"' );
+
+		$cond = $search->getConditionString( $types, $translations );
+		$sql = str_replace( ':cond', $cond, $sql );
+
+
+		try
+		{
+			$dbm = $context->getDatabaseManager();
+			$conn = $dbm->acquire();
+
+			$stmt = $conn->create( $sql );
+
+			if( $siteidcheck ) {
+				$stmt->bind( 1, $context->getLocale()->getSiteId(), MW_DB_Statement_Abstract::PARAM_INT );
+			}
+
+			$stmt->execute()->finish();
+
+			$dbm->release( $conn );
+		}
+		catch( Exception $e )
+		{
+			$dbm->release( $conn );
+			throw $e;
+		}
+	}
+
+
+	/**
 	 * Starts a database transaction on the connection identified by the given name.
 	 *
 	 * @param string $name Connection name as named in the resource file
@@ -897,23 +974,5 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		$conn = $dbm->acquire( $name );
 		$conn->rollback();
 		$dbm->release( $conn, $name );
-	}
-
-
-	/**
-	 * Returns a list of site IDs from a tree of site items.
-	 *
-	 * @param MShop_Locale_Item_Site_Interface $siteItem Site item, maybe with children
-	 * @return array List of site IDs
-	 */
-	private function _getSiteIds( MShop_Locale_Item_Site_Interface $siteItem )
-	{
-		$siteIds = array( $siteItem->getId() );
-
-		foreach( $siteItem->getChildren() as $child ) {
-			$siteIds = array_merge( $siteIds, $this->_getSiteIds( $child ) );
-		}
-
-		return $siteIds;
 	}
 }

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MW
  * @subpackage View
- * @version $Id$
  */
 
 
@@ -53,11 +52,11 @@ class MW_View_Helper_Url_Default
 		$path .= ( $action !== null ? $action . '/' : '' );
 
 		$parameter = ( count( $params ) > 0 ? '?' . http_build_query( $params ) : '' );
-		$pretty = ( count( $trailing ) > 0 ? implode( '/', $trailing ) : '' );
+		$pretty = ( count( $trailing ) > 0 ? implode( '-', $trailing ) : '' );
 
-		$badchars = array( ' ', '&', '%', '?', '#', '=', '{', '}', '|', '\\', '^', '~', '[', ']', '`' );
+		$badchars = array( ' ', '/', '&', '%', '?', '#', '=', '{', '}', '|', '\\', '^', '~', '[', ']', '`' );
 		$pretty = str_replace( $badchars, '-', $pretty );
-		
+
 		return $this->_baseUrl . '/' . $path . $pretty . $parameter;
 	}
 }

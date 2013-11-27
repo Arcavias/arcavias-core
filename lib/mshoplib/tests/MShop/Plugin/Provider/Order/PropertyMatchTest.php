@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2013
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: PropertyMatchTest.php 1391 2013-01-24 11:11:56Z jevers $
  */
 
 /**
@@ -11,10 +10,10 @@
  */
 class MShop_Plugin_Provider_Order_PropertyMatchTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_plugin;
-	protected $_order;
-	protected $_products;
+	private $_object;
+	private $_plugin;
+	private $_order;
+	private $_products;
 
 
 	/**

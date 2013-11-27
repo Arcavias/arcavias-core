@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -334,5 +333,14 @@ interface MShop_Common_Item_Address_Interface extends MShop_Common_Item_Interfac
 	 * @param integer $position New position of the address item
 	 */
 	public function setPosition($position);
+
+
+	/**
+	 * Copies the values of the order address item into the address item.
+	 *
+	 * @param MShop_Order_Item_Base_Address_Interface $item Order address item
+	 * @return MShop_Common_Item_Address_Interface The address item for method chaining
+	 */
+	public function copyFrom( MShop_Order_Item_Base_Address_Interface $item );
 
 }

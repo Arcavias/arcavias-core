@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Supplier
- * @version $Id: Default.php 14852 2012-01-13 12:24:15Z doleiynyk $
  */
 
 
@@ -29,7 +28,7 @@ class MShop_Supplier_Item_Default
 	public function __construct( array $values = array() )
 	{
 		parent::__construct('supplier.', $values);
-		
+
 		$this->_values = $values;
 	}
 
@@ -77,6 +76,8 @@ class MShop_Supplier_Item_Default
 	 */
 	public function setCode( $value )
 	{
+		$this->_checkCode( $value );
+
 		$this->_values['code'] = (string) $value;
 		$this->setModified();
 	}

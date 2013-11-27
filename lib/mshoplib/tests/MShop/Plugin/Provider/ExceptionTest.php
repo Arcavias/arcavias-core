@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/license
- * @version $Id$
  */
 
 class MShop_Plugin_Provider_ExceptionTest extends PHPUnit_Framework_TestCase
 {
 
-	protected $_codes;
+	private $_codes;
 
 	/**
 	 * Runs the test methods of this class.

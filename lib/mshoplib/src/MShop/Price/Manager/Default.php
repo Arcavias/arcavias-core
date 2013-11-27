@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Price
- * @version $Id: Default.php 14754 2012-01-09 13:26:10Z nsendetzky $
  */
 
 
@@ -78,9 +77,9 @@ class MShop_Price_Manager_Default
 			'type' => 'decimal',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
 		),
-		'price.shipping' => array(
-			'code' => 'price.shipping',
-			'internalcode' => 'mpri."shipping"',
+		'price.costs' => array(
+			'code' => 'price.costs',
+			'internalcode' => 'mpri."costs"',
 			'label' => 'Price shipping costs',
 			'type' => 'decimal',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
@@ -405,28 +404,14 @@ class MShop_Price_Manager_Default
 
 
 	/**
-	 * Deletes a price item object from the permanent storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Unique price ID referencing an existing price
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem($id)
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/price/manager/default/item/delete');
-			$stmt->bind(1, $id, MW_DB_Statement_Abstract::PARAM_INT);
-			$result = $stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/price/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -434,8 +419,9 @@ class MShop_Price_Manager_Default
 	 * Returns the price item object specificed by its ID.
 	 *
 	 * @param integer $id Unique price ID referencing an existing price
-	 * @return MShop_Price_Item_Interface $item Price item object
-	 * @throws MShop_Price_Exception If price couldn't be found
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Price_Item_Interface $item Returns the price item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -482,7 +468,7 @@ class MShop_Price_Manager_Default
 			$stmt->bind( 5, $item->getLabel() );
 			$stmt->bind( 6, $item->getQuantity(), MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind( 7, $item->getValue() );
-			$stmt->bind( 8, $item->getShipping() );
+			$stmt->bind( 8, $item->getCosts() );
 			$stmt->bind( 9, $item->getRebate() );
 			$stmt->bind(10, $item->getTaxRate() );
 			$stmt->bind(11, $item->getStatus(), MW_DB_Statement_Abstract::PARAM_INT );
@@ -521,7 +507,7 @@ class MShop_Price_Manager_Default
 	 * Returns the item objects matched by the given search criteria.
 	 *
 	 * Possible search keys: 'price.id', 'price.currencyid', 'price.quantity',
-	 *  'price.value','price.shipping', 'price.rebate', 'price.taxrate', 'price.status'.
+	 *  'price.value','price.costs', 'price.rebate', 'price.taxrate', 'price.status'.
 	 *
 	 * @param MW_Common_Criteria_Interface $search Search criteria object
 	 * @param integer &$total Number of items that are available in total
@@ -547,7 +533,7 @@ class MShop_Price_Manager_Default
 			while( ( $row = $results->fetch() ) !== false )
 			{
 				$map[ $row['id'] ] = $row;
-				$typeIds[] = $row['typeid'];
+				$typeIds[ $row['typeid'] ] = null;
 			}
 
 			$dbm->release( $conn );
@@ -558,12 +544,13 @@ class MShop_Price_Manager_Default
 			throw $e;
 		}
 
-		if( count( $typeIds ) > 0 )
+		if( !empty( $typeIds ) )
 		{
 			$typeManager = $this->getSubManager( 'type' );
-			$search = $typeManager->createSearch();
-			$search->setConditions( $search->compare( '==', 'price.type.id', array_unique( $typeIds ) ) );
-			$typeItems = $typeManager->searchItems( $search );
+			$typeSearch = $typeManager->createSearch();
+			$typeSearch->setConditions( $typeSearch->compare( '==', 'price.type.id', array_keys( $typeIds ) ) );
+			$typeSearch->setSlice( 0, $search->getSliceSize() );
+			$typeItems = $typeManager->searchItems( $typeSearch );
 
 			foreach( $map as $id => $row )
 			{

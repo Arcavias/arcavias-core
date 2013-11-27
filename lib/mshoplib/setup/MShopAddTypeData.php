@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: TablesAddDefaultData.php 14336 2011-12-14 14:38:50Z nsendetzky $
  */
 
 
@@ -12,7 +11,7 @@
  */
 class MW_Setup_Task_MShopAddTypeData extends MW_Setup_Task_Abstract
 {
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	 * Returns the list of task names which this task depends on.

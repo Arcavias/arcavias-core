@@ -3,10 +3,8 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ExampleTest.php 14602 2011-12-27 15:27:08Z gwussow $
  */
 
-require_once 'MShop/Plugin/Provider/Order/Example.php';
 
 /**
  * Test class for MShop_Plugin_Provider_Order_Example and MShop_Plugin_Provider_Abstract because abstract classes can not be tested directly
@@ -17,7 +15,7 @@ class MShop_Plugin_Provider_Order_ExampleTest extends MW_Unittest_Testcase
 	 * @var    MShop_Plugin_Provider_Order_Example
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
 	/**
 	 * Runs the test methods of this class.

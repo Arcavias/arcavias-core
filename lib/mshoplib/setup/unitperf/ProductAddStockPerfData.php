@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ProductAddPricePerfData.php 14535 2011-12-21 16:47:21Z nsendetzky $
  */
 
 
@@ -49,6 +48,7 @@ class MW_Setup_Task_ProductAddStockPerfData extends MW_Setup_Task_ProductAddBase
 
 		$item = $productStockManager->createItem();
 		$search = $productManager->createSearch();
+		$search->setSortations( array( $search->sort( '+', 'product.id' ) ) );
 
 		$start = 0;
 		$stocklevel = 1;

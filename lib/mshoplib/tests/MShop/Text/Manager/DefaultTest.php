@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14843 2012-01-13 08:11:39Z nsendetzky $
  */
 
 /**
@@ -14,13 +13,13 @@ class MShop_Text_Manager_DefaultTest extends MW_Unittest_Testcase
 	/**
 	 * @var MShop_Text_Manager_Default
 	 */
-	protected $_object;
+	private $_object;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.

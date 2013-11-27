@@ -3,10 +3,7 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14880 2012-01-15 18:31:50Z nsendetzky $
  */
-
-require_once 'MShop/Common/Manager/Address/Default.php';
 
 
 /**
@@ -15,14 +12,14 @@ require_once 'MShop/Common/Manager/Address/Default.php';
  */
 class MShop_Common_Manager_Address_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_fixture = null;
-	protected $_object = null;
+	private $_fixture = null;
+	private $_object = null;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	 * Runs the test methods of this class.

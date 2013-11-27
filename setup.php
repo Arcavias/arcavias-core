@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: setup.php 14823 2012-01-12 11:54:16Z nsendetzky $
  */
 
 
@@ -87,18 +86,16 @@ try
 	}
 
 
-	require_once dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'MShop.php';
-
 	spl_autoload_register( 'setup_autoload' );
-	spl_autoload_register( 'MShop::autoload' );
 
-	$mshop = new MShop( ( isset( $options['extdir'] ) ? (array) $options['extdir'] : array() ) );
+	require 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+	$arcavias = new Arcavias( ( isset( $options['extdir'] ) ? (array) $options['extdir'] : array() ) );
 
 
-	$taskPaths = $mshop->getSetupPaths( $site );
+	$taskPaths = $arcavias->getSetupPaths( $site );
 
-	$includePaths = $mshop->getIncludePaths();
-	$includePaths = array_merge( $includePaths, $taskPaths );
+	$includePaths = $taskPaths;
 	$includePaths[] = get_include_path();
 
 	if( set_include_path( implode( PATH_SEPARATOR, $includePaths ) ) === false ) {
@@ -107,7 +104,7 @@ try
 
 	$ctx = new MShop_Context_Item_Default();
 
-	$confPaths = $mshop->getConfigPaths( 'mysql' );
+	$confPaths = $arcavias->getConfigPaths( 'mysql' );
 	if( isset( $options['config'] ) ) {
 		$confPaths[] = $options['config'];
 	}

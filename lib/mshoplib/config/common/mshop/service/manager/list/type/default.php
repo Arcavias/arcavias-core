@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14408 2011-12-17 13:24:46Z nsendetzky $
  */
 
 return array(
@@ -21,7 +20,8 @@ return array(
 		',
 		'delete' => '
 			DELETE FROM "mshop_service_list_type"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'search' => '
 			SELECT mserlity."id", mserlity."siteid", mserlity."code", mserlity."domain", mserlity."label",

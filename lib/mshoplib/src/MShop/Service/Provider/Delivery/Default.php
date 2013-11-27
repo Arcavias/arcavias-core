@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Service
- * @version $Id: Default.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -21,49 +20,49 @@ class MShop_Service_Provider_Delivery_Default
 {
 
 	private $_beConfig = array(
-		'project' => array(
-			'code' => 'project',
-			'internalcode'=> 'project',
+		'default.project' => array(
+			'code' => 'default.project',
+			'internalcode'=> 'default.project',
 			'label'=> 'Project name',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> true,
 		),
-		'url' => array(
-			'code' => 'url',
-			'internalcode'=> 'url',
-			'label'=> 'URL to success page',
+		'default.url' => array(
+			'code' => 'default.url',
+			'internalcode'=> 'default.url',
+			'label'=> 'URL to webservice the HTTP request is sent to',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> true,
 		),
-		'username' => array(
-			'code' => 'username',
-			'internalcode'=> 'username',
+		'default.username' => array(
+			'code' => 'default.username',
+			'internalcode'=> 'default.username',
 			'label'=> 'Username',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> false,
 		),
-		'password' => array(
-			'code' => 'password',
-			'internalcode'=> 'password',
+		'default.password' => array(
+			'code' => 'default.password',
+			'internalcode'=> 'default.password',
 			'label'=> 'Password',
 			'type'=> 'string',
 			'internaltype'=> 'string',
 			'default'=> '',
 			'required'=> false,
 		),
-		'ssl' => array(
-			'code' => 'ssl',
-			'internalcode'=> 'ssl',
+		'default.ssl' => array(
+			'code' => 'default.ssl',
+			'internalcode'=> 'default.ssl',
 			'label'=> 'SSL mode ("weak" for self signed certificates)',
 			'type'=> 'string',
-			'internaltype'=> 'string',
-			'default'=> '',
+			'internaltype'=> 'integer',
+			'default'=> 0,
 			'required'=> false,
 		),
 	);
@@ -146,7 +145,7 @@ class MShop_Service_Provider_Delivery_Default
 		$response = '';
 		$config = $this->getServiceItem()->getConfig();
 
-		if( !isset( $config['url'] ) ) {
+		if( !isset( $config['default.url'] ) ) {
 			throw new MShop_Service_Exception(
 				sprintf( 'Parameter "%1$s" for configuration not available', "url" ), parent::ERR_TEMP );
 		}
@@ -159,7 +158,7 @@ class MShop_Service_Provider_Delivery_Default
 		{
 			curl_setopt( $curl, CURLOPT_USERAGENT, 'MShop library' );
 
-			curl_setopt( $curl, CURLOPT_URL, $config['url'] );
+			curl_setopt( $curl, CURLOPT_URL, $config['default.url'] );
 			curl_setopt( $curl, CURLOPT_POST, true );
 			curl_setopt( $curl, CURLOPT_POSTFIELDS, array( 'xml' => $xml ) );
 
@@ -168,17 +167,17 @@ class MShop_Service_Provider_Delivery_Default
 			curl_setopt( $curl, CURLOPT_FOLLOWLOCATION, false );   // don't allow redirects
 			curl_setopt( $curl, CURLOPT_MAXREDIRS, 1 );   // maximum amount of redirects
 
-			if( isset( $config['username'] ) && isset( $config['password'] ) )
+			if( isset( $config['default.username'] ) && isset( $config['default.password'] ) )
 			{
 				$context->getLogger()->log( 'Using user name and password for authentication', MW_Logger_Abstract::NOTICE );
 				curl_setopt( $curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY );
-				curl_setopt( $curl, CURLOPT_USERPWD, $config['username'] . ':' . $config['password'] );
+				curl_setopt( $curl, CURLOPT_USERPWD, $config['default.username'] . ':' . $config['default.password'] );
 			}
 
-			$urlinfo = parse_url($config['url']);
+			$urlinfo = parse_url($config['default.url']);
 			if (isset($urlinfo['scheme']) && $urlinfo['scheme'] == 'https')
 			{
-				if( isset( $config['ssl'] ) && $config['ssl'] == 'weak' )
+				if( isset( $config['default.ssl'] ) && $config['default.ssl'] == 'weak' )
 				{
 					$context->getLogger()->log( 'Using weak SSL options', MW_Logger_Abstract::NOTICE );
 					curl_setopt( $curl, CURLOPT_SSL_VERIFYPEER, false );
@@ -353,7 +352,7 @@ class MShop_Service_Provider_Delivery_Default
 
 		$config = $this->getServiceItem()->getConfig();
 
-		if( !isset( $config['project'] ) ) {
+		if( !isset( $config['default.project'] ) ) {
 			throw new MShop_Service_Exception(
 				sprintf( 'Parameter "%1$s" for configuration not available', "project" ), parent::ERR_TEMP );
 		}
@@ -367,7 +366,7 @@ class MShop_Service_Provider_Delivery_Default
 		}
 
 		$this->_appendChildCDATA( 'customerid', $base->getCustomerId(), $dom, $orderitem );
-		$this->_appendChildCDATA( 'projectcode', $config['project'], $dom, $orderitem );
+		$this->_appendChildCDATA( 'projectcode', $config['default.project'], $dom, $orderitem );
 		$this->_appendChildCDATA( 'languagecode', strtoupper( $base->getLocale()->getLanguageId() ), $dom, $orderitem );
 		$this->_appendChildCDATA( 'currencycode', $base->getPrice()->getCurrencyId(), $dom, $orderitem );
 	}
@@ -448,11 +447,11 @@ class MShop_Service_Provider_Delivery_Default
 		MShop_Order_Item_Base_Interface $base, DOMDocument $dom, DOMElement $orderitem )
 	{
 		$price = $base->getPrice();
-		$total = $price->getValue() + $price->getShipping();
+		$total = $price->getValue() + $price->getCosts();
 
 		$priceitem = $dom->createElement( 'priceitem' );
 		$this->_appendChildCDATA( 'price', number_format( $price->getValue(), 2, '.', '' ), $dom, $priceitem );
-		$this->_appendChildCDATA( 'shipping', number_format( $price->getShipping(), 2, '.', '' ), $dom, $priceitem );
+		$this->_appendChildCDATA( 'shipping', number_format( $price->getCosts(), 2, '.', '' ), $dom, $priceitem );
 		$this->_appendChildCDATA( 'discount', number_format( 0.00, 2, '.', '' ), $dom, $priceitem );
 		$this->_appendChildCDATA( 'total', number_format( $total, 2, '.', '' ), $dom, $priceitem );
 
@@ -476,14 +475,26 @@ class MShop_Service_Provider_Delivery_Default
 		$criteria = $orderProductManager->createSearch();
 		$criteria->setConditions( $criteria->compare( '==', 'order.base.product.baseid', $base->getId() ) );
 		$criteria->setSortations( array( $criteria->sort( '+', 'order.base.product.position' ) ) );
-		$products = $orderProductManager->searchItems( $criteria );
+		$allproducts = $orderProductManager->searchItems( $criteria );
+
+		$products = $childproducts = array();
+		foreach( $allproducts as $product )
+		{
+			if( $product->getOrderProductId() === null )
+			{
+				$products[] = $product;
+				continue;
+			}
+
+			$childproducts[ $product->getOrderProductId() ][] = $product;
+		}
 
 		$productlist = $dom->createElement( 'productlist' );
 
 		foreach( $products as $product )
 		{
 			$price = $product->getPrice();
-			$total = $price->getValue() + $price->getShipping();
+			$total = $price->getValue() + $price->getCosts();
 
 			$productitem = $dom->createElement( 'productitem' );
 
@@ -494,15 +505,57 @@ class MShop_Service_Provider_Delivery_Default
 
 			$priceitem = $dom->createElement( 'priceitem' );
 			$this->_appendChildCDATA( 'price', number_format( $price->getValue(), 2, '.', '' ), $dom, $priceitem );
-			$this->_appendChildCDATA( 'shipping', number_format( $price->getShipping(), 2, '.', '' ), $dom, $priceitem );
+			$this->_appendChildCDATA( 'shipping', number_format( $price->getCosts(), 2, '.', '' ), $dom, $priceitem );
 			$this->_appendChildCDATA( 'discount', number_format( 0.00, 2, '.', '' ), $dom, $priceitem );
 			$this->_appendChildCDATA( 'total', number_format( $total, 2, '.', '' ), $dom, $priceitem );
 			$productitem->appendChild( $priceitem );
+
+			if( $product->getType() === 'bundle' ) {
+				$this->_buildXMLChildList( $product, $childproducts[ $product->getId() ], $dom, $productitem );
+			}
 
 			$productlist->appendChild( $productitem );
 		}
 
 		$orderitem->appendChild( $productlist );
+	}
+
+
+	/**
+	 * Adds the list of child products to the bundle products in the XML object
+	 *
+	 * @param MShop_Order_Item_Base_Product_Interface $parent The bundle product
+	 * @param array $products List of child products attached to $parent
+	 * @param DOMDocument $dom DOM document object with contains the XML structure
+	 * @param DOMElement $productelement DOM element to which the child products are added
+	 */
+	protected function _buildXMLChildList( MShop_Order_Item_Base_Product_Interface $parent, array $products, DOMDocument $dom, DOMElement $productelement )
+	{
+		$childlist = $dom->createElement( 'childlist' );
+
+		foreach( $products as $product )
+		{
+			$price = $product->getPrice();
+			$total = $price->getValue() + $price->getCosts();
+
+			$childproductitem = $dom->createElement( 'productitem' );
+
+			$this->_appendChildCDATA( 'position', $product->getPosition(), $dom, $childproductitem );
+			$this->_appendChildCDATA( 'code', $product->getProductCode(), $dom, $childproductitem );
+			$this->_appendChildCDATA( 'name', $product->getName(), $dom, $childproductitem );
+			$this->_appendChildCDATA( 'quantity', $product->getQuantity(), $dom, $childproductitem );
+
+			$priceitem = $dom->createElement( 'priceitem' );
+			$this->_appendChildCDATA( 'price', number_format( $price->getValue(), 2, '.', '' ), $dom, $priceitem );
+			$this->_appendChildCDATA( 'shipping', number_format( $price->getCosts(), 2, '.', '' ), $dom, $priceitem );
+			$this->_appendChildCDATA( 'discount', number_format( $price->getRebate(), 2, '.', '' ), $dom, $priceitem );
+			$this->_appendChildCDATA( 'total', number_format( $total, 2, '.', '' ), $dom, $priceitem );
+			$childproductitem->appendChild( $priceitem );
+
+			$childlist->appendChild( $childproductitem );
+		}
+
+		$productelement->appendChild( $childlist );
 	}
 
 

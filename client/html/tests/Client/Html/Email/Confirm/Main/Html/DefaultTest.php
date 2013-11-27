@@ -7,8 +7,8 @@
 
 class Client_Html_Email_Confirm_Main_Html_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -38,7 +38,6 @@ class Client_Html_Email_Confirm_Main_Html_DefaultTest extends MW_Unittest_Testca
 
 		$paths = TestHelper::getHtmlTemplatePaths();
 		$this->_object = new Client_Html_Email_Confirm_Main_Html_Default( $this->_context, $paths );
-		$this->_object->setView( TestHelper::getView() );
 	}
 
 
@@ -56,6 +55,8 @@ class Client_Html_Email_Confirm_Main_Html_DefaultTest extends MW_Unittest_Testca
 
 	public function testGetHeader()
 	{
+		$this->_object->setView( $this->_getView() );
+
 		$output = $this->_object->getHeader();
 	}
 
@@ -83,7 +84,7 @@ class Client_Html_Email_Confirm_Main_Html_DefaultTest extends MW_Unittest_Testca
 		$this->_object->setView( $view );
 
 		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( "<html>\n	<head>\n		<style type=\"text/css\">", $output );
+		$this->assertStringStartsWith( "<html>\n	<body>\n\n	<style type=\"text/css\">", $output );
 	}
 
 
@@ -103,6 +104,8 @@ class Client_Html_Email_Confirm_Main_Html_DefaultTest extends MW_Unittest_Testca
 
 	public function testProcess()
 	{
+		$this->_object->setView( $this->_getView() );
+
 		$this->_object->process();
 	}
 
@@ -122,6 +125,7 @@ class Client_Html_Email_Confirm_Main_Html_DefaultTest extends MW_Unittest_Testca
 
 		$view->confirmOrderItem = $orderItem;
 		$view->confirmOrderBaseItem = $orderManager->getSubManager( 'base' )->load( $orderItem->getBaseId() );
+		$view->summaryBasket = $view->confirmOrderBaseItem;
 
 		return $view;
 	}

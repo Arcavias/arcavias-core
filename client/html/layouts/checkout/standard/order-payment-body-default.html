@@ -5,26 +5,37 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  */
 
+$enc = $this->encoder();
+
+if( isset( $this->paymentForm ) )
+{
+	$url = $this->paymentForm->getUrl();
+	$method = $this->paymentForm->getMethod();
+	$params = $this->paymentForm->getValues();
+}
+else
+{
+	$url = $method = '';
+	$params = array();
+}
+
 ?>
-<div class="checkout-standard-order-payment">
-<?php if( isset( $this->paymentForm ) ) : ?>
+<div class="checkout-standard-order-payment" data-url="<?php echo $enc->attr( $url ); ?>">
+	<h2><?php echo $enc->html( $this->translate( 'client/html', 'Payment' ), $enc::TRUST ); ?></h2>
+	<p class="order-notice"><?php echo $enc->html( $this->translate( 'client/html', 'You will now be forwarded to the next step' ), $enc::TRUST ); ?></p>
+<?php if( $method === 'REDIRECT' ) : ?>
 	<noscript>
-		<h2><?php echo $this->translate( 'client/html', 'Payment' ); ?></h2>
-		<p class="order-notice"><?php echo $this->translate( 'client/html', 'You will now be redirected to our payment service partner' ); ?></p>
+		<a class="standardbutton" href="<?php echo $enc->attr( $url ); ?>"><?php echo $enc->html( $this->translate( 'client/html', 'Proceed' ), $enc::TRUST ); ?></a>
 	</noscript>
-	<form method="<?php echo $this->paymentForm->getMethod(); ?>" action="<?php echo $this->paymentForm->getUrl(); ?>">
-<?php	foreach( $this->paymentForm->getValues() as $key => $value ) : ?>
-		<input type="hidden" name="<?php echo $key; ?>" value="<?php echo $value; ?>" />
+<?php elseif( $method && $url ) : ?>
+	<form method="<?php echo $enc->attr( $method ); ?>" action="<?php echo $enc->attr( $url ); ?>">
+<?php	foreach( $params as $key => $value ) : ?>
+		<input type="hidden" name="<?php echo $enc->attr( $key ); ?>" value="<?php echo $enc->attr( $value ); ?>" />
 <?php	endforeach; ?>
 <?php echo $this->get( 'paymentBody' ); ?>
 		<noscript>
-			<button class="standardbutton"><?php echo $this->translate( 'client/html', 'Proceed to payment' ); ?></button>
+			<button class="standardbutton"><?php echo $enc->html( $this->translate( 'client/html', 'Proceed' ), $enc::TRUST ); ?></button>
 		</noscript>
 	</form>
-<?php elseif( isset( $this->paymentUrl ) ) : ?>
-	<noscript>
-		<h2><?php echo $this->translate( 'client/html', 'Order successful' ); ?></h2>
-		<a class="standardbutton" href="<?php echo $this->paymentUrl; ?>"><?php echo $this->translate( 'client/html', 'Proceed to confirmation page' ); ?></a>
-	</noscript>
 <?php endif; ?>
 </div>

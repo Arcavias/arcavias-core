@@ -3,10 +3,7 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id$
 */
-
-
 
 class Jobs
 {
@@ -45,9 +42,13 @@ class Jobs
 				foreach( $items as $item )
 				{
 					$sites = MShop_Locale_Manager_Abstract::SITE_ONE;
-					$localeItem = $localeManager->bootstrap( $item->getCode(), '', '', false, $sites );
 
-					$this->_executeJobs( $localeItem );
+					try {
+						$localeItem = $localeManager->bootstrap( $item->getCode(), '', '', false, $sites );
+						$this->_executeJobs( $localeItem );
+					} catch ( Exception $e ) {
+						$this->_context->getLogger()->log( 'Job scheduler: ' . $e->getMessage() );
+					}
 				}
 
 				$count += count( $items );

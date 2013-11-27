@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Product
- * @version $Id: Default.php 14682 2012-01-04 11:30:14Z nsendetzky $
  */
 
 
@@ -174,36 +173,24 @@ class MShop_Product_Manager_Stock_Warehouse_Default
 
 
 	/**
-	 * Delete a warehouse item by given Id
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param Integer $id Id of the warehouse item to delete
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement( $conn, 'mshop/product/manager/stock/warehouse/default/item/delete' );
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$result = $stmt->execute()->finish();
-
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/product/manager/stock/warehouse/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
 	/**
 	 * Creates a warehouse item object for the given item id.
 	 *
-	 * @param Integer $id Id of warehouse item
-	 * @return MShop_Product_Item_Warehouse_Interface Product warehouse item
+	 * @param integer $id Id of the warehouse item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Product_Item_Warehouse_Interface Returns product warehouse item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

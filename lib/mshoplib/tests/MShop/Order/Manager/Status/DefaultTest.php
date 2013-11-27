@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14566 2011-12-23 13:24:56Z doleiynyk $
  */
 
 /**
@@ -12,14 +11,14 @@
 
 class MShop_Order_Manager_Status_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_context;
-	protected $_object;
+	private $_context;
+	private $_object;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	* Runs the test methods of this class.

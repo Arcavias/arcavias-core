@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Service
- * @version $Id$
  */
 
 
@@ -16,8 +15,8 @@
  * @subpackage Service
  */
 abstract class MShop_Service_Provider_Payment_Abstract
-extends MShop_Service_Provider_Abstract
-implements MShop_Service_Provider_Payment_Interface
+	extends MShop_Service_Provider_Abstract
+	implements MShop_Service_Provider_Payment_Interface
 {
 	/**
 	 * Feature constant if querying for status updates for an order is supported.
@@ -40,7 +39,84 @@ implements MShop_Service_Provider_Payment_Interface
 	const FEAT_REFUND = 4;
 
 
-	private $_communication;
+	private $_beConfig = array(
+		'payment.url-success' => array(
+			'code' => 'payment.url-success',
+			'internalcode'=> 'payment.url-success',
+			'label'=> 'Shop URL customers are redirected to after successful payments',
+			'type'=> 'string',
+			'internaltype'=> 'string',
+			'default'=> '',
+			'required'=> false,
+		),
+		'payment.url-failure' => array(
+			'code' => 'payment.url-failure',
+			'internalcode'=> 'payment.url-failure',
+			'label'=> 'Shop URL customers are redirected to after failed payments',
+			'type'=> 'string',
+			'internaltype'=> 'string',
+			'default'=> '',
+			'required'=> false,
+		),
+		'payment.url-cancel' => array(
+			'code' => 'payment.url-cancel',
+			'internalcode'=> 'payment.url-cancel',
+			'label'=> 'Shop URL customers are redirected to after canceled payments',
+			'type'=> 'string',
+			'internaltype'=> 'string',
+			'default'=> '',
+			'required'=> false,
+		),
+		'payment.url-update' => array(
+			'code' => 'payment.url-update',
+			'internalcode'=> 'payment.url-update',
+			'label'=> 'Shop URL payment status updates from payment providers are sent to',
+			'type'=> 'string',
+			'internaltype'=> 'string',
+			'default'=> '',
+			'required'=> false,
+		),
+	);
+
+
+	/**
+	 * Checks the backend configuration attributes for validity.
+	 *
+	 * @param array $attributes Attributes added by the shop owner in the administraton interface
+	 * @return array An array with the attribute keys as key and an error message as values for all attributes that are
+	 * 	known by the provider but aren't valid
+	 */
+	public function checkConfigBE( array $attributes )
+	{
+		$error = $this->_checkConfig( $this->_beConfig, $attributes );
+
+		foreach ( $this->_beConfig as $key => $value )
+		{
+			if( isset( $attributes[$key] ) && $value['type'] != gettype( $attributes[$key] ) ) {
+				$error[ $key ] = sprintf( 'The type of the configuration option with key "%1$s" must be "%2$s"', $key, $value['type'] );
+			}
+		}
+
+		return $error;
+	}
+
+
+	/**
+	 * Returns the configuration attribute definitions of the provider to generate a list of available fields and
+	 * rules for the value of each field in the administration interface.
+	 *
+	 * @return array List of attribute definitions implementing MW_Common_Critera_Attribute_Interface
+	 */
+	public function getConfigBE()
+	{
+		$list = array();
+
+		foreach( $this->_beConfig as $key => $config ) {
+			$list[$key] = new MW_Common_Criteria_Attribute_Default( $config );
+		}
+
+		return $list;
+	}
 
 
 	/**
@@ -66,6 +142,22 @@ implements MShop_Service_Provider_Payment_Interface
 
 
 	/**
+	 * Tries to get an authorization or captures the money immediately for the given order if capturing the money
+	 * separately isn't supported or not configured by the shop owner.
+	 *
+	 * @param MShop_Order_Item_Interface $order Order invoice object
+	 * @return MW_Common_Form_Interface Form object with URL, action and parameters to redirect to
+	 * 	(e.g. to an external server of the payment provider or to a local success page)
+	 */
+	public function process( MShop_Order_Item_Interface $order )
+	{
+		$url = $this->_getConfigValue( array( 'payment.url-success' ) );
+
+		return new MShop_Common_Item_Helper_Form_Default( $url, 'REDIRECT', array() );
+	}
+
+
+	/**
 	 * Refunds the money for the given order if supported.
 	 *
 	 * @param MShop_Order_Item_Interface $order Order invoice object
@@ -73,21 +165,6 @@ implements MShop_Service_Provider_Payment_Interface
 	public function refund( MShop_Order_Item_Interface $order )
 	{
 		throw new MShop_Service_Exception( sprintf( 'Method "%1$s" for provider not available', 'refund' ) );
-	}
-
-
-	/**
-	 * Send http request to the given url.
-	 *
-	 * @param string $url URL of the Ogone server
-	 * @param string $param Parameter string
-	 * @param string $method Initial method (e.g. post or get)
-	 * @return string response body of a http request
-	 * @throws MShop_Service_Exception If the request couldn't be sent
-	 */
-	protected function _sendRequest( $url, $param, $method = 'POST' )
-	{
-		return $this->_getCommunication()->transmit( $url, $method, $param );
 	}
 
 

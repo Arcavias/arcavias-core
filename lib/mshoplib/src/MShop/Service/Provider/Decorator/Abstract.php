@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Service
- * @version $Id: Abstract.php 14558 2011-12-22 19:19:28Z nsendetzky $
  */
 
 
@@ -53,6 +52,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 		return $this->_object->calcPrice($basket);
 	}
 
+
 	/**
 	 * Checks the backend configuration attributes for validity.
 	 *
@@ -64,6 +64,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 	{
 		return $this->_object->checkConfigBE($attributes);
 	}
+
 
 	/**
 	 * Checks the frontend configuration attributes for validity.
@@ -77,6 +78,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 		return $this->_object->checkConfigFE($attributes);
 	}
 
+
 	/**
 	 * Returns the configuration attribute definitions of the provider to generate a list of available fields and
 	 * rules for the value of each field in the administration interface.
@@ -87,6 +89,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 	{
 		return $this->_object->getConfigBE();
 	}
+
 
 	/**
 	 * Returns the configuration attribute definitions of the provider to generate a list of available fields and
@@ -100,6 +103,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 		return $this->_object->getConfigFE( $basket );
 	}
 
+
 	/**
 	 * Returns the service item which also includes the configuration for the service provider.
 	 *
@@ -109,6 +113,29 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 	{
 		return $this->_item;
 	}
+
+
+	/**
+	 * Injects additional global configuration for the backend.
+	 *
+	 * It's used for adding additional backend configuration from the application
+	 * like the URLs to redirect to.
+	 *
+	 * Supported redirect URLs are:
+	 * - payment.url-success
+	 * - payment.url-failure
+	 * - payment.url-cancel
+	 * - payment.url-update
+	 *
+	 * @param array $config Associative list of config keys and their value
+	 */
+	public function injectGlobalConfigBE( array $config )
+	{
+		parent::injectGlobalConfigBE( $config );
+
+		$this->_object->injectGlobalConfigBE( $config );
+	}
+
 
 	/**
 	 * Checks if payment provider can be used based on the basket content.
@@ -122,6 +149,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 		return $this->_object->isAvailable($basket);
 	}
 
+
 	/**
 	 * Checks what features the payment provider implements.
 	 *
@@ -133,6 +161,7 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 		return $this->_object->isImplemented( $what );
 	}
 
+
 	/**
 	 * Queries for status updates for the given order if supported.
 	 *
@@ -142,6 +171,20 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 	{
 		$this->_object->query( $order );
 	}
+
+
+	/**
+	 * Sets the communication object for a service provider.
+	 *
+	 * @param MW_Communication_Interface $communication Object of communication
+	 */
+	public function setCommunication( MW_Communication_Interface $communication )
+	{
+		parent::setCommunication( $communication );
+
+		$this->_object->setCommunication( $communication );
+	}
+
 
 	/**
 	 * Looks for new update files and updates the orders for which status updates were received.
@@ -155,11 +198,12 @@ abstract class MShop_Service_Provider_Decorator_Abstract
 		return $this->_object->updateAsync();
 	}
 
+
 	/**
 	 * Updates the orders for which status updates were received via direct requests (like HTTP).
 	 *
 	 * @param mixed $additional Update information whose format depends on the payment provider
-	 * @return boolean True if the update was successful, false if the given parameters are not valid for this provider
+	 * @return MShop_Order_Item_Interface|null Order item if update was successful, null if the given parameters are not valid for this provider
 	 * @throws MShop_Service_Exception If updating one of the orders failed
 	 */
 	public function updateSync( $additional )

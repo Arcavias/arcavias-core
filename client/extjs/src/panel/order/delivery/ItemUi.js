@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ItemUi.js 14818 2012-01-12 09:53:56Z spopp $
  */
 
 
@@ -45,7 +44,12 @@ MShop.panel.order.base.service.delivery.ItemUi = Ext.extend(Ext.Panel, {
 					name : 'order.base.service.id'
 				}, {
 					xtype: 'displayfield',
+					fieldLabel: 'Service ID',
+					name: 'order.base.service.serviceid'
+				}, {
+					xtype: 'displayfield',
 					fieldLabel: 'Code',
+					maxLength : 32,
 					name: 'order.base.service.code'
 				}, {
 					xtype: 'displayfield',
@@ -57,8 +61,8 @@ MShop.panel.order.base.service.delivery.ItemUi = Ext.extend(Ext.Panel, {
 					name: 'order.base.service.price'
 				}, {
 					xtype: 'displayfield',
-					fieldLabel: 'Shipping',
-					name: 'order.base.service.shipping'
+					fieldLabel: 'Costs',
+					name: 'order.base.service.costs'
 				}, {
 					xtype: 'displayfield',
 					fieldLabel: 'Rebate',

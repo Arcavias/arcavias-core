@@ -3,13 +3,13 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14711 2012-01-05 12:52:13Z nsendetzky $
  */
 
 return array(
 	'delete' => '
 		DELETE FROM "madmin_log"
-		WHERE "id" = ?
+		WHERE :cond
+		AND siteid = ?
 	',
 	'insert' => '
 		INSERT INTO "madmin_log" ("siteid", "facility", "timestamp", "priority", "message", "request")

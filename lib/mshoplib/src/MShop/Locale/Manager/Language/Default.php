@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Locale
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -156,30 +155,14 @@ class MShop_Locale_Manager_Language_Default
 
 
 	/**
-	 * Deletes the language item specified by its ID
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param string $languageId Language id/key of an existing Language in the storage to be deleted
-	 * @throws MW_DB_Exception If language object couldn't be deleted
-	 * @throws MShop_Locale_Exception On failures with the language item object
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $languageId )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/locale/manager/language/default/item/delete');
-			$stmt->bind(1, $languageId, MW_DB_Statement_Abstract::PARAM_STR);
-			$stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch ( Exception $e )
-		{
-			$dbm->release($conn);
-			throw $e;
-		}
+		$path = 'mshop/locale/manager/language/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -187,9 +170,9 @@ class MShop_Locale_Manager_Language_Default
 	 * Create a Language object from a given Language ID/Key.
 	 *
 	 * @param string $id Language id to create the Language object
-	 * @return MShop_Locale_Item_Language_Interface Language object
+	 * @return MShop_Locale_Item_Language_Interface Returns the language item of the given id
 	 * @throws MW_DB_Exception If language object couldn't be fetched
-	 * @throws MShop_Locale_Exception On failures with the language item object
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

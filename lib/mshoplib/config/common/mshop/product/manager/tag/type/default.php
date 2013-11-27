@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 return array(
@@ -20,7 +19,8 @@ return array(
 		',
 		'delete' => '
 			DELETE FROM "mshop_product_tag_type"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'search' => '
 			SELECT mprotaty."id", mprotaty."siteid", mprotaty."code", mprotaty."domain", mprotaty."label", mprotaty."status",

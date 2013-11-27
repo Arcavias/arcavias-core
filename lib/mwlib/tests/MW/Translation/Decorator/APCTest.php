@@ -8,7 +8,7 @@
  */
 class MW_Translation_Decorator_APCTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 	/**
 	 * Runs the test methods of this class.
@@ -35,8 +35,7 @@ class MW_Translation_Decorator_APCTest extends MW_Unittest_Testcase
 		}
 
 		$trans = new MW_Translation_None( 'en_GB' );
-		$config = new MW_Config_Zend( new Zend_Config( array() ) );
-		$this->_object = new MW_Translation_Decorator_APC( $trans, $config );
+		$this->_object = new MW_Translation_Decorator_APC( $trans, 'i18n' );
 	}
 
 	/**

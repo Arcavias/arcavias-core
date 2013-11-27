@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14602 2011-12-27 15:27:08Z gwussow $
  */
 
 
@@ -16,7 +15,7 @@ class MShop_Order_Item_Base_Product_Attribute_DefaultTest extends MW_Unittest_Te
 	 * @var    MShop_Order_Item_Base_Product_Attribute_Default
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
 
 	/**

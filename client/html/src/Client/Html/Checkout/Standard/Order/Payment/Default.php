@@ -100,33 +100,48 @@ class Client_Html_Checkout_Standard_Order_Payment_Default
 	public function process()
 	{
 		$view = $this->getView();
+		$basket = $view->orderBasket;
+		$orderItem = $view->orderItem;
 		$context = $this->_getContext();
 
-		$controller = Controller_Frontend_Basket_Factory::createController( $context );
-		$service = $controller->get()->getService( 'payment' );
 
-		$manager = MShop_Service_Manager_Factory::createManager( $context );
-		$provider = $manager->getProvider( $manager->getItem( $service->getServiceId() ) );
+		$target = $view->config( 'client/html/checkout/confirm/url/target' );
+		$controller = $view->config( 'client/html/checkout/confirm/url/controller', 'checkout' );
+		$action = $view->config( 'client/html/checkout/confirm/url/action', 'confirm' );
+		$config = $view->config( 'client/html/checkout/confirm/url/config', array( 'absoluteUri' => true ) );
 
-		$confirmTarget = $view->config( 'client/html/checkout/confirm/url/target' );
-		$confirmController = $view->config( 'client/html/checkout/confirm/url/controller', 'checkout' );
-		$confirmAction = $view->config( 'client/html/checkout/confirm/url/action', 'confirm' );
-		$confirmConfig = $view->config( 'client/html/checkout/confirm/url/config', array() );
+		$confirmUrl = $view->url( $target, $controller, $action, array(), array(), $config );
+
+		$target = $view->config( 'client/html/checkout/update/url/target' );
+		$controller = $view->config( 'client/html/checkout/update/url/controller', 'checkout' );
+		$action = $view->config( 'client/html/checkout/update/url/action', 'update' );
+		$config = $view->config( 'client/html/checkout/update/url/config', array( 'absoluteUri' => true ) );
+
+		$updateUrl = $view->url( $target, $controller, $action, array(), array(), $config );
+
+		$config = array( 'payment.url-success' => $confirmUrl, 'payment.url-update' => $updateUrl );
 
 
-		$url = $view->url( $confirmTarget, $confirmController, $confirmAction, array(), array(), $confirmConfig );
+		try
+		{
+			$service = $basket->getService( 'payment' );
 
-		if( strpos( $url, '?' ) === false ) {
-			$url .= '?';
-		} else {
-			$url .= '&';
+			$manager = MShop_Service_Manager_Factory::createManager( $context );
+			$provider = $manager->getProvider( $manager->getItem( $service->getServiceId() ) );
+			$provider->injectGlobalConfigBE( $config );
+
+			$view->paymentForm = $provider->process( $orderItem );
+		}
+		catch( MShop_Order_Exception $e )
+		{
+			$view->paymentForm = new MShop_Common_Item_Helper_Form_Default( $confirmUrl, 'REDIRECT' );
 		}
 
-		$url .= 'arcavias=' . $view->orderItem->getId();
-
-		$view->paymentForm = $provider->process( $view->orderItem );
-		$view->paymentUrl = $url;
-
+		if( !isset( $view->paymentForm ) || $view->paymentForm === null )
+		{
+			$msg = sprintf( 'Invalid process response from service provider with code "%1$s"', $service->getCode() );
+			throw new Client_Html_Exception( $msg );
+		}
 
 		$this->_process( $this->_subPartPath, $this->_subPartNames );
 	}

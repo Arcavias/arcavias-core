@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Default.php 14852 2012-01-13 12:24:15Z doleiynyk $
  */
 
 
@@ -170,6 +169,8 @@ class MShop_Order_Item_Base_Product_Default
 	 */
 	public function setSupplierCode( $suppliercode )
 	{
+		$this->_checkCode( $suppliercode );
+
 		if ( $suppliercode == $this->getSupplierCode() ) { return; }
 
 		$this->_values['suppliercode'] = (string) $suppliercode;
@@ -220,6 +221,8 @@ class MShop_Order_Item_Base_Product_Default
 	 */
 	public function setProductCode( $code )
 	{
+		$this->_checkCode( $code );
+
 		if ( $code == $this->getProductCode() ) { return; }
 
 		$this->_values['prodcode'] = (string) $code;
@@ -309,7 +312,7 @@ class MShop_Order_Item_Base_Product_Default
 	/**
 	 * Returns the price item for the product.
 	 *
-	 * @return MShop_Price_Item_Interface Price item with price, shipping and rebate
+	 * @return MShop_Price_Item_Interface Price item with price, costs and rebate
 	 */
 	public function getPrice()
 	{
@@ -320,7 +323,7 @@ class MShop_Order_Item_Base_Product_Default
 	/**
 	 * Sets the price item for the product.
 	 *
-	 * @param MShop_Price_Item_Interface $price Price item containing price and shipping costs
+	 * @param MShop_Price_Item_Interface $price Price item containing price and additional costs
 	 */
 	public function setPrice( MShop_Price_Item_Interface $price )
 	{
@@ -334,14 +337,14 @@ class MShop_Order_Item_Base_Product_Default
 	/**
 	 * Returns the price item for the product whose values are multiplied with the quantity.
 	 *
-	 * @return MShop_Price_Item_Interface Price item with price, shipping and rebate
+	 * @return MShop_Price_Item_Interface Price item with price, additional costs and rebate
 	 */
 	public function getSumPrice()
 	{
 		$price = clone $this->_price;
 
 		$price->setValue( $price->getValue() * $this->_values['quantity'] );
-		$price->setShipping( $price->getShipping() * $this->_values['quantity'] );
+		$price->setCosts( $price->getCosts() * $this->_values['quantity'] );
 		$price->getRebate( $price->getRebate() * $this->_values['quantity'] );
 
 		return $price;
@@ -420,17 +423,28 @@ class MShop_Order_Item_Base_Product_Default
 	 */
 	public function getAttribute( $code )
 	{
-		if( !isset( $this->_attributesMap ) )
-		{
-			$this->_attributesMap = array();
+		$map = $this->_getAttributeMap();
 
-			foreach( $this->_attributes as $attribute ) {
-				$this->_attributesMap[ $attribute->getCode() ] = $attribute->getValue();
-			}
+		if( isset( $map[ $code ] ) ) {
+			return $map[ $code ]->getValue();
 		}
 
-		if( isset( $this->_attributesMap[ $code ] ) ) {
-			return $this->_attributesMap[ $code ];
+		return null;
+	}
+
+
+	/**
+	 * Returns the attribute item for the ordered product with the given code.
+	 *
+	 * @param string $code code of the product attribute item.
+	 * @return MShop_Order_Item_Base_Product_Attribute_Interface|null Attribute item for the ordered product and the given code
+	 */
+	public function getAttributeItem( $code )
+	{
+		$map = $this->_getAttributeMap();
+
+		if( isset( $map[ $code ] ) ) {
+			return $map[ $code ];
 		}
 
 		return null;
@@ -482,7 +496,7 @@ class MShop_Order_Item_Base_Product_Default
 		$list['order.base.product.mediaurl'] = $this->getMediaUrl();
 		$list['order.base.product.position'] = $this->getPosition();
 		$list['order.base.product.price'] = $this->_price->getValue();
-		$list['order.base.product.shipping'] = $this->_price->getShipping();
+		$list['order.base.product.costs'] = $this->_price->getCosts();
 		$list['order.base.product.rebate'] = $this->_price->getRebate();
 		$list['order.base.product.taxrate'] = $this->_price->getTaxRate();
 		$list['order.base.product.quantity'] = $this->getQuantity();
@@ -512,5 +526,25 @@ class MShop_Order_Item_Base_Product_Default
 		}
 
 		$this->setModified();
+	}
+
+
+	/**
+	 * Returns the attribute map for the ordered products.
+	 *
+	 * @return array Associative list of code as key and an MShop_Order_Item_Base_Product_Attribute_Interface as value
+	 */
+	protected function _getAttributeMap()
+	{
+		if( !isset( $this->_attributesMap ) )
+		{
+			$this->_attributesMap = array();
+
+			foreach( $this->_attributes as $attribute ) {
+				$this->_attributesMap[ $attribute->getCode() ] = $attribute;
+			}
+		}
+
+		return $this->_attributesMap;
 	}
 }

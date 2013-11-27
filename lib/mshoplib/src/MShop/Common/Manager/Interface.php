@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -38,6 +37,13 @@ interface MShop_Common_Manager_Interface
 	 * @param mixed $id ID of the item object
 	 */
 	public function deleteItem( $id );
+
+	/**
+	 * Removes multiple items specified by ids in the array.
+	 *
+	 * @param array $ids List of IDs
+	 */
+	public function deleteItems( array $ids );
 
 	/**
 	 * Returns the item specified by its ID

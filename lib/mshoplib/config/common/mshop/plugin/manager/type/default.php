@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 return array(
@@ -19,7 +18,8 @@ return array(
 		',
 		'delete' => '
 			DELETE FROM "mshop_plugin_type"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'search' => '
 			SELECT mpluty."id", mpluty."siteid", mpluty."code", mpluty."domain", mpluty."label", mpluty."status",

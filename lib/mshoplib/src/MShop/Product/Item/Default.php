@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Product
- * @version $Id: Default.php 14852 2012-01-13 12:24:15Z doleiynyk $
  */
 
 
@@ -116,6 +115,8 @@ class MShop_Product_Item_Default
 	 */
 	public function setCode( $code )
 	{
+		$this->_checkCode( $code );
+
 		if ( $code == $this->getCode() ) { return; }
 
 		$this->_values['code'] = (string) $code;

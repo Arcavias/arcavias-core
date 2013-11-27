@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Locale
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -161,29 +160,14 @@ class MShop_Locale_Manager_Currency_Default
 
 
 	/**
-	 * Deletes a currency.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param string $currencyId Currency ID of an existing currency in the storage which should be deleted
-	 * @throws MShop_Locale_Exception
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $currencyId )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/locale/manager/currency/default/item/delete');
-			$stmt->bind(1, $currencyId, MW_DB_Statement_Abstract::PARAM_STR);
-			$stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch ( Exception $e )
-		{
-			$dbm->release($conn);
-			throw $e;
-		}
+		$path = 'mshop/locale/manager/currency/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -191,8 +175,9 @@ class MShop_Locale_Manager_Currency_Default
 	 * Returns the currency object with the given currency ID.
 	 *
 	 * @param string $id Currency ID indentifying the currency object
-	 * @return MShop_Locale_Item_Currency_Interface Currency object
-	 * @throws MShop_Locale_Exception If no currency object was found
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Locale_Item_Currency_Interface Returns the currency item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
  * @package MW
  * @subpackage Tree
- * @version $Id: DBNestedSet.php 16606 2012-10-19 12:50:23Z nsendetzky $
  */
 
 
@@ -29,6 +28,7 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 	 *	[id] => Array describing unique ID codes/types/labels
 	 *	[label] => Array describing codes/types/labels for descriptive labels
 	 *	[status] => Array describing codes/types/labels for status values
+	 *	[parentid] => Array describing codes/types/labels for parentid values
 	 *	[level] => Array describing codes/types/labels for height levels of tree nodes
 	 *	[left] => Array describing codes/types/labels for nodes left values
 	 *	[right] => Array describing codes/types/labels for nodes right values
@@ -59,6 +59,8 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 	 *		ORDER BY :order
 	 *	[update] =>
 	 *		UPDATE treetable SET label = ?, code = ? WHERE type = <type> AND id = ?
+	 *	[update-parentid] =>
+	 *		UPDATE treetable SET parentid = ? WHERE id = ?
 	 *	[newid] =>
 	 *		SELECT LAST_INSERT_ID()
 	 *
@@ -233,7 +235,7 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 			$result = $stmt->execute();
 
 			if( ( $row = $result->fetch() ) === false ) {
-				throw new MW_Tree_Exception( sprintf( 'No node with ID "%1$d" found for base "%2$s"', $id, $base ) );
+				throw new MW_Tree_Exception( sprintf( 'No node with ID "%1$d" found', $id ) );
 			}
 
 			$node = $this->_createNode( $row );
@@ -260,7 +262,6 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 	 */
 	public function insertNode( MW_Tree_Node_Interface $node, $parentId = null, $refId = null )
 	{
-		$base = null;
 		$node->parentid = $parentId;
 
 		if( $refId !== null )
@@ -385,8 +386,18 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 		{
 			$refNode = $this->getNode( $newParentId, MW_Tree_Manager_Abstract::LEVEL_ONE );
 
-			$leveldiff = $refNode->level - $node->level + 1;
+			if( $newParentId === null )
+			{
+				//make virtual root
+				if( ( $root = $this->_getRootNode( '-' ) ) !== null )
+				{
+					$refNode->left = $root->right;
+					$refNode->right = $root->right + 1;
+					$refNode->level = -1;
+				}
+			}
 
+			$leveldiff = $refNode->level - $node->level + 1;
 			$openNodeLeftBegin = $refNode->right + 1;
 			$openNodeRightBegin = $refNode->right;
 
@@ -418,7 +429,7 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 		{
 			$stmtLeft = $conn->create( $this->_config['move-left'], MW_DB_Connection_Abstract::TYPE_PREP );
 			$stmtRight = $conn->create( $this->_config['move-right'], MW_DB_Connection_Abstract::TYPE_PREP );
-
+			$updateParentId = $conn->create( $this->_config['update-parentid'], MW_DB_Connection_Abstract::TYPE_PREP );
 			// open gap for inserting node or subtree
 
 			$stmtLeft->bind( 1, $diff, MW_DB_Statement_Abstract::PARAM_INT );
@@ -457,6 +468,11 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 			$stmtRight->bind( 2, $closeNodeRightBegin, MW_DB_Statement_Abstract::PARAM_INT );
 			$stmtRight->bind( 3, 0x7FFFFFFF, MW_DB_Statement_Abstract::PARAM_INT );
 			$stmtRight->execute()->finish();
+
+
+			$updateParentId->bind( 1, $newParentId, MW_DB_Statement_Abstract::PARAM_INT );
+			$updateParentId->bind( 2, $id, MW_DB_Statement_Abstract::PARAM_INT );
+			$updateParentId->execute()->finish();
 
 			$this->_dbm->release( $conn );
 		}

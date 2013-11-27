@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 896 2012-07-04 12:25:26Z nsendetzky $
  */
 
 class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
@@ -108,7 +107,7 @@ class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
 		$price = $this->_object->getServicePrice( 'delivery', $service->getId(), $basket );
 
 		$this->assertEquals( '12.95', $price->getValue() );
-		$this->assertEquals( '1.99', $price->getShipping() );
+		$this->assertEquals( '1.99', $price->getCosts() );
 	}
 
 
@@ -126,7 +125,7 @@ class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
 		$price = $this->_object->getServicePrice( 'delivery', $service->getId(), $basket );
 
 		$this->assertEquals( '12.95', $price->getValue() );
-		$this->assertEquals( '1.99', $price->getShipping() );
+		$this->assertEquals( '1.99', $price->getCosts() );
 	}
 
 

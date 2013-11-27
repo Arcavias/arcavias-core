@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14682 2012-01-04 11:30:14Z nsendetzky $
  */
 
 /**
@@ -11,14 +10,14 @@
  */
 class MShop_Customer_Manager_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_fixture = null;
-	protected $_object = null;
+	private $_fixture = null;
+	private $_object = null;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	 * Runs the test methods of this class.
@@ -121,7 +120,7 @@ class MShop_Customer_Manager_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $item->getStatus(), $itemSaved->getStatus() );
 		$this->assertEquals( $item->getCode(), $itemSaved->getCode() );
 		$this->assertEquals( $item->getLabel(), $itemSaved->getLabel() );
-		$this->assertEquals( $item->getBillingAddress(), $itemSaved->getBillingAddress() );
+		$this->assertEquals( $item->getPaymentAddress(), $itemSaved->getPaymentAddress() );
 		$this->assertEquals( $item->getBirthday(), $itemSaved->getBirthday() );
 		$this->assertEquals( $item->getPassword(), $itemSaved->getPassword() );
 
@@ -134,7 +133,7 @@ class MShop_Customer_Manager_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $itemExp->getStatus(), $itemUpd->getStatus() );
 		$this->assertEquals( $itemExp->getCode(), $itemUpd->getCode() );
 		$this->assertEquals( $itemExp->getLabel(), $itemUpd->getLabel() );
-		$this->assertEquals( $itemExp->getBillingAddress(), $itemUpd->getBillingAddress() );
+		$this->assertEquals( $itemExp->getPaymentAddress(), $itemUpd->getPaymentAddress() );
 		$this->assertEquals( $itemExp->getBirthday(), $itemUpd->getBirthday() );
 		$this->assertEquals( $itemExp->getPassword(), $itemUpd->getPassword() );
 

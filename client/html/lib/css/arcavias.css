@@ -1,47 +1,44 @@
 ﻿/* Arcavias standard CSS */
-.button-group {
-	text-align: center;
-	padding: 10px 0px 10px 0px;
-}
 
-.button-group a.standardbutton {
-	height: 25px;
-	margin: 0px 0px 0px 10px;
-	padding: 4px 4px 4px 4px;
-	background: url(images/buttonfond.gif) repeat-x;
-	border: 1px solid #689DB9;
-	box-shadow: 2px 2px 4px #5C88A1;
-	color: #FFFFFF;
-	border-radius: 4px 4px 4px 4px;
-	font-weight: bold;
-	font-family: Arial, Verdana, Helvetica, sans-serif; 
-}
 
-.button-group  button.standardbutton {
-	height: 25px;
-	margin: 0px;
-	padding: 3px 4px 4px 4px;
-	background: url(images/buttonfond.gif) repeat-x;
-	border: 1px solid #689DB9;
+.arcavias .standardbutton,
+.arcavias .minibutton {
+	background-image: url("images/buttonfond.png");
+	background-repeat: repeat-x;
+	background-size: contain;
 	box-shadow: 2px 2px 4px #5C88A1;
-	color: #FFFFFF;
-	border-radius: 4px 4px 4px 4px;
+	border: 1px solid #689DB9;
+	border-radius: 4px;
 	text-decoration: none;
 	font-weight: bold;
-	font-family: Arial, Verdana, Helvetica, sans-serif; 
-	font-size: 1em;
+	font-size: 100%;
+	color: #FFFFFF;
+	padding: 4px;
+	margin: 5px;
+	min-width: 60px;
+	line-height: 1em;
+	display: inline-block;
+	vertical-align: middle;
+	cursor: pointer;
+}
+
+.arcavias .standardbutton:hover {
+	background-image: url("images/buttonfond-active.png");
 }
 
 .arcavias .minibutton {
-	padding: 3px 6px;
-	margin: 0px 3px 3px 3px;
-	background: url(images/buttonfond.gif) repeat-x #6C9BB4;
-	border: 1px solid #689DB9;
-	box-shadow: 2px 2px 4px #5C88A1;
-	color: #FFFFFF;
-	border-radius: 4px 4px 4px 4px;
-	display: inline-block;
-	font-weight: bold;
+	min-width: 0;
+}
+
+/** Enforce equal width/height for buttons */
+.arcavias .button-group button.standardbutton {
+	height: 22px;
+	min-width: 70px;
+}
+
+.arcavias .button-group {
+	text-align: center;
+	padding: 10px 0px;
 }
 
 .arcavias .attr-list,
@@ -51,8 +48,7 @@
 }
 
 .arcavias li.attr-item,
-.arcavias li.form-item,
-.arcavias li.error-item {
+.arcavias li.form-item {
 	list-style: none;
 }
 
@@ -60,19 +56,223 @@
 	background-color: #ffeeee;
 	border: solid 1px #FF3300;
 	padding: 0.5em;
-	margin-top: 1em;
-	list-style: none;
 }
+
+.arcavias .error-item {
+	padding: 0.25em 0.5em;
+}
+
+/* Common summary CSS also used in e-mail ===>>> */
+
+.arcavias .container {
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border: solid 1px #689DB9;
+	margin: 10px 0px;
+	padding: 0px 5px;
+}
+
+
+/* Common summary */
+.common-summary .error,
+.common-summary-detail .error {
+	background-color: #ffeeee;
+	border-bottom: 1px solid #FF3300;
+}
+
+.common-summary .item {
+	display: inline-block;
+	vertical-align: top;
+	min-width: 232px;
+	width: 50%;
+}
+
+.common-summary .item li {
+	vertical-align: top;
+	padding-top: 5px;
+}
+
+.common-summary .item .content {
+	margin: 10px 10px 10px 10px;
+}
+
+.common-summary .item .name {
+	display: inline-block;
+	vertical-align: top;
+	color: #004266;
+	width: 198px;
+}
+
+.common-summary .item .name:after {
+	content: ":";
+}
+
+.common-summary .item .value {
+	display: inline-block;
+	vertical-align: top;
+	width: 198px;
+}
+
+.common-summary .item .item-icons {
+	float: right;
+	margin: 0 20px 10px 20px;
+}
+
+.common-summary .item .attr-list {
+	list-style: none;
+	margin: 0 10px;
+	padding: 10px;
+	padding-top: 0;
+}
+
+.common-summary .header,
+.common-summary-detail .header {
+	border-bottom: 1px solid #689DB9;
+	background-color: #F2F7FA;
+	padding: 5px 10px;
+	margin: 5px;
+	margin-top: 0;
+}
+
+.common-summary-address h2,
+.common-summary-service h2 {
+	display: none;
+}
+
+.common-summary-service .item .item {
+	margin: 0px;
+}
+
+.common-summary-service .item h4 {
+	margin: 10px;
+	padding: 0px;
+	color: #000000;
+}
+
+.common-summary-detail .header {
+	border-bottom: none;
+	background-color: #FFFFFF;
+}
+
+.common-summary-detail h2 {
+	font-size: 1em;
+}
+
+.common-summary-detail .basket {
+	margin: 0px 5px;
+}
+
+.common-summary-detail table {
+	border-collapse: collapse;
+	width: 100%;
+}
+
+.common-summary-detail tbody tr {
+	border-bottom: 1px solid #689DB9;
+}
+
+.common-summary-detail thead {
+	font-weight: bold;
+	background-color: #F2F7FA;
+}
+
+.common-summary-detail thead tr {
+	border-bottom: 1px solid #689DB9;
+	color: #004266;
+}
+
+.common-summary-detail tr.total {
+	border-top: 1px solid #689DB9;
+	color: #004266;
+	background-color: #F2F7FA
+}
+
+.common-summary-detail th,
+.common-summary-detail td {
+	padding: 5px;
+	vertical-align: middle;
+}
+
+.common-summary-detail .details img {
+	display: none;
+	float: left;
+	max-width: 60px;
+	max-height: 80px;
+	overflow: hidden;
+}
+
+.common-summary-detail .attr-item .name:after {
+	content: ":";
+}
+
+.common-summary-detail tr.subtotal,
+.common-summary-detail tr.delivery,
+.common-summary-detail tr.payment,
+.common-summary-detail tr.total,
+.common-summary-detail tr.rebate,
+.common-summary-detail tr.tax,
+.common-summary-detail th.unitprice,
+.common-summary-detail th.price,
+.common-summary-detail td.unitprice,
+.common-summary-detail td.price {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.common-summary-detail th.price {
+	width: 20%;
+}
+
+.common-summary-detail th.quantity,
+.common-summary-detail td.quantity {
+	white-space: nowrap;
+	text-align: center;
+}
+
+.common-summary-detail td.quantity input {
+	text-align: center;
+	display: inline;
+	width: 3em;
+}
+
+.common-summary-detail th.action,
+.common-summary-detail td.action {
+	text-align: center;
+}
+
+.common-summary-detail tr.delivery td:first-child:after,
+.common-summary-detail tr.payment td:first-child:after {
+	content: " +";
+}
+
+.common-summary-detail tfoot {
+	vertical-align: bottom;
+	font-weight: bold;
+}
+
+.common-summary-detail tfoot .delivery,
+.common-summary-detail tfoot .payment,
+.common-summary-detail tr.rebate,
+.common-summary-detail tr.tax {
+	font-weight: normal;
+}
+
+/* <<<=== Common summary CSS also used in e-mail*/
+
+
 
 /* Catalog filter */
 .catalog-filter button {
-	display: none !important;
+	width: 100%;
+	margin: 0 !important;
 }
 
 /* Catalog filter, tree section */
 .catalog-filter-tree {
 	line-height: 125%;
 }
+
 .catalog-filter-tree ul {
 	list-style: none;
 	padding: 0px;
@@ -113,14 +313,35 @@
 	padding-left: 10px;
 }
 
+.catalog-filter-tree .level-2 li.nochild {
+	
+}
+
+.catalog-filter-tree .level-2 li.withchild {
+	background: url("images/listIconClose.png") no-repeat scroll 0px 4px transparent;
+}
+
+.catalog-filter-tree .level-2 li.withchild.active {
+	background: url("images/listIconOpen.png") no-repeat scroll 0px 4px transparent;
+}
+
 .catalog-filter-tree .level-2 li a {
-	color: #679CB8;
+	color: #689DB9;
 }
 
 .catalog-filter-tree .level-3 li {
-	padding-left: 10px;
 	margin-bottom: 0;
+	padding: 0px;
+} 
+
+.catalog-filter-tree .level-3 li.nochild {
+	background: none;
 }
+
+.catalog-filter-tree .level-3 li.withchild {
+	background: url("images/listIconOpen.png") no-repeat scroll 0px 4px transparent;
+}
+
 
 .catalog-filter-tree .level-3 li a {
 	font-weight: normal;
@@ -131,39 +352,109 @@
 	font-weight: bold;
 }
 
-/* Product list, stage image section */
-.catalog-list-stage {
+.catalog-filter-search {
+	background-image: url("images/buttonfond.png");
+	background-repeat: repeat-x;
+	background-size: 100% 100%;
+	background-color: #689DB9;
+	border: 1px solid #689DB9;
+	border-radius: 4px;
+	white-space: nowrap;
+}
+
+.catalog-filter-search:hover {
+	background-image: url("images/buttonfond-active.png");
+}
+
+.catalog-filter-search .value {
+	background-color: #FFFFFF;
+	border-radius: 4px 0 0 4px;
+	border: none;
+	min-width: 5em;
+	max-width: 25em;
+	height: 1.55em;
+}
+
+.catalog-filter-search .standardbutton {
+	background: none;
+	box-shadow: none;
+	border-radius: 0;
+	border: 0 none;
+	min-width: 2em;
+	padding: 0 5px;
+}
+
+.catalog-filter-search .standardbutton:hover {
+	background: none;
+}
+
+.catalog-filter-search .ui-helper-hidden-accessible {
 	display: none;
 }
 
-/* Product list, breadcrumb section */
-.catalog-list-breadcrumb {
+/* Catalog filter, attribute section */
+.catalog-filter-attribute {
+	padding: 5px 0;
+}
+
+.catalog-filter-attribute fieldset {
+        border: 1px solid #C3D9E5;
+        color: #679CB8;
+        font-weight: bold;
+        padding: 5px;
+        margin: 10px 0px;
+}
+
+.catalog-filter-attribute legend {
+        color: #004266;
+        font-size: 120%;
+}
+
+.catalog-filter-attribute li.disabled {
+        font-weight: normal;
+}
+
+.catalog-filter-attribute input.attr-item {
+        border: 1px solid #C3D9E5;
+}
+
+.catalog-filter-attribute .attr-count:before {
+        content: "(";
+}
+
+.catalog-filter-attribute .attr-count:after {
+        content: ")";
+}
+
+
+/* Product list, stage section */
+.catalog-stage-breadcrumb {
 	padding: 0px 0px 10px 0px;
 }
 
-.catalog-list-breadcrumb .title {
+.catalog-stage-breadcrumb .title {
 	color: #004266;
 	font-size: 1em;
 	font-weight: bold;
 }
 
-.catalog-list-breadcrumb ol{
+.catalog-stage-breadcrumb ol{
 	display: inline;
 	list-style: none;
 }
 
-.catalog-list-breadcrumb li{
+.catalog-stage-breadcrumb li{
 	display: inline;
 	font-size: 1em;
 }	
 
-.catalog-list-breadcrumb li:after {
-	content: ' : ';
+.catalog-stage-breadcrumb li:after {
+	content: ' > ';
 	color: #004266;
 	font-weight: bold;
 }
 
-.catalog-list-breadcrumb li:last-child:after {
+.catalog-stage-breadcrumb li:last-child:after {
 	content: '';
 }
 
@@ -183,6 +474,15 @@
 .catalog-list-head h1 {
 	font-size: 1.5em;
 	padding: 10px 0px 10px 0px;
+}
+
+.catalog-list-head .head-search {
+	font-weight: bold;
+}
+
+.catalog-list-head .searchstring {
+	font-size: 133%;
+	color: #004266;
 }
 
 /* Product list, pagination section */
@@ -240,7 +540,7 @@
 	margin: 10px 0px;
 }
 
-.catalog-list-items .single {
+.catalog-list-items .product {
 	display: inline-block;
 	width: 180px;
 	position: relative;
@@ -248,7 +548,7 @@
 	margin: 0 1px;
 }
 
-.catalog-list-items .single a {
+.catalog-list-items .product a {
 	text-decoration: none;
 	display: inline-block; 
 }
@@ -279,7 +579,7 @@
 /* text list */
 .catalog-list-items .text-list {
 	height: 5.3125em;
-	padding: 3px 5px 3px 5px;
+	padding: 3px 5px;
 	text-align: left;
 	overflow: hidden;
 	border-top: 1px solid #C3D9E5;
@@ -288,10 +588,11 @@
 
 /* price list */
 .catalog-list-items .price-list {
-	padding: 5px 5px 5px 5px;
+	padding: 5px;
 	font-weight: bold;
 	color: #004266;
-	height: 0.9375em;
+	height: 1em;
+	float: left;
 }
 
 .catalog-list-items .price-item {
@@ -309,6 +610,44 @@
 .catalog-list-items .price-item:first-child .taxrate {
 	display: none;
 }
+
+/* Stock level */
+.catalog-list-items .stock {
+	padding: 5px;
+	float: left;
+}
+
+.catalog-list-items .stockitem {
+	display: none;
+}
+
+.catalog-list-items .stockitem:first-child {
+	display: block;
+}
+
+.catalog-list-items .stocklevel {
+	display: inline-block;
+	height: 0.85em;
+	width: 0.85em;
+}
+
+.catalog-list-items .stocktext {
+	display: none;
+}
+
+.catalog-list-items .stock-unlimited .stocklevel,
+.catalog-list-items .stock-high .stocklevel {
+	background-color: #0BA008;
+}
+
+.catalog-list-items .stock-low .stocklevel {
+	background-color: #F0A008;
+}
+
+.catalog-list-items .stock-out .stocklevel {
+	background-color: #F01800;
+}
+
 
 /* Product detail, image section */
 .catalog-detail-image {
@@ -338,6 +677,7 @@
 	background-repeat: no-repeat;
 	background-position: center;
 	background-color: #FFFFFF;
+	background-size: contain;
 	width: 240px;
 	height: 320px;
 }
@@ -459,7 +799,7 @@
 	padding: 0.5em;
 	margin-top: 1em;
 	text-align: right;
-	background-color: #679CB8;
+	background-color: #88B3CB;
 }
 
 .catalog-detail-basket .group input {
@@ -469,20 +809,12 @@
 	width: 3em;
 }
 
-.group .standardbutton {
-	padding: 4px 4px 4px 4px;
-	background: url(images/buttonfond.gif) repeat-x;
-	border: 1px solid #689DB9;
-	box-shadow: 2px 2px 4px #5C88A1;
-	color: #FFFFFF;
-	border-radius: 4px 4px 4px 4px;
-	text-decoration: none;
-	display: inline;
-	font-weight: bold;
-	cursor: pointer;
+.catalog-detail-basket .group .standardbutton {
+	font-size: 150%;
 }
 
 /* product attributes */
+.catalog-detail-basket-selection,
 .catalog-detail-basket-attribute {
 	margin-top: 1.5em;
 	font-weight: bold;
@@ -490,12 +822,14 @@
 	color: #004266;
 }
 
+.catalog-detail-basket-selection select,
 .catalog-detail-basket-attribute select {
 	font-weight: normal;
 	text-transform: none;
 	margin-bottom: 3px;
 }
 
+.catalog-detail-basket-selection td,
 .catalog-detail-basket-attribute td {
 	padding-right: 5px;
 }
@@ -522,8 +856,30 @@
 	padding: 1% 0 1% 0.5%;
 }
 
+/* Stock level */
+.catalog-detail-basic .stock {
+	margin: 0.5em 0;
+}
+
+.catalog-detail-basic .stocklevel {
+	display: none;
+}
+
+.catalog-detail-basic .stock-unlimited,
+.catalog-detail-basic .stock-high {
+	color: #0BA008;
+}
+
+.catalog-detail-basic .stock-low {
+	color: #F0A008;
+}
+
+.catalog-detail-basic .stock-out {
+	color: #F01800;
+}
+
+
 /* Basket */
- .basket-standard,
 .checkout-standard,
 .checkout-confirm,
 .account-history {
@@ -545,9 +901,6 @@
 }
 
 .checkout-confirm-basic,
-.checkout-standard-summary-service,
-.checkout-standard-summary-option,
-.checkout-standard-summary-basket,
 .account-history-detail-service,
 .account-history-detail-basket {
 	padding: 0px 10px 10px 10px;
@@ -558,8 +911,33 @@
 	margin: 0px 0px 8px 0px;
 }
 
+.basket-mini {
+	background-image: url("images/basket.png");
+	background-repeat: no-repeat;
+	background-position: center;
+	margin: 5px;
+	margin-top: 0;
+	padding: 5px;
+	height: 60px;
+	width: 70px;
+	background-color: #F2F7FA;
+	border: 1px solid #C3D9E5;
+	text-align: center;
+	line-height: 125%;
+	color: #004266;
+}
+
 .basket-mini h1 {
 	display: none;
+}
+
+.basket-mini-main .quantity {
+	display: block;
+}
+
+.basket-mini-main .value {
+	font-weight: bold;
+	white-space: nowrap;
 }
 
 .basket-standard-main {
@@ -571,156 +949,9 @@
 	margin: 0px 0px 0px 0px;
 }
 
-.checkout-standard-summary-basket .basket,
-.basket-standard-main .basket,
-.account-history-detail-basket .basket {
-	margin-top: 0;
-}
-.checkout-standard-summary-basket table,
-.basket-standard-main table,
-.account-history-detail-basket table {
-	border-collapse: collapse;
-	width: 100%;
-}
-
-.checkout-standard-summary-basket tbody tr,
-.basket-standard-main tbody tr,
-.account-history-detail-basket tbody tr {
-	border-bottom: 1px solid #689DB9;
-}
-
-.checkout-standard-summary-basket thead,
-.basket-standard-main thead,
-.account-history-detail-basket thead {
-	font-weight: bold;
-	background-color: #F2F7FA;
-}
-
-.checkout-standard-summary-basket thead tr,
-.basket-standard-main thead tr,
-.account-history-detail-basket thead tr {
-	border-bottom: 1px solid #689DB9;
-	color: #004266;
-}
-
-.checkout-standard-summary-basket tr.total,
-.basket-standard-main tr.total,
-.account-history-detail-basket tr.total {
-	border-top: 1px solid #689DB9;
-	color: #004266;
-	background-color: #F2F7FA
-}
-.checkout-standard-summary-basket th,
-.checkout-standard-summary-basket td,
-.basket-standard-main th,
-.basket-standard-main td,
-.account-history-detail-basket th,
-.account-history-detail-basket td {
-	padding: 5px;
-	vertical-align: middle;
-}
-
-.checkout-standard-summary-basket .details img,
-.basket-standard-main .details img,
-.account-history-detail-basket .details img {
-	display: none;
-	float: left;
-	max-width: 60px;
-	max-height: 80px;
-	overflow: hidden;
-}
-
-.checkout-standard-summary-basket th.quantity,
-.checkout-standard-summary-basket th.action,
-.basket-standard-main th.quantity,
-.basket-standard-main th.action,
-.account-history-detail-basket th.quantity,
-.account-history-detail-basket th.action {
-	width: 10%;
-}
-
-.checkout-standard-summary-basket th.price,
-.basket-standard-main th.price,
-.account-history-detail-basket th.price {
-	width: 20%;
-}
-
-.checkout-standard-summary-basket tr.subtotal,
-.checkout-standard-summary-basket tr.delivery,
-.checkout-standard-summary-basket tr.payment,
-.checkout-standard-summary-basket tr.total,
-.checkout-standard-summary-basket tr.rebate,
-.checkout-standard-summary-basket tr.tax,
-.checkout-standard-summary-basket td.unitprice,
-.checkout-standard-summary-basket td.price,
-.basket-standard-main tr.subtotal,
-.basket-standard-main tr.delivery,
-.basket-standard-main tr.payment,
-.basket-standard-main tr.total,
-.basket-standard-main tr.rebate,
-.basket-standard-main tr.tax,
-.basket-standard-main td.unitprice,
-.basket-standard-main td.price,
-.account-history-detail-basket tr.subtotal,
-.account-history-detail-basket tr.delivery,
-.account-history-detail-basket tr.payment,
-.account-history-detail-basket tr.total,
-.account-history-detail-basket tr.rebate,
-.account-history-detail-basket tr.tax,
-.account-history-detail-basket td.unitprice,
-.account-history-detail-basket td.price {
-	text-align: right;
-	white-space: nowrap;
-}
-
-.checkout-standard-summary-basket tr.delivery td:first-child:after,
-.checkout-standard-summary-basket tr.payment td:first-child:after,
-.basket-standard-main tr.delivery td:first-child:after,
-.basket-standard-main tr.payment td:first-child:after,
-.account-history-detail-basket tr.delivery td:first-child:after,
-.account-history-detail-basket tr.payment td:first-child:after {
-	content: " +";
-}
-
-.checkout-standard-summary-basket td.quantity,
-.basket-standard-main td.quantity,
-.basket-standard-main td.action,
-.account-history-detail-basket td.quantity {
-	text-align: center;
-	white-space: nowrap;
-}
-
 .basket-standard-main td.quantity a,
 .basket-standard-main td.action a {
 	text-decoration: none;
-}
-
-.basket-standard-main td.quantity input {
-	text-align: center;
-	display: inline;
-	width: 3em;
-}
-
-.checkout-standard-summary-basket tfoot,
-.basket-standard-main tfoot,
-.account-history-detail-basket tfoot {
-	vertical-align: bottom;
-	font-weight: bold;
-}
-
-.checkout-standard-summary-basket tfoot .delivery,
-.basket-standard-main tfoot .delivery,
-.account-history-detail-basket tfoot .delivery {
-	font-weight: normal;
-}
-
-.checkout-standard-summary-basket tr.rebate,
-.checkout-standard-summary-basket tr.tax,
-.basket-standard-main tr.rebate,
-.basket-standard-main tr.tax,
-.account-history-detail-basket tr.rebate,
-.account-history-detail-basket tr.tax {
-	font-weight: normal;
 }
 
 /* Checkout */
@@ -840,10 +1071,6 @@
 
 .checkout-standard-address h2 {
 	padding: 20px 20px 10px 0px;
-}
-
-.checkout-standard-address .button-group a.standardbutton{
-	margin: 0px 10px 0px 0px;
 }
 
 .checkout-standard-address-billing,
@@ -1015,148 +1242,14 @@
 	margin: 0px 10px 0px 0px;
 }
 
-.checkout-standard-summary .item-address,
-.checkout-standard-summary .item-service,
-.account-history-detail .item-address,
-.account-history-detail .item-service {
-	display: inline-block;
-	vertical-align: top;
-	max-width: 458px;
-	min-width: 238px;
-	width: 50%;
-}
-
-.checkout-standard-summary .item-service h4,
-.account-history-detail .item-service h4 {
-	margin: 0 10px;
-	margin-bottom: 10px;
-	padding: 0 10px;
-}
-
-.checkout-standard-summary .item-service li,
-.account-history-detail .item-service h4 {
-	vertical-align: top;
-	padding-top: 5px;
-}
-
-.checkout-standard-summary .item-address .content,
-.account-history-detail .item-address .content {
-	margin: 10px 10px 0px 10px;
-}
-
-.checkout-standard-summary .item-service .name,
-.account-history-detail .item-service .name {
-	display: inline-block;
-	vertical-align: top;
-	color: #004266;
-	width: 198px;
-}
-
-.checkout-standard-summary .item-service .name:after,
-.account-history-detail .item-service .name:after {
-	content: ":";
-}
-
-.checkout-standard-summary .item-service .value,
-.account-history-detail .item-service .value {
-	display: inline-block;
-	vertical-align: top;
-	width: 198px;
-}
-
-.checkout-standard-summary .item-service .item-icons,
-.account-history-detail .item-service .item-icons {
-	float: right;
-	margin: 0 20px 10px 20px;
-}
-
-.checkout-standard-summary .item-service .attr-list,
-.account-history-detail .item-service .attr-list {
-	list-style: none;
-	margin: 0 10px;
-	padding: 10px;
-	padding-top: 0;
-}
-
 .checkout-standard-summary .modify {
 	float: right;
-	margin: 5px 0;
-}
-
-/* Checkout summary address */
-.checkout-standard-summary-address,
-.account-history-detail-address {
-	padding: 0px 10px 10px 10px;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border: solid 1px #689DB9;
-	margin: 0px 0px 8px 0px;
-}
-
-.checkout-standard-summary-address h2,
-.account-history-detail-address h2 {
-	display: none;
-}
-
-.checkout-standard-summary-address .payment .header,
-.account-history-detail-address .payment .header {
-	background-color: #F2F7FA;
-	border-bottom: 1px solid #689DB9;
-	margin: 0px 10px 0px 0px;
-	padding: 5px 10px 5px 10px;
-}
-
-.checkout-standard-summary-address .delivery .header,
-.account-history-detail-address .delivery .header {
-	background-color: #F2F7FA;
-	border-bottom: 1px solid #689DB9;
-	padding: 5px 10px 5px 10px;
-}
-
-
-/* Checkout summary service payment */
-.checkout-standard-summary-service .item-service .header,
-.account-history-detail-service .item-service .header {
-	padding: 0px 10px 0px 0px;
-	border-bottom: 1px solid #689DB9;
-}
-.checkout-standard-summary-service h2,
-.account-history-detail-service h2 {
-	display: none;
-}
-
-.checkout-standard-summary-service .payment h4,
-.account-history-detail-service .payment h4 {
-	padding: 10px;
-	margin: 0px;
-}
-
-.checkout-standard-summary-service .delivery h4,
-.account-history-detail-service .delivery h4 {
-	padding: 10px;
-	margin: 0px;
-}
-
-.checkout-standard-summary-service .payment .header,
-.account-history-detail-service .payment .header {
-	background-color: #F2F7FA;
-	border-bottom: 1px solid #689DB9;
-	margin: 0px 10px 0px 0px;
-	padding: 5px 10px 5px 10px;
-}
-
-.checkout-standard-summary-service .delivery .header,
-.account-history-detail-service .delivery .header {
-	background-color: #F2F7FA;
-	border-bottom: 1px solid #689DB9;
-	padding: 5px 10px 5px 10px;
+	margin: 5px 0px;
 }
 
 /* Checkout summary option terms */
-.checkout-standard-summary-option {
-	padding: 10px;
-	padding-top: 0;
+.checkout-standard-summary-option-terms {
+	margin: 0px 10px;
 }
 
 .checkout-standard-summary-option h2 {
@@ -1165,6 +1258,8 @@
 
 .checkout-standard-summary-option h3 {
 	display: block;
+	padding: 5px;
+	padding-top: 10px;
 }
 
 .checkout-standard-summary-option p {
@@ -1180,28 +1275,6 @@
 .checkout-standard-summary-option input {
 	display: inline-block;
 	vertical-align: middle;
-}
-
-.checkout-standard-summary-option .error {
-	background-color: #ffeeee;
-	border-bottom: 1px solid #FF3300;
-}
-
-/* Checkout summary basket */
-.checkout-standard-summary-basket h2,
-.account-history-detail-basket h2 {
-	margin: 5px 10px;
-	font-size: 1em;
-}
-
-.checkout-standard-summary-basket .basket,
-.account-history-detail-basket .basket {
-	margin: 0px;
-}
-
-.checkout-standard-summary-basket .modify {
-	display: block;
-	margin: 5px 10px;
 }
 
 /* Checkout order */
@@ -1300,6 +1373,14 @@
 	}
 }
 
+@media only screen and (max-width: 562px) and (orientation: portrait) {
+	.common-summary .item {
+		display: block;
+		width: 100%;
+	}
+}
+
+
 @media only screen and (max-width: 490px) and (orientation: portrait) {
 	.catalog-list-pagination {
 		text-align: center;
@@ -1335,4 +1416,56 @@
 	.catalog-detail-image #next-image {
 		display: none !important;
 	}
+}
+
+
+
+/*! jQuery UI - v1.10.0 - 2013-01-17
+* http://jqueryui.com
+* Copyright 2013 jQuery Foundation and other contributors; Licensed MIT */
+
+/* Layout helpers */
+.ui-helper-hidden-accessible {
+	border: 0;
+	clip: rect(0 0 0 0);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	width: 1px;
+	color: #000000;
+	display: none;
+}
+
+/* Interaction Cues */
+.ui-autocomplete {
+	position: absolute;
+	top: 0;
+	left: 0;
+	cursor: default;
+}
+
+.ui-autocomplete li {
+	list-style: none;
+	padding: 0px 5px 2px 5px;
+}
+
+.ui-autocomplete li  a {
+	cursor: pointer;
+}
+
+.ui-autocomplete-input {
+	margin: 0px;
+}
+
+/* Component containers */
+.ui-widget {
+	font-family: Verdana,Arial,sans-serif;
+	font-size: 1.1em;
+}
+
+.ui-widget-content {
+	border: 1px solid #aaaaaa;
+	background: #ffffff url(images/ui-bg_flat_75_ffffff_40x100.png) 50% 50% repeat-x;
+	color: #222222;
 }

@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ProductAddMediaPerfData.php 14535 2011-12-21 16:47:21Z nsendetzky $
  */
 
 
@@ -76,6 +75,7 @@ class MW_Setup_Task_ProductAddMediaPerfData extends MW_Setup_Task_ProductAddBase
 
 
 		$search = $productManager->createSearch();
+		$search->setSortations( array( $search->sort( '+', 'product.id' ) ) );
 
 		$listItem = $productListManager->createItem();
 		$listItem->setTypeId( $productListTypeItem->getId() );

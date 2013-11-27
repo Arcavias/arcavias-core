@@ -7,8 +7,8 @@
 
 class Client_Html_Account_History_Detail_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -79,8 +79,8 @@ class Client_Html_Account_History_Detail_DefaultTest extends MW_Unittest_Testcas
 
 		$output = $this->_object->getBody();
 
-		$this->assertStringStartsWith( '<div class="account-history-detail">', $output );
-		$this->assertRegExp( '#<div class="basket">#', $output );
+		$this->assertStringStartsWith( '<div class="account-history-detail common-summary">', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="tax">.*<td class="price">0.00 .+</td>.*.*</tfoot>#smU', $output );
 	}
 
 
@@ -117,7 +117,12 @@ class Client_Html_Account_History_Detail_DefaultTest extends MW_Unittest_Testcas
 	{
 		$manager = MShop_Order_Manager_Factory::createManager( $this->_context );
 		$search = $manager->createSearch( true );
-		$search->setConditions( $search->compare( '==', 'order.base.customerid', $customerid ) );
+		$expr = array(
+			$search->getConditions(),
+			$search->compare( '==', 'order.base.customerid', $customerid )
+		);
+		$search->setConditions( $search->combine( '&&', $expr ) );
+
 		$items = $manager->searchItems( $search );
 
 		if( ( $item = reset( $items ) ) === false ) {

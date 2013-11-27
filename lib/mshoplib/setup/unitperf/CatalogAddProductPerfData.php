@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ProductAddCatalogPerfData.php 14535 2011-12-21 16:47:21Z nsendetzky $
  */
 
 
@@ -19,7 +18,7 @@ class MW_Setup_Task_CatalogAddProductPerfData extends MW_Setup_Task_ProductAddBa
 	 */
 	public function getPreDependencies()
 	{
-		return array( 'CatalogAddBasePerfData', 'MShopAddTypeDataUnitperf' );
+		return array( 'CatalogAddBasePerfData', 'MShopAddTypeDataUnitperf', 'ProductAddBasePerfData', 'ProductAddSelectPerfData' );
 	}
 
 
@@ -63,7 +62,7 @@ class MW_Setup_Task_CatalogAddProductPerfData extends MW_Setup_Task_ProductAddBa
 
 
 		$search = $catalogManager->createSearch();
-		$search->setSortations( array( $search->sort( '+', 'catalog.left' ) ) );
+		$search->setSortations( array( $search->sort( '+', 'catalog.level' ), $search->sort( '+', 'catalog.left' ) ) );
 		$search->setSlice( 0, 0x7fffffff );
 
 		$catIds = array_keys( $catalogManager->searchItems( $search ) );
@@ -78,6 +77,7 @@ class MW_Setup_Task_CatalogAddProductPerfData extends MW_Setup_Task_ProductAddBa
 
 		$productManager = MShop_Product_Manager_Factory::createManager( $context );
 		$search = $productManager->createSearch();
+		$search->setSortations( array( $search->sort( '+', 'product.id' ) ) );
 
 		$start = $pos = 0;
 

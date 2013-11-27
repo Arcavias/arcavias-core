@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14389 2011-12-16 14:31:10Z doleiynyk $
  */
 
 return array(
@@ -21,7 +20,8 @@ return array(
 		',
 		'delete' => '
 			DELETE FROM "mshop_order_status"
-			WHERE "id" = ?
+			WHERE :cond
+			AND siteid = ?
 		',
 		'search' => '
 			SELECT mordst."id", mordst."siteid", mordst."parentid", mordst."type", mordst."value",

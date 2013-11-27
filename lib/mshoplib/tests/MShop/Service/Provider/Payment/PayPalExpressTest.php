@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: PayPalExpressTest.php 1332 2012-10-23 11:28:24Z doleiynyk $
  */
 
 
@@ -16,11 +15,11 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 	 * @var    MShop_Service_Provider_Payment_PayPal
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
-	protected $_serviceItem;
+	private $_serviceItem;
 
-	protected $_order;
+	private $_order;
 
 
 	/**
@@ -105,15 +104,22 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 
 	public function testCheckConfigBE()
 	{
-		$attributes = array( 'ApiUsername' => 'user', 'ApiPassword' => 'pw', 'ApiSignature' => '1df23eh67', 'CancelUrl' => 'http://cancelUrl', 'ReturnUrl' => 'http://returnUrl'  );
+		$attributes = array(
+			'paypalexpress.ApiUsername' => 'user',
+			'paypalexpress.ApiPassword' => 'pw',
+			'paypalexpress.ApiSignature' => '1df23eh67',
+			'payment.url-cancel' => 'http://cancelUrl',
+			'payment.url-success' => 'http://returnUrl'
+		);
+
 		$result = $this->_object->checkConfigBE( $attributes );
 
-		$this->assertEquals( 8, count( $result ) );
-		$this->assertEquals( null, $result['ApiUsername'] );
-		$this->assertEquals( null, $result['ApiPassword'] );
-		$this->assertEquals( null, $result['ApiSignature'] );
-		$this->assertEquals( null, $result['CancelUrl'] );
-		$this->assertEquals( null, $result['ReturnUrl'] );
+		$this->assertEquals( 10, count( $result ) );
+		$this->assertEquals( null, $result['paypalexpress.ApiUsername'] );
+		$this->assertEquals( null, $result['paypalexpress.ApiPassword'] );
+		$this->assertEquals( null, $result['paypalexpress.ApiSignature'] );
+		$this->assertEquals( null, $result['payment.url-cancel'] );
+		$this->assertEquals( null, $result['payment.url-success'] );
 	}
 
 	public function testIsImplemented()
@@ -121,6 +127,7 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 		$this->assertTrue( $this->_object->isImplemented( MShop_Service_Provider_Payment_Abstract::FEAT_CANCEL ) );
 		$this->assertTrue( $this->_object->isImplemented( MShop_Service_Provider_Payment_Abstract::FEAT_CAPTURE ) );
 		$this->assertTrue( $this->_object->isImplemented( MShop_Service_Provider_Payment_Abstract::FEAT_QUERY ) );
+		$this->assertTrue( $this->_object->isImplemented( MShop_Service_Provider_Payment_Abstract::FEAT_REFUND ) );
 	}
 
 
@@ -153,8 +160,8 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 		}
 
 		$this->assertInstanceOf( 'MShop_Common_Item_Helper_Form_Interface', $helperForm );
-		$this->assertEquals( 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&token=UT-99999999', $helperForm->getUrl() );
-		$this->assertEquals( 'GET', $helperForm->getMethod() );
+		$this->assertEquals( 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&useraction=commit&token=UT-99999999', $helperForm->getUrl() );
+		$this->assertEquals( 'POST', $helperForm->getMethod() );
 		$this->assertEquals( array(), $helperForm->getValues() );
 
 		foreach( $testData AS $key => $value ) {
@@ -167,25 +174,24 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 	{
 		$what = array( 'TOKEN' => 'UT-99999999' );
 		$error = '&ACK=Error&VERSION=87.0&BUILD=3136725&CORRELATIONID=1234567890&L_ERRORCODE0=0000&L_SHORTMESSAGE0=updatesync method error';
-		$success = '&TOKEN=UT-99999999&CORRELATIONID=1234567890&ACK=Success&VERSION=87.0&BUILD=3136725&EMAIL=user_paypal_email@metaways.de&PAYERID=PaypalUnitTestBuyer&TRANSACTIONID=111111111&PAYMENTSTATUS=Pending&PENDINGREASON=authorization&INVNUM='.$this->_order->getId();
+		$success = '&TOKEN=UT-99999999&CORRELATIONID=1234567890&ACK=Success&VERSION=87.0&BUILD=3136725&PAYERID=PaypalUnitTestBuyer&TRANSACTIONID=111111111&PAYMENTSTATUS=Pending&PENDINGREASON=authorization&INVNUM='.$this->_order->getId();
 
 		$com = new MW_Communication_TestPayPalExpress();
 		$com->addRule( $what, $error, $success );
 		$this->_object->setCommunication( $com );
 
-		$response = array ( 'TOKEN' => 'UT-99999999' );
+		$response = array ( 'token' => 'UT-99999999', 'PayerID' => 'PaypalUnitTestBuyer', 'orderid' => $this->_order->getId() );
 
 		$testData = array(
 			'TOKEN' => 'UT-99999999',
 			'PAYERID' => 'PaypalUnitTestBuyer',
 			'TRANSACTIONID' => '111111111',
-			'EMAIL' => 'user_paypal_email@metaways.de'
 		);
 
 		$orderManager = MShop_Order_Manager_Factory::createManager( TestHelper::getContext() );
 		$orderBaseManager = $orderManager->getSubManager( 'base' );
 
-		$this->assertTrue( $this->_object->updateSync( $response ) );
+		$this->assertInstanceOf( 'MShop_Order_Item_Interface', $this->_object->updateSync( $response ) );
 
 		$refOrderBase = $orderBaseManager->load( $this->_order->getBaseId() );
 
@@ -224,7 +230,6 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 			'TOKEN' => 'UT-99999999',
 			'PAYERID' => 'PaypalUnitTestBuyer',
 			'TRANSACTIONID' => '111111111',
-			'EMAIL' => 'user_paypal_email@metaways.de',
 			'REFUNDTRANSACTIONID' => '88888888'
 		);
 
@@ -261,7 +266,7 @@ class MShop_Service_Provider_Payment_PayPalExpressTest extends MW_Unittest_Testc
 			'AUTHORIZATIONID' => '111111111',
 			'INVNUM' => $this->_order->getId(),
 			'CURRENCYCODE' => $baseItem->getPrice()->getCurrencyId(),
-			'AMT' => ( $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getShipping() )
+			'AMT' => ( $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getCosts() )
 		);
 		$error = '&ACK=Error&VERSION=87.0&BUILD=3136725&CORRELATIONID=1234567890&L_ERRORCODE0=0000&L_SHORTMESSAGE0=capture method error';
 		$success = 'AUTHORIZATIONID=112233&TRANSACTIONID=111111111&PARENTTRANSACTIONID=12212AD&TRANSACTIONTYPE=express-checkout&AMT=22.30&FEEAMT=3.33&PAYMENTSTATUS=Completed&PENDINGREASON=None&CORRELATIONID=1234567890&ACK=Success&VERSION=87.0&BUILD=3136725';

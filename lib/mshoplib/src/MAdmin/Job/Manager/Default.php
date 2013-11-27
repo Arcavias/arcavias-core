@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MAdmin
  * @subpackage Job
- * @version $Id: Default.php 14711 2012-01-05 12:52:13Z nsendetzky $
  */
 
 
@@ -191,33 +190,13 @@ class MAdmin_Job_Manager_Default
 
 
 	/**
-	 * Deletes an existing job from the storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $itemId Job id of an existing job in the storage that should be deleted
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $itemId )
+	public function deleteItems( array $ids )
 	{
-		$context = $this->_getContext();
-		$config = $context->getConfig();
-		$dbm = $context->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$path = 'madmin/job/manager/default/delete';
-			$sql = $config->get( $path, $path );
-
-			$stmt = $conn->create( $sql );
-			$stmt->bind( 1, $itemId );
-			$stmt->execute()->finish();
-
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( 'madmin/job/manager/default/delete', 'madmin/job/manager/default/delete' ) );
 	}
 
 
@@ -225,7 +204,9 @@ class MAdmin_Job_Manager_Default
 	 * Creates the job object for the given job id.
 	 *
 	 * @param integer $id Job ID to fetch job object for
-	 * @return MAdmin_Job_Item_Interface
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MAdmin_Job_Item_Interface Returns the job item of the given id
+	 * @throws MAdmin_Job_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{

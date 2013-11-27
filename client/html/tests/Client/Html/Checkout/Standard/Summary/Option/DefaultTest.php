@@ -7,8 +7,8 @@
 
 class Client_Html_Checkout_Standard_Summary_Option_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -70,7 +70,7 @@ class Client_Html_Checkout_Standard_Summary_Option_DefaultTest extends MW_Unitte
 		$this->_object->setView( $view );
 
 		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( '<div class="checkout-standard-summary-option">', $output );
+		$this->assertStringStartsWith( '<div class="checkout-standard-summary-option container">', $output );
 	}
 
 

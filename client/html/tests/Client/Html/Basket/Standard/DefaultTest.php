@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 1352 2012-10-29 16:11:47Z nsendetzky $
  */
 
 class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_context;
+	private $_object;
+	private $_context;
 
 
 	/**
@@ -85,10 +84,11 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<tbody>.*<td class="price">18.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">18.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">1.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">19.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">18.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">18.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">1.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">19.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="tax">.*<td class="price">3.03 .+</td>.*.*</tfoot>#smU', $output );
 	}
 
 
@@ -115,11 +115,11 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<tbody>.*<td class="price">18.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tbody>.*<td class="price">600.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">618.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">31.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">649.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">18.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">600.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">618.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">31.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">649.00 .+</td>.*</tfoot>#smU', $output );
 	}
 
 
@@ -132,11 +132,11 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 			$search->compare( '==', 'attribute.domain', 'product' ),
 			$search->combine( '||', array(
 				$search->combine( '&&', array(
-					$search->compare( '==', 'attribute.code', '30' ),
+					$search->compare( '==', 'attribute.code', '32' ),
 					$search->compare( '==', 'attribute.type.code', 'length' ),
 				) ),
 				$search->combine( '&&', array(
-					$search->compare( '==', 'attribute.code', '29' ),
+					$search->compare( '==', 'attribute.code', '30' ),
 					$search->compare( '==', 'attribute.type.code', 'width' ),
 				) ),
 			) ),
@@ -158,8 +158,8 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
+		$this->assertRegExp( '#<li class="attr-item">.*<span class="value">32</span>.*</li>#smU', $output );
 		$this->assertRegExp( '#<li class="attr-item">.*<span class="value">30</span>.*</li>#smU', $output );
-		$this->assertRegExp( '#<li class="attr-item">.*<span class="value">29</span>.*</li>#smU', $output );
 	}
 
 
@@ -229,7 +229,7 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<li class="attr-item">.*<!-- hidden -->.*</li>#smU', $output );
+		$this->assertNotRegExp( '#<li class="attr-item">.*<span class="value">m</span>.*</li>#smU', $output );
 	}
 
 
@@ -250,10 +250,10 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<tbody>.*<td class="price">18.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">18.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">1.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">19.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">18.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">18.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">1.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">19.00 .+</td>.*</tfoot>#smU', $output );
 	}
 
 
@@ -283,11 +283,11 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<tbody>.*<td class="price">36.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tbody>.*<td class="price">600.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">636.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">32.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">668.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">36.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">600.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">636.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">32.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">668.00 .+</td>.*</tfoot>#smU', $output );
 	}
 
 
@@ -308,10 +308,10 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<tbody>.*<td class="price">36.00 [A-Z]{3}</td>.*</tbody>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">36.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">2.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">38.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tbody>.*<td class="price">36.00 .+</td>.*</tbody>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">36.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">2.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">38.00 .+</td>.*</tfoot>#smU', $output );
 	}
 
 
@@ -332,9 +332,9 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->process();
 		$output = $this->_object->getBody();
 
-		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">0.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">0.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
-		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">0.00 [A-Z]{3}</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="subtotal">.*<td class="price">0.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="delivery">.*<td class="price">0.00 .+</td>.*</tfoot>#smU', $output );
+		$this->assertRegExp( '#<tfoot>.*<tr class="total">.*<td class="price">0.00 .+</td>.*</tfoot>#smU', $output );
 	}
 
 
@@ -357,7 +357,7 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetSubClient()
 	{
-		$client = $this->_object->getSubClient( 'main', 'Default' );
+		$client = $this->_object->getSubClient( 'detail', 'Default' );
 		$this->assertInstanceOf( 'Client_HTML_Interface', $client );
 	}
 

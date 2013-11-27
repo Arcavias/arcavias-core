@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14602 2011-12-27 15:27:08Z gwussow $
  */
 
 
@@ -16,9 +15,9 @@ class MShop_Product_Item_Tag_DefaultTest extends MW_Unittest_Testcase
 	 * @var    MShop_Product_Item_Tag_Default
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
-	protected $_values;
+	private $_values;
 
 	/**
 	 * Runs the test methods of this class.

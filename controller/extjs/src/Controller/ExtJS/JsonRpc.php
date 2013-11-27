@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage ExtJS
- * @version $Id$
  */
 
 
@@ -17,8 +16,9 @@
  */
 class Controller_ExtJS_JsonRpc
 {
-	protected $_classprefix = 'Controller_ExtJS';
+	private $_classprefix = 'Controller_ExtJS';
 	private $_controllers = array();
+	private $_cntlPaths;
 	private $_context;
 
 
@@ -28,36 +28,10 @@ class Controller_ExtJS_JsonRpc
 	 *
 	 * @param MShop_Context_Item_Interface $context Context object
 	 */
-	public function __construct( MShop_Context_Item_Interface $context )
+	public function __construct( MShop_Context_Item_Interface $context, array $cntlPaths )
 	{
+		$this->_cntlPaths = $cntlPaths;
 		$this->_context = $context;
-	}
-
-
-	/**
-	 * Returns a new instance of the frontend controller.
-	 *
-	 * @param MShop_Context_Item_Interface $context Context object
-	 * @param string|null $name Name of the frontend controller (null for default name)
-	 * @throws Controller_ExtJS_Exception If classname is invalid
-	 */
-	public static function getInstance( MShop_Context_Item_Interface $context, $name = null )
-	{
-		if( $name === null ) {
-			$name = $context->getConfig()->get( 'classes/controller/extjs/frontend', 'JsonRpc' );
-		}
-
-		$classname = is_string( $name ) ? 'Controller_ExtJS_' . $name : '<not a string>';
-
-		if( ctype_alnum( $name ) === false ) {
-			throw new Controller_ExtJS_Exception( sprintf( 'Invalid class name "%1$s"', $classname ) );
-		}
-
-		if( class_exists( $classname ) === false ) {
-			throw new Controller_ExtJS_Exception( sprintf( 'Class "%1$s" not found', $classname ) );
-		}
-
-		return new $classname( $context );
 	}
 
 
@@ -272,7 +246,7 @@ class Controller_ExtJS_JsonRpc
 		$class = $parts[0];
 		$method = $parts[1];
 
-		$name = $this->_classprefix . '_' . $class . '_Factory';
+		$name = $this->_getClassPrefix() . '_' . $class . '_Factory';
 
 		if( preg_match( '/^[a-zA-Z0-9\_]+$/', $name ) !== 1 ) {
 			throw new Controller_ExtJS_Exception( sprintf( 'Invalid controller factory name "%1$s"', $name ), -32602 );
@@ -295,6 +269,17 @@ class Controller_ExtJS_JsonRpc
 
 
 	/**
+	 * Returns the used prefix for all classes.
+	 *
+	 * @return string Class prefix (default: "Controller_ExtJS")
+	 */
+	protected function _getClassPrefix()
+	{
+		return $this->_classprefix;
+	}
+
+
+	/**
 	 * Returns all available controller instances.
 	 *
 	 * @return array Associative list of base controller name (Controller_ExtJS_Admin_Log_Default becomes Admin_Log)
@@ -304,14 +289,17 @@ class Controller_ExtJS_JsonRpc
 	{
 		if( $this->_controllers === array() )
 		{
-			$subFolder = str_replace( '_', DIRECTORY_SEPARATOR, $this->_classprefix );
+			$subFolder = str_replace( '_', DIRECTORY_SEPARATOR, $this->_getClassPrefix() );
 
-			foreach( explode( PATH_SEPARATOR, get_include_path() ) as $incdir )
+			foreach( $this->_cntlPaths as $path => $list )
 			{
-				$incdir .= DIRECTORY_SEPARATOR . $subFolder;
+				foreach( $list as $relpath )
+				{
+					$path .= DIRECTORY_SEPARATOR . $relpath . DIRECTORY_SEPARATOR . $subFolder;
 
-				if( is_dir( $incdir ) ) {
-					$this->_addControllers( new DirectoryIterator( $incdir ) );
+					if( is_dir( $path ) ) {
+						$this->_addControllers( new DirectoryIterator( $path ) );
+					}
 				}
 			}
 		}
@@ -329,6 +317,8 @@ class Controller_ExtJS_JsonRpc
 	 */
 	protected function _addControllers( DirectoryIterator $dir, $prefix = '' )
 	{
+		$classprefix = $this->_getClassPrefix();
+
 		foreach( $dir as $entry )
 		{
 			if( $entry->getType() === 'dir' && $entry->isDot() === false )
@@ -336,9 +326,10 @@ class Controller_ExtJS_JsonRpc
 				$subdir = new DirectoryIterator( $entry->getPathName() );
 				$this->_addControllers( $subdir, ( $prefix !== '' ? $prefix . '_' : '' ) . $entry->getBaseName() );
 			}
-			else if( $entry->getType() === 'file' && ( $name = $entry->getBaseName( '.php' ) ) === 'Factory' )
+			else if( $prefix !== '' && $entry->getType() === 'file'
+				&& ( $name = $entry->getBaseName( '.php' ) ) === 'Factory' )
 			{
-				$name = $this->_classprefix . '_' . $prefix . '_Factory';
+				$name = $classprefix . '_' . $prefix . '_Factory';
 
 				if( preg_match( '/^[a-zA-Z0-9\_]+$/', $name ) !== 1 ) {
 					throw new Controller_ExtJS_Exception( sprintf( 'Invalid controller factory name "%1$s"', $name ) );
@@ -348,10 +339,10 @@ class Controller_ExtJS_JsonRpc
 					throw new Controller_ExtJS_Exception( sprintf( 'Class "%1$s" not found', $name ) );
 				}
 
-				$name .= '::createController';
+				$controller = call_user_func_array( array( $name, 'createController' ), array( $this->_context ) );
 
-				if( ( $controller = call_user_func_array( $name, array( $this->_context ) ) ) === false ) {
-					throw new Controller_ExtJS_Exception( sprintf( 'Factory "%1$s" not found', $name ) );
+				if( $controller === false ) {
+					throw new Controller_ExtJS_Exception( sprintf( 'Invalid factory "%1$s"', $name ) );
 				}
 
 				$this->_controllers[$prefix] = $controller;

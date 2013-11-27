@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage ExtJS
- * @version $Id: Default.php 14265 2011-12-11 16:57:33Z nsendetzky $
  */
 
 
@@ -56,6 +55,7 @@ class Controller_ExtJS_Order_Base_Address_Default
 			$item = $this->_manager->createItem();
 
 			if( isset( $entry->{'order.base.address.baseid'} ) ) { $item->setBaseId( $entry->{'order.base.address.baseid'} ); }
+			if( isset( $entry->{'order.base.address.addressid'} ) ) { $item->setAddressId( $entry->{'order.base.address.addressid'} ); }
 			if( isset( $entry->{'order.base.address.type'} ) ) { $item->setType( $entry->{'order.base.address.type'} ); }
 
 			if( isset( $entry->{'order.base.address.company'} ) ) { $item->setCompany( $entry->{'order.base.address.company'} ); }

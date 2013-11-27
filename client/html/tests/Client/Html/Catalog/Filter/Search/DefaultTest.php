@@ -7,7 +7,7 @@
 
 class Client_Html_Catalog_Filter_Search_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -53,15 +53,14 @@ class Client_Html_Catalog_Filter_Search_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetHeader()
 	{
-		$output = $this->_object->getHeader();
-		$this->assertStringStartsWith( '<link href="css/search.css"', $output );
+		$this->_object->getHeader();
 	}
 
 
 	public function testGetBody()
 	{
 		$output = $this->_object->getBody();
-		$this->assertStringStartsWith( '<div class="catalog-filter-search">', $output );
+		$this->assertStringStartsWith( '<div class="arcavias catalog-filter-search">', $output );
 	}
 
 

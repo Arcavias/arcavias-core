@@ -2,7 +2,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14478 2011-12-20 12:18:52Z doleiynyk $
  */
 
 /**
@@ -12,8 +11,8 @@
 class MShop_Order_Item_Status_DefaultTest extends MW_Unittest_Testcase
 {
 
-	protected $_object;
-	protected $_values;
+	private $_object;
+	private $_values;
 	
 	/**
 	* Runs the test methods of this class.

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Locale
- * @version $Id: Default.php 14860 2012-01-13 14:37:51Z nsendetzky $
  */
 
 
@@ -151,8 +150,10 @@ class MShop_Locale_Manager_Default
 	/**
 	 * Returns the item specified by its ID.
 	 *
-	 * @param integer $id Id of item
-	 * @return MShop_Common_Item_Interface Item object
+	 * @param integer $id Unique ID of the locale item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Locale_Item_Interface Returns the locale item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -191,28 +192,14 @@ class MShop_Locale_Manager_Default
 
 
 	/**
-	 * Deletes the item specified by its ID.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param mixed $id ID of the item object
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/locale/manager/default/item/delete');
-			$stmt->bind(1, $id);
-			$stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch ( Exception $e )
-		{
-			$dbm->release($conn);
-			throw $e;
-		}
+		$path = 'mshop/locale/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -375,6 +362,7 @@ class MShop_Locale_Manager_Default
 		}
 
 
+		// Try to find the best matching locale
 		$search = $this->createSearch( $active );
 
 		$expr = array (

@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14852 2012-01-13 12:24:15Z doleiynyk $
  */
 
 
@@ -12,8 +11,8 @@
  */
 class MShop_Common_Item_Address_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_values;
+	private $_object;
+	private $_values;
 
 
 	/**
@@ -53,7 +52,7 @@ class MShop_Common_Item_Address_DefaultTest extends MW_Unittest_Testcase
 			'postal' => '22769',
 			'city' => 'Hamburg',
 			'state' => 'Hamburg',
-			'countryid' => 'de',
+			'countryid' => 'DE',
 			'langid' => 'de',
 			'telephone' => '05554433221',
 			'email' => 'unit.test@metaways.de',
@@ -159,9 +158,9 @@ class MShop_Common_Item_Address_DefaultTest extends MW_Unittest_Testcase
 
 	public function testSetLastname()
 	{
-		$this->_object->setLastname( 'im Gl�ck' );
+		$this->_object->setLastname( 'im Glueck' );
 		$this->assertTrue($this->_object->isModified());
-		$this->assertEquals( 'im Gl�ck', $this->_object->getLastname() );
+		$this->assertEquals( 'im Glueck', $this->_object->getLastname() );
 	}
 
 	public function testGetAddress1()
@@ -238,14 +237,14 @@ class MShop_Common_Item_Address_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetCountryId()
 	{
-		$this->assertEquals( 'de', $this->_object->getCountryId());
+		$this->assertEquals( 'DE', $this->_object->getCountryId());
 	}
 
 	public function testSetCountryId()
 	{
 		$this->_object->setCountryId('uk');
 		$this->assertTrue($this->_object->isModified());
-		$this->assertEquals( 'uk', $this->_object->getCountryId());
+		$this->assertEquals( 'UK', $this->_object->getCountryId());
 	}
 
 	public function testGetLanguageId()
@@ -255,9 +254,9 @@ class MShop_Common_Item_Address_DefaultTest extends MW_Unittest_Testcase
 
 	public function testSetLanguageId()
 	{
-		$this->_object->setLanguageId('uk');
+		$this->_object->setLanguageId('en');
 		$this->assertTrue($this->_object->isModified());
-		$this->assertEquals( 'uk', $this->_object->getLanguageId());
+		$this->assertEquals( 'en', $this->_object->getLanguageId());
 	}
 
 	public function testGetTelephone()
@@ -359,6 +358,85 @@ class MShop_Common_Item_Address_DefaultTest extends MW_Unittest_Testcase
 	public function testGetEditor()
 	{
 		$this->assertEquals( 'unitTestUser', $this->_object->getEditor() );
+	}
+
+	public function testCopyFrom()
+	{
+		$object = new MShop_Common_Item_Address_Default( 'common.address.' );
+		$address = new MShop_Order_Item_Base_Address_Default( $this->_values );
+		$object->copyFrom( $address );
+
+		$this->assertNull( $object->getId() );
+		$this->assertEquals( $this->_values['salutation'], $object->getSalutation() );
+		$this->assertEquals( $this->_values['company'], $object->getCompany() );
+		$this->assertEquals( $this->_values['title'], $object->getTitle() );
+		$this->assertEquals( $this->_values['firstname'], $object->getFirstname() );
+		$this->assertEquals( $this->_values['lastname'], $object->getLastname() );
+		$this->assertEquals( $this->_values['address1'], $object->getAddress1() );
+		$this->assertEquals( $this->_values['address2'], $object->getAddress2() );
+		$this->assertEquals( $this->_values['address3'], $object->getAddress3() );
+		$this->assertEquals( $this->_values['postal'], $object->getPostal() );
+		$this->assertEquals( $this->_values['city'], $object->getCity() );
+		$this->assertEquals( $this->_values['state'], $object->getState() );
+		$this->assertEquals( $this->_values['countryid'], $object->getCountryId() );
+		$this->assertEquals( $this->_values['langid'], $object->getLanguageId() );
+		$this->assertEquals( $this->_values['telephone'], $object->getTelephone() );
+		$this->assertEquals( $this->_values['telefax'], $object->getTelefax() );
+		$this->assertEquals( $this->_values['email'], $object->getEmail() );
+		$this->assertEquals( $this->_values['website'], $object->getWebsite() );
+		$this->assertEquals( $this->_values['flag'], $object->getFlag() );
+	}
+
+	public function testFromArray()
+	{
+		$list = array(
+			'common.address.id' => 1,
+			'common.address.refid' => 2,
+			'common.address.salutation' => 'mr',
+			'common.address.company' => 'mw',
+			'common.address.title' => 'dr',
+			'common.address.firstname' => 'first',
+			'common.address.lastname' => 'last',
+			'common.address.address1' => 'street',
+			'common.address.address2' => 'no',
+			'common.address.address3' => 'flat',
+			'common.address.postal' => '12345',
+			'common.address.city' => 'city',
+			'common.address.state' => 'state',
+			'common.address.countryid' => 'DE',
+			'common.address.languageid' => 'de',
+			'common.address.telephone' => '01234',
+			'common.address.telefax' => '02345',
+			'common.address.email' => 'a@b',
+			'common.address.website' => 'example.com',
+			'common.address.flag' => 3,
+			'common.address.position' => 4,
+		);
+
+		$object = new MShop_Common_Item_Address_Default( 'common.address.' );
+		$object->fromArray( $list );
+
+		$this->assertEquals( $list['common.address.id'], $object->getId() );
+		$this->assertEquals( $list['common.address.refid'], $object->getRefId() );
+		$this->assertEquals( $list['common.address.salutation'], $object->getSalutation() );
+		$this->assertEquals( $list['common.address.company'], $object->getCompany() );
+		$this->assertEquals( $list['common.address.title'], $object->getTitle() );
+		$this->assertEquals( $list['common.address.firstname'], $object->getFirstname() );
+		$this->assertEquals( $list['common.address.lastname'], $object->getLastname() );
+		$this->assertEquals( $list['common.address.address1'], $object->getAddress1() );
+		$this->assertEquals( $list['common.address.address2'], $object->getAddress2() );
+		$this->assertEquals( $list['common.address.address3'], $object->getAddress3() );
+		$this->assertEquals( $list['common.address.postal'], $object->getPostal() );
+		$this->assertEquals( $list['common.address.city'], $object->getCity() );
+		$this->assertEquals( $list['common.address.state'], $object->getState() );
+		$this->assertEquals( $list['common.address.countryid'], $object->getCountryId() );
+		$this->assertEquals( $list['common.address.languageid'], $object->getLanguageId() );
+		$this->assertEquals( $list['common.address.telephone'], $object->getTelephone() );
+		$this->assertEquals( $list['common.address.telefax'], $object->getTelefax() );
+		$this->assertEquals( $list['common.address.email'], $object->getEmail() );
+		$this->assertEquals( $list['common.address.website'], $object->getWebsite() );
+		$this->assertEquals( $list['common.address.flag'], $object->getFlag() );
+		$this->assertEquals( $list['common.address.position'], $object->getPosition() );
 	}
 
 	public function testToArray()

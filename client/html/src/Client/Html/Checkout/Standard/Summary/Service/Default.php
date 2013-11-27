@@ -15,90 +15,35 @@
  * @subpackage Html
  */
 class Client_Html_Checkout_Standard_Summary_Service_Default
-	extends Client_Html_Abstract
+	extends Client_Html_Common_Summary_Service_Default
 	implements Client_Html_Interface
 {
 	private $_cache;
-	private $_subPartPath = 'client/html/checkout/standard/summary/service/default/subparts';
-	private $_subPartNames = array();
 
 
 	/**
-	 * Returns the HTML code for insertion into the body.
+	 * Sets the necessary parameter values in the view.
 	 *
-	 * @return string HTML code
+	 * @param MW_View_Interface $view The view object which generates the HTML output
+	 * @return MW_View_Interface Modified view object
 	 */
-	public function getBody()
+	protected function _setViewParams( MW_View_Interface $view )
 	{
-		$view = $this->getView();
+		$view = parent::_setViewParams( $view );
 
-		$html = '';
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$html .= $subclient->setView( $view )->getBody();
+		if( !isset( $this->_cache ) )
+		{
+			$target = $view->config( 'client/html/checkout/standard/url/target' );
+			$cntl = $view->config( 'client/html/checkout/standard/url/controller', 'checkout' );
+			$action = $view->config( 'client/html/checkout/standard/url/action', 'index' );
+
+			$view->summaryUrlServicePayment = $view->url( $target, $cntl, $action, array( 'c-step' => 'payment' ) );
+			$view->summaryUrlServiceDelivery = $view->url( $target, $cntl, $action, array( 'c-step' => 'delivery' ) );
+			$view->summaryBasket = $view->standardBasket;
+
+			$this->_cache = $view;
 		}
-		$view->serviceBody = $html;
 
-		$tplconf = 'client/html/checkout/standard/summary/service/default/template-body';
-		$default = 'checkout/standard/summary-service-body-default.html';
-
-		return $view->render( $this->_getTemplate( $tplconf, $default ) );
-	}
-
-
-	/**
-	 * Returns the HTML string for insertion into the header.
-	 *
-	 * @return string String including HTML tags for the header
-	 */
-	public function getHeader()
-	{
-		$view = $this->getView();
-
-		$html = '';
-		foreach( $this->_getSubClients( $this->_subPartPath, $this->_subPartNames ) as $subclient ) {
-			$html .= $subclient->setView( $view )->getHeader();
-		}
-		$view->serviceHeader = $html;
-
-		$tplconf = 'client/html/checkout/standard/summary/service/default/template-header';
-		$default = 'checkout/standard/summary-service-header-default.html';
-
-		return $view->render( $this->_getTemplate( $tplconf, $default ) );
-	}
-
-
-	/**
-	 * Returns the sub-client given by its name.
-	 *
-	 * @param string $type Name of the client type
-	 * @param string|null $name Name of the sub-client (Default if null)
-	 * @return Client_Html_Interface Sub-client object
-	 */
-	public function getSubClient( $type, $name = null )
-	{
-		return $this->_createSubClient( 'checkout/standard/summary/service/' . $type, $name );
-	}
-
-
-	/**
-	 * Tests if the output of is cachable.
-	 *
-	 * @param integer $what Header or body constant from Client_HTML_Abstract
-	 * @return boolean True if the output can be cached, false if not
-	 */
-	public function isCachable( $what )
-	{
-		return false;
-	}
-
-
-	/**
-	 * Processes the input, e.g. store given values.
-	 * A view must be available and this method doesn't generate any output
-	 * besides setting view variables.
-	 */
-	public function process()
-	{
-		$this->_process( $this->_subPartPath, $this->_subPartNames );
+		return $this->_cache;
 	}
 }

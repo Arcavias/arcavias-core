@@ -3,14 +3,13 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14408 2011-12-17 13:24:46Z nsendetzky $
  */
 
 return array(
 	'item' => array(
 		'delete' => '
 			DELETE FROM "mshop_locale_site"
-			WHERE "id" = ?
+			WHERE :cond
 		',
 		'insert' => '
 			INSERT INTO "mshop_locale_site" ( "code", "label", "config", "status", "parentid", "editor", "mtime", "ctime", "level", "nleft", "nright" )

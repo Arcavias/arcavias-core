@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ListUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -79,6 +78,13 @@ MShop.panel.plugin.ListUi = Ext.extend(MShop.panel.AbstractListUi, {
 				width : 100,
 				editable : false,
 				id : 'plugin-list-label'
+			}, {
+				xtype : 'gridcolumn',
+				dataIndex : 'plugin.position',
+				header : _('Position'),
+				sortable : true,
+				width : 100,
+				editable : false
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'plugin.config',

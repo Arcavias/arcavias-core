@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ListUiSmall.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -112,7 +111,7 @@ MShop.panel.media.ListUiSmall = Ext.extend(MShop.panel.AbstractListUi, {
 	},
 
 	previewRenderer : function(preview) {
-		return "<img class='mshop-admin-media-list-preview' src=\"" + preview + "\" />";
+		return "<img class='arcavias-admin-media-list-preview' src=\"" + preview + "\" />";
 	}
 });
 

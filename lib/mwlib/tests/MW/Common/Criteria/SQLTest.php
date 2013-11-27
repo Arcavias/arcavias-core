@@ -19,6 +19,15 @@ class Criteria_Plugin_SQLTest implements MW_Common_Criteria_Plugin_Interface
 			default: return $value;
 		}
 	}
+
+	public function reverse( $value )
+	{
+		switch( $value )
+		{
+			case 10: return 'a';
+			default: return $value;
+		}
+	}
 }
 
 
@@ -27,7 +36,7 @@ class Criteria_Plugin_SQLTest implements MW_Common_Criteria_Plugin_Interface
  */
 class MW_Common_Criteria_SQLTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -38,12 +47,12 @@ class MW_Common_Criteria_SQLTest extends MW_Unittest_Testcase
 	 */
 	protected function setUp()
 	{
-		if( MW_TestHelper::getConfig()->get( 'resource/db/adapter', false ) === false ) {
+		if( TestHelper::getConfig()->get( 'resource/db/adapter', false ) === false ) {
 			$this->markTestSkipped( 'No database configured' );
 		}
 
 
-		$dbm = MW_TestHelper::getDBManager();
+		$dbm = TestHelper::getDBManager();
 
 		$conn = $dbm->acquire();
 		$this->_object = new MW_Common_Criteria_SQL( $conn );

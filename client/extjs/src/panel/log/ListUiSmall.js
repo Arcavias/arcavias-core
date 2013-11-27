@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ListUiSmall.js 14713 2012-01-05 13:03:50Z nsendetzky $
  */
 
 
@@ -87,9 +86,9 @@ MShop.panel.log.ListUiSmall = Ext.extend( MShop.panel.AbstractListUi, {
 						for( var name in object ) {
 							result += name + ': ' + object[name] + '<br/>'; 
 						}
-						return result;
+						return '<div style="white-space:normal !important;">' + result + '</div>';
 					} catch( e ) {
-						return data;
+						return '<div style="white-space:normal !important;">' + data + '</div>';
 					}
 				}
 			}, {

@@ -3,12 +3,11 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id$
  */
 
 class Perf_CatalogTest extends MW_Unittest_Testcase
 {
-	protected $_context;
+	private $_context;
 
 
 	public static function main()

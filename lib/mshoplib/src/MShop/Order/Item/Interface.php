@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -100,34 +99,6 @@ interface MShop_Order_Item_Interface extends MShop_Common_Item_Interface
 	 * @param integer $status Payment constant from MShop_Order_Item_Abstract
 	 */
 	public function setPaymentStatus( $status );
-
-	/**
-	 * Returns the order flag.
-	 *
-	 * @return integer Binary group of bits for order status
-	 */
-	public function getFlag();
-
-	/**
-	 * Sets the order flag.
-	 *
-	 * @param integer $flag Binary group of bits for order status
-	 */
-	public function setFlag( $flag );
-
-	/**
-	 * Returns the email flag.
-	 *
-	 * @return integer Binary group of bits for order status
-	 */
-	public function getEmailFlag();
-
-	/**
-	 * Sets the flag.
-	 *
-	 * @param integer $flag Binary group of bits for email order status
-	 */
-	public function setEmailFlag( $flag );
 
 	/**
 	 * Returns the related invoice ID.

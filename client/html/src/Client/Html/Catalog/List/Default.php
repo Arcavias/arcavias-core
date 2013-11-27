@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Client
  * @subpackage Html
- * @version $Id: Default.php 1354 2012-10-30 11:17:57Z nsendetzky $
  */
 
 
@@ -185,74 +184,95 @@ class Client_Html_Catalog_List_Default
 			$context = $this->_getContext();
 			$config = $context->getConfig();
 
-
-			$params = array();
-			foreach( $view->param() as $key => $value )
-			{
-				if( strncmp( 'f-', $key, 2 ) === 0 || strncmp( 'l-', $key, 2 ) === 0 ) {
-					$params[$key] = $value;
-				}
-			}
-
-
 			$defaultPageSize = $config->get( 'client/html/catalog/list/size', 48 );
 			$domains = $config->get( 'client/html/catalog/list/domains', array( 'media', 'price', 'text' ) );
 
 
 			$page = (int) $view->param( 'l-page', 1 );
 			$size = (int) $view->param( 'l-size', $defaultPageSize );
-			$sortation = (string) $view->param( 'l-sort', 'position' );
+			$sortation = (string) $view->param( 'l-sort', 'relevance' );
 			$text = (string) $view->param( 'f-search-text' );
 			$catid = (string) $view->param( 'f-catalog-id' );
+			$attrids = $view->param( 'f-attr-id', array() );
+
+			if( is_string( $attrids ) ) {
+				$attrids = explode( ' ', $attrids );
+			}
 
 			if( $catid == '' ) {
-				$catid = $config->get( 'client/html/catalog/list/catid-default', null );
+				$catid = $config->get( 'client/html/catalog/list/catid-default', '' );
 			}
 
 			$page = ( $page < 1 ? 1 : $page );
 			$size = ( $size < 1 || $size > 100 ? $defaultPageSize : $size );
-			$sortation = ( strlen( $sortation ) === 0 ? $sortation = 'position' : $sortation );
+			$sortation = ( strlen( $sortation ) === 0 ? $sortation = 'relevance' : $sortation );
 
 
 			$sortdir = ( $sortation[0] === '-' ? '-' : '+' );
 			$sort = ltrim( $sortation, '-' );
+			$products = array();
 			$total = 0;
 
 
 			$controller = Controller_Frontend_Catalog_Factory::createController( $context );
-			$catalogManager = MShop_Catalog_Manager_Factory::createManager( $context );
 
-			if( $catid !== null )
+			if( $text !== '' )
+			{
+				$filter = $controller->createProductFilterByText( $text, $sort, $sortdir, ($page-1) * $size, $size );
+			}
+			else if( $catid !== '' )
 			{
 				$filter = $controller->createProductFilterByCategory( $catid, $sort, $sortdir, ($page-1) * $size, $size );
+
+				$catalogManager = MShop_Factory::createManager( $context, 'catalog' );
 				$view->listCatPath = $catalogManager->getPath( $catid, array( 'text', 'media', 'attribute' ) );
 
 				$listCatPath = $view->get( 'listCatPath', array() );
 				if( ( $categoryItem = end( $listCatPath ) ) !== false ) {
 					$view->listCurrentCatItem = $categoryItem;
 				}
-
-				$view->listProductItems = $controller->getProductList( $filter, $total, $domains );
-				$view->listProductTotal = $total;
-			}
-			else if( $text !== '' )
-			{
-				$filter = $controller->createProductFilterByText( $text, $sort, $sortdir, ($page-1) * $size, $size );
-
-				$view->listProductItems = $controller->getProductList( $filter, $total, $domains );
-				$view->listProductTotal = $total;
 			}
 			else
 			{
-				$view->listProductItems = array();
-				$view->listProductTotal = 0;
+				$filter = $controller->createProductFilterDefault( $sort, $sortdir, ($page-1) * $size, $size );
+			}
+
+			if( !empty( $attrids ) )
+			{
+				$func = $filter->createFunction( 'catalog.index.attributeaggregate', array( $attrids ) );
+
+				$expr = array(
+					$filter->getConditions(),
+					$filter->compare( '==', $func, count( $attrids ) ),
+				);
+
+				$filter->setConditions( $filter->combine( '&&', $expr ) );
+			}
+
+			$products = $controller->getProductList( $filter, $total, $domains );
+
+
+			if( !empty( $products ) && $config->get( 'client/html/catalog/list/stock/enable', true ) === true )
+			{
+				$stockTarget = $config->get( 'client/html/catalog/stock/url/target' );
+				$stockController = $config->get( 'client/html/catalog/stock/url/controller', 'catalog' );
+				$stockAction = $config->get( 'client/html/catalog/stock/url/action', 'stock' );
+				$stockConfig = $config->get( 'client/html/catalog/stock/url/config', array() );
+
+				$productIds = array_keys( $products );
+				sort( $productIds );
+
+				$params = array( 's-product-id' => implode( ' ', $productIds ) );
+				$view->listStockUrl = $view->url( $stockTarget, $stockController, $stockAction, $params, array(), $stockConfig );
 			}
 
 
+			$view->listParams = $this->_getClientParams( $view->param() );
+			$view->listProductItems = $products;
+			$view->listProductTotal = $total;
 			$view->listProductSort = $sortation;
 			$view->listPageCurr = $page;
 			$view->listPageSize = $size;
-			$view->listParams = $params;
 
 			$this->_cache = $view;
 		}

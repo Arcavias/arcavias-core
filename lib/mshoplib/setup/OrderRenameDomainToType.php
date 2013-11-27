@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: OrderRenameDomainToType.php 14251 2011-12-09 13:36:27Z nsendetzky $
  */
 
 
@@ -34,7 +33,7 @@ class MW_Setup_Task_OrderRenameDomainToType extends MW_Setup_Task_Abstract
 	 */
 	public function getPreDependencies()
 	{
-		return array();
+		return array( 'OrderRenameTables' );
 	}
 
 

@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 1333 2012-10-23 17:52:13Z doleiynyk $
  */
 
 
@@ -12,7 +11,7 @@
  */
 class MShop_Catalog_Manager_Index_Price_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 	protected static $_products;
 
 
@@ -87,6 +86,34 @@ class MShop_Catalog_Manager_Index_Price_DefaultTest extends MW_Unittest_Testcase
 	{
 		$item = $this->_object->getItem( self::$_products[ 'CNC' ]->getId(), array( 'attribute', 'price', 'text' ) );
 		$this->assertEquals( self::$_products[ 'CNC' ], $item );
+	}
+
+
+	public function testAggregate()
+	{
+		$manager = MShop_Factory::createManager( TestHelper::getContext(), 'price' );
+
+		$search = $manager->createSearch();
+		$expr = array(
+			$search->compare( '==', 'price.value', '18.00' ),
+			$search->compare( '==', 'price.currencyid', 'EUR' ),
+			$search->compare( '==', 'price.editor', 'core:unittest' ),
+		);
+		$search->setConditions( $search->combine( '&&', $expr ) );
+
+		$items = $manager->searchItems( $search );
+
+		if( ( $item = reset( $items ) ) === false ) {
+			throw new Exception( 'No price item found' );
+		}
+
+
+		$search = $this->_object->createSearch( true );
+		$result = $this->_object->aggregate( $search, 'catalog.index.price.id' );
+
+		$this->assertEquals( 12, count( $result ) );
+		$this->assertArrayHasKey( $item->getId(), $result );
+		$this->assertEquals( $result[ $item->getId() ], 3 );
 	}
 
 

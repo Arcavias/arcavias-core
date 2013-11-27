@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: ListUi.js 14701 2012-01-05 08:52:24Z nsendetzky $
  */
 
 
@@ -27,10 +26,10 @@ MShop.panel.locale.site.ListUi = Ext.extend( MShop.panel.AbstractListUi, {
 	initComponent : function()
 	{
 		this.title = _( 'Locale Site' );
-
+		
 		MShop.panel.AbstractListUi.prototype.initActions.call( this );
 		MShop.panel.AbstractListUi.prototype.initToolbar.call( this );
-		
+
 		this.initStore();
 
 		MShop.panel.locale.site.ListUi.superclass.initComponent.call( this );
@@ -75,7 +74,7 @@ MShop.panel.locale.site.ListUi = Ext.extend( MShop.panel.AbstractListUi, {
 				header : _('Configuration'),
 				width : 200,
 				editable : false,
-				renderer: function (value) {	
+				renderer: function (value) {
 					var s = "";
 					Ext.iterate(value, function (key, value, object) {
 						s = s + String.format('<div>{0}: {1}</div>', key, value);
@@ -109,6 +108,16 @@ MShop.panel.locale.site.ListUi = Ext.extend( MShop.panel.AbstractListUi, {
 				editable : false,
 				hidden : true
 			}
+		];
+	},
+	
+	initToolbar: function() {
+		this.tbar = [
+			this.actionAdd,
+			this.actionEdit,
+			this.actionDelete,
+			this.actionExport,
+			this.importButton
 		];
 	},
 	

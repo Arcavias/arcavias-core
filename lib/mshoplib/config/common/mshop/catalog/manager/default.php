@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: default.php 14869 2012-01-13 17:30:30Z nsendetzky $
  */
 
 return array(
@@ -31,6 +30,11 @@ return array(
 		'update' => '
 			UPDATE "mshop_catalog"
 			SET "label" = ?, "code" = ?, "status" = ?
+			WHERE "siteid" = :siteid AND "id" = ?
+		',
+		'update-parentid' => '
+			UPDATE "mshop_catalog"
+			SET "parentid" = ?
 			WHERE "siteid" = :siteid AND "id" = ?
 		',
 		'move-left' => '

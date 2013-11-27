@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -12,8 +11,8 @@
  */
 class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
-	protected $_values;
+	private $_object;
+	private $_values;
 
 	/**
 	 * Runs the test methods of this class.
@@ -53,6 +52,7 @@ class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 			'birthday' => '2010-01-01',
 			'status' => 1,
 			'password' => '',
+			'vdate' => null,
 			'company' => 'unitCompany',
 			'salutation' => MShop_Common_Item_Address_Abstract::SALUTATION_MR,
 			'title' => 'Dr.',
@@ -165,7 +165,7 @@ class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 	{
 		$this->assertEquals( 'unitTestUser', $this->_object->getEditor() );
 	}
-	
+
 	public function testGetBirthday()
 	{
 		$this->assertEquals( '2010-01-01', $this->_object->getBirthday() );
@@ -178,9 +178,21 @@ class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 		$this->assertTrue( $this->_object->isModified() );
 	}
 
-	public function testGetBillingAddress()
+	public function testGetDateVerified()
 	{
-		$address = $this->_object->getBillingAddress();
+		$this->assertEquals( null, $this->_object->getDateVerified() );
+	}
+
+	public function testSetDateVerified()
+	{
+		$this->_object->setDateVerified( '2010-02-01' );
+		$this->assertEquals( '2010-02-01', $this->_object->getDateVerified() );
+		$this->assertTrue( $this->_object->isModified() );
+	}
+
+	public function testGetPaymentAddress()
+	{
+		$address = $this->_object->getPaymentAddress();
 		$this->assertEquals( $address->getRefId(), 'referenceid' );
 		$this->assertEquals( $address->getCompany(), 'unitCompany' );
 		$this->assertEquals( $address->getSalutation(), MShop_Common_Item_Address_Abstract::SALUTATION_MR );
@@ -193,7 +205,7 @@ class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $address->getPostal(), '22769' );
 		$this->assertEquals( $address->getCity(), 'Hamburg' );
 		$this->assertEquals( $address->getState(), 'Hamburg' );
-		$this->assertEquals( $address->getCountryId(), 'de' );
+		$this->assertEquals( $address->getCountryId(), 'DE' );
 		$this->assertEquals( $address->getLanguageId(), 'de' );
 		$this->assertEquals( $address->getTelephone(), '05554433221' );
 		$this->assertEquals( $address->getEmail(), 'unit.test@metaways.de' );
@@ -201,11 +213,11 @@ class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $address->getWebsite(), 'www.metaways.de' );
 	}
 
-	public function testSetBillingAddress()
+	public function testSetPaymentAddress()
 	{
 		$this->_address->setCompany('unitCompany0815');
-		$this->_object->setBillingAddress( $this->_address );
-		$this->assertEquals( $this->_address, $this->_object->getBillingAddress() );
+		$this->_object->setPaymentAddress( $this->_address );
+		$this->assertEquals( $this->_address, $this->_object->getPaymentAddress() );
 	}
 
 	public function testToArray()
@@ -218,11 +230,12 @@ class MShop_Customer_Item_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $this->_object->getCode(), $arrayObject['customer.code'] );
 		$this->assertEquals( $this->_object->getStatus(), $arrayObject['customer.status'] );
 		$this->assertEquals( $this->_object->getPassword(), $arrayObject['customer.password'] );
+		$this->assertEquals( $this->_object->getBirthday(), $arrayObject['customer.birthday'] );
+		$this->assertEquals( $this->_object->getDateVerified(), $arrayObject['customer.dateverified'] );
 		$this->assertEquals( $this->_object->getTimeCreated(), $arrayObject['customer.ctime'] );
 		$this->assertEquals( $this->_object->getTimeModified(), $arrayObject['customer.mtime'] );
-		$this->assertEquals( $this->_object->getBirthday(), $arrayObject['customer.birthday'] );
 		$this->assertEquals( $this->_object->getEditor(), $arrayObject['customer.editor'] );
-		$address = $this->_object->getBillingAddress();
+		$address = $this->_object->getPaymentAddress();
 		$this->assertEquals( $address->getCompany(), $arrayObject['customer.company'] );
 		$this->assertEquals( $address->getSalutation(), $arrayObject['customer.salutation'] );
 		$this->assertEquals( $address->getTitle(), $arrayObject['customer.title'] );

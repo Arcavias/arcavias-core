@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Product
- * @version $Id: Default.php 14562 2011-12-23 11:32:48Z nsendetzky $
  */
 
 
@@ -450,37 +449,24 @@ class MShop_Product_Manager_Default
 
 
 	/**
-	 * Deletes an existing product from the storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $productId Product id of an existing product in the storage that should be deleted
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem($productId)
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$path = 'mshop/product/manager/default/item/delete';
-			$stmt = $this->_getCachedStatement($conn, $path);
-			$stmt->bind( 1, $productId );
-			$stmt->execute()->finish();
-
-			$dbm->release( $conn );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/product/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
 	/**
 	 * Returns the product item for the given product ID.
 	 *
-	 * @param integer $id Unique ID to search for
-	 * @return MShop_Product_Item_Interface Product item
+	 * @param integer $id Unique ID of the product item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Product_Item_Interface Returns the product item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -515,7 +501,7 @@ class MShop_Product_Manager_Default
 			while( ( $row = $results->fetch() ) !== false )
 			{
 				$map[ $row['id'] ] = $row;
-				$typeIds[] = $row['typeid'];
+				$typeIds[ $row['typeid'] ] = null;
 			}
 
 			$dbm->release( $conn );
@@ -526,12 +512,13 @@ class MShop_Product_Manager_Default
 			throw $e;
 		}
 
-		if( count( $typeIds ) > 0 )
+		if( !empty( $typeIds ) )
 		{
 			$typeManager = $this->getSubManager( 'type' );
-			$search = $typeManager->createSearch();
-			$search->setConditions( $search->compare( '==', 'product.type.id', array_unique( $typeIds ) ) );
-			$typeItems = $typeManager->searchItems( $search );
+			$typeSearch = $typeManager->createSearch();
+			$typeSearch->setConditions( $typeSearch->compare( '==', 'product.type.id', array_keys( $typeIds ) ) );
+			$typeSearch->setSlice( 0, $search->getSliceSize() );
+			$typeItems = $typeManager->searchItems( $typeSearch );
 
 			foreach( $map as $id => $row )
 			{

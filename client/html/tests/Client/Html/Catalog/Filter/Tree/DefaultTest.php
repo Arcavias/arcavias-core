@@ -3,12 +3,11 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 1325 2012-10-21 15:41:26Z nsendetzky $
  */
 
 class Client_Html_Catalog_Filter_Tree_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -54,22 +53,7 @@ class Client_Html_Catalog_Filter_Tree_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetHeader()
 	{
-		$output = $this->_object->getHeader();
-
-		$this->assertContains( '<script type="text/javascript">', $output );
-	}
-
-
-	public function testGetHeaderWithID()
-	{
-		$catalogManager = MShop_Catalog_Manager_Factory::createManager( TestHelper::getContext() );
-		$node = $catalogManager->getTree( null, array(), MW_Tree_Manager_Abstract::LEVEL_ONE );
-
-		$view = $this->_object->getView();
-		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-catalog-id' => $node->getId() ) );
-		$view->addHelper( 'param', $helper );
-
-		$this->assertContains( '<script type="text/javascript">', $this->_object->getHeader() );
+		$this->_object->getHeader();
 	}
 
 
@@ -86,7 +70,7 @@ class Client_Html_Catalog_Filter_Tree_DefaultTest extends MW_Unittest_Testcase
 
 		$this->assertContains( 'Groups', $output );
 		$this->assertContains( 'Neu', $output );
-		$this->assertContains( 'evel-2', $output );
+		$this->assertContains( 'level-2', $output );
 	}
 
 

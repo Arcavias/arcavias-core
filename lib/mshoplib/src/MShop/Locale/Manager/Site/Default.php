@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Locale
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -196,28 +195,14 @@ class MShop_Locale_Manager_Site_Default
 
 
 	/**
-	 * Deletes a site item specified by its ID.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param string $siteId Site id of an existing Site in the storage to be deleted
-	 * @throws MShop_Locale_Exception
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $siteId )
+	public function deleteItems( array $ids )
 	{
-		$conn = $this->_dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/locale/manager/site/default/item/delete');
-			$stmt->bind(1, $siteId, MW_DB_Statement_Abstract::PARAM_INT);
-			$stmt->execute()->finish();
-
-			$this->_dbm->release($conn);
-		}
-		catch ( Exception $e )
-		{
-			$this->_dbm->release($conn);
-			throw $e;
-		}
+		$path = 'mshop/locale/manager/site/default/item/delete';
+		$this->_deleteItems($ids, $this->_getContext()->getConfig()->get( $path, $path ), false );
 	}
 
 
@@ -225,7 +210,9 @@ class MShop_Locale_Manager_Site_Default
 	 * Returns the site item specified by its ID.
 	 *
 	 * @param string $siteId Site id to create the Site object
-	 * @return MShop_Locale_Item_Site_Interface Site object
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Locale_Item_Site_Interface Returns the site item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -419,6 +406,8 @@ class MShop_Locale_Manager_Site_Default
 		if( ( $item = reset( $items ) ) === false ) {
 			throw new MShop_Locale_Exception( sprintf( 'Tree root with code "%1$s" in "%2$s" not found', 'default', 'locale.site.code' ) );
 		}
+
+		$this->_cache[ $item->getId() ] = $item;
 
 		return $item;
 	}

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
  * @package MW
  * @subpackage Common
- * @version $Id: Interface.php 16606 2012-10-19 12:50:23Z nsendetzky $
  */
 
 
@@ -24,4 +23,12 @@ interface MW_Common_Criteria_Plugin_Interface
 	 * @return mixed Translated value
 	 */
 	public function translate( $value );
+
+	/**
+	 * Reverses the translation of the value.
+	 *
+	 * @param mixed $value Value to reverse
+	 * @return mixed Reversed translation
+	 */
+	public function reverse( $value );
 }

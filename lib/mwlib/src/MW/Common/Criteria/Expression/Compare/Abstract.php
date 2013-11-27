@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
  * @package MW
  * @subpackage Common
- * @version $Id: Abstract.php 16606 2012-10-19 12:50:23Z nsendetzky $
  */
 
 
@@ -87,7 +86,7 @@ abstract class MW_Common_Criteria_Expression_Compare_Abstract
 		$name = $this->_name;
 
 		if( ( $transname = $this->_translateName( $name, $translations ) ) === '' ) {
-			return '';
+			$transname = $name;
 		}
 
 		if( !isset( $types[$name] ) ) {
@@ -98,7 +97,7 @@ abstract class MW_Common_Criteria_Expression_Compare_Abstract
 			return $this->_createNullTerm( $transname );
 		}
 
-		if( is_array( $this->_value ) && count( $this->_value ) > 0 ) {
+		if( is_array( $this->_value ) ) {
 			return $this->_createListTerm( $transname, $types[$name] );
 		}
 

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage Frontend
- * @version $Id: Abstract.php 866 2012-06-28 16:14:02Z fblasel $
  */
 
 
@@ -17,6 +16,23 @@
  */
 class Controller_Frontend_Common_Factory_Abstract
 {
+	private static $_objects = array();
+
+
+	/**
+	 * Injects a controller object.
+	 * The object is returned via createController() if an instance of the class
+	 * with the name name is requested.
+	 *
+	 * @param string $classname Full name of the class for which the object should be returned
+	 * @param Controller_Frontend_Interface|null $controller Frontend controller object
+	 */
+	public static function injectController( $classname, Controller_Frontend_Interface $controller = null )
+	{
+		self::$_objects[$classname] = $controller;
+	}
+
+
 	/**
 	 * Adds the decorators to the controller object.
 	 *
@@ -35,19 +51,19 @@ class Controller_Frontend_Common_Factory_Abstract
 			if( ctype_alnum( $name ) === false )
 			{
 				$classname = is_string($name) ? $classprefix . ucfirst( strtolower( $name ) ) : '<not a string>';
-				throw new Controller_Frontend_Exception( sprintf( 'Invalid class name "%1$s"', $classname ) );
+				throw new Controller_Frontend_Exception( sprintf( 'Invalid characters in class name "%1$s"', $classname ) );
 			}
 
 			$classname = $classprefix . ucfirst( strtolower( $name ) );
 
 			if( class_exists( $classname ) === false ) {
-				throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" not found', $classname ) );
+				throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" not available', $classname ) );
 			}
 
 			$controller =  new $classname( $context, $controller );
 
 			if( !( $controller instanceof $iface ) ) {
-				throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" does not implement "%2$s"', $classname, $iface ) );
+				throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" does not implement interface "%2$s"', $classname, $iface ) );
 			}
 		}
 
@@ -113,14 +129,18 @@ class Controller_Frontend_Common_Factory_Abstract
 	 */
 	protected static function _createController( MShop_Context_Item_Interface $context, $classname, $interface )
 	{
+		if( isset( self::$_objects[$classname] ) ) {
+			return self::$_objects[$classname];
+		}
+
 		if( class_exists( $classname ) === false ) {
-			throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" not found', $classname ) );
+			throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" not available', $classname ) );
 		}
 
 		$controller =  new $classname( $context );
 
 		if( !( $controller instanceof $interface ) ) {
-			throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" does not implement "%2$s"', $classname, $interface ) );
+			throw new Controller_Frontend_Exception( sprintf( 'Class "%1$s" does not implement interface "%2$s"', $classname, $interface ) );
 		}
 
 		return $controller;

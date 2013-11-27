@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage ExtJS
- * @version $Id: Abstract.php 14428 2011-12-19 09:26:03Z nsendetzky $
  */
 
 
@@ -375,7 +374,7 @@ abstract class Controller_ExtJS_Abstract
 
 		foreach( $lists as $domain => $ids )
 		{
-			$manager = $this->_getDomainManager( $domain );
+			$manager = MShop_Factory::createManager( $this->_context, $domain );
 
 			$total = 0;
 			$criteria = $manager->createSearch();
@@ -417,45 +416,6 @@ abstract class Controller_ExtJS_Abstract
 		}
 
 		return $result;
-	}
-
-
-	/**
-	 * Returns the (sub-)manager of the given domain.
-	 *
-	 * @param string $domain Name of the domain, maybe with additional sub-manager names like "product" for the product
-	 * 	manager or "product/list/type" for the product list type sub-manager.
-	 * @return MShop_Common_Manager_Interface Manager object of the domain or sub-manager thereof
-	 */
-	protected function _getDomainManager( $domain )
-	{
-		$domain = strtolower( $domain );
-		$parts = explode( '/', $domain );
-
-		if( count( $parts ) < 1 ) {
-			throw new Controller_ExtJS_Exception( sprintf( 'Invalid domain "%1$s"', $domain ) );
-		}
-
-		foreach( $parts as $part )
-		{
-			if( ctype_alnum( $part ) === false ) {
-				throw new Controller_ExtJS_Exception( sprintf( 'Invalid domain "%1$s"', $domain ) );
-			}
-		}
-
-		$iface = 'MShop_Common_Manager_Interface';
-		$factory = 'MShop_' . ucwords( array_shift( $parts ) ) . '_Manager_Factory';
-		$manager = call_user_func_array( $factory . '::createManager', array( $this->_context ) );
-
-		if( !( $manager instanceof $iface ) ) {
-			throw new Controller_ExtJS_Exception( sprintf( 'Factory "%1$s" not found invalid manager', $factory ) );
-		}
-
-		foreach( $parts as $part ) {
-			$manager = $manager->getSubManager( $part );
-		}
-
-		return $manager;
 	}
 
 

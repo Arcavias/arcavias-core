@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: PriceListAddTestData.php 1365 2012-10-31 13:54:32Z doleiynyk $
  */
 
 
@@ -154,14 +153,14 @@ class MW_Setup_Task_PriceListAddTestData extends MW_Setup_Task_Abstract
 		$search = $priceManager->createSearch();
 		$expr = array(
 			$search->compare( '==', 'price.value', $value ),
-			$search->compare( '==', 'price.shipping', $ship ),
+			$search->compare( '==', 'price.costs', $ship ),
 			$search->compare( '==', 'price.typeid', $typeids )
 		);
 		$search->setConditions( $search->combine( '&&', $expr ) );
 
 		$parentIds = array();
 		foreach( $priceManager->searchItems( $search ) as $item )	{
-			$parentIds[ 'price/'.$item->getDomain().'/'.$item->getType().'/'.$item->getValue().'/'.$item->getShipping() ] = $item->getId();
+			$parentIds[ 'price/'.$item->getDomain().'/'.$item->getType().'/'.$item->getValue().'/'.$item->getCosts() ] = $item->getId();
 		}
 
 		$listItemTypeIds = array();

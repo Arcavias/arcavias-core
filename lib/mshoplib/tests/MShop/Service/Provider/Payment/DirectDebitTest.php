@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14843 2012-01-13 08:11:39Z nsendetzky $
  */
 
 
@@ -16,7 +15,7 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 	 * @var    MShop_Service_Provider_Payment_DirectDebit
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -68,13 +67,20 @@ class MShop_Service_Provider_Payment_DirectDebitTest extends MW_Unittest_Testcas
 
 	public function testGetConfigBE()
 	{
-		$this->assertEquals( array(), $this->_object->getConfigBE() );
+		$this->assertEquals( 4, count( $this->_object->getConfigBE() ) );
 	}
 
 
 	public function testCheckConfigBE()
 	{
-		$this->assertEquals( array(), $this->_object->checkConfigBE( array('url' => 'testurl' ) ) );
+		$attributes = array(
+			'payment.url-success' => 'http://returnUrl'
+		);
+
+		$result = $this->_object->checkConfigBE( $attributes );
+
+		$this->assertEquals( 4, count( $result ) );
+		$this->assertEquals( null, $result['payment.url-success'] );
 	}
 
 

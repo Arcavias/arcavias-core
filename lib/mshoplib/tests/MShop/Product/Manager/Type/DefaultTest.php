@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 14682 2012-01-04 11:30:14Z nsendetzky $
  */
 
 
@@ -15,13 +14,13 @@ class MShop_Product_Manager_Type_DefaultTest extends MW_Unittest_Testcase
 	/**
 	 * @var MShop_Product_Manager_Type_Default
 	 */
-	protected $_object;
+	private $_object;
 
 	/**
 	 * @var string
 	 * @access protected
 	 */
-	protected $_editor = '';
+	private $_editor = '';
 
 	/**
 	 * Runs the test methods of this class.

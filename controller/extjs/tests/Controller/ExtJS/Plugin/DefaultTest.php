@@ -3,13 +3,12 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php
  */
 
 
 class Controller_ExtJS_Plugin_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -90,6 +89,7 @@ class Controller_ExtJS_Plugin_DefaultTest extends MW_Unittest_Testcase
 			'site' => 'unittest',
 			'items' => (object) array(
 				'plugin.status' => 1,
+				'plugin.position' => 2,
 				'plugin.provider' => 'test provider',
 				'plugin.config' => array( 'url' => 'www.url.de' ),
 				'plugin.typeid' => $type->getId(),
@@ -113,6 +113,7 @@ class Controller_ExtJS_Plugin_DefaultTest extends MW_Unittest_Testcase
 		$this->assertNotNull( $saved['items']->{'plugin.id'} );
 		$this->assertEquals( $saved['items']->{'plugin.id'}, $searched['items'][0]->{'plugin.id'} );
 		$this->assertEquals( $saved['items']->{'plugin.status'}, $searched['items'][0]->{'plugin.status'} );
+		$this->assertEquals( $saved['items']->{'plugin.position'}, $searched['items'][0]->{'plugin.position'} );
 		$this->assertEquals( $saved['items']->{'plugin.provider'}, $searched['items'][0]->{'plugin.provider'} );
 		$this->assertEquals( $saved['items']->{'plugin.config'}, $searched['items'][0]->{'plugin.config'} );
 		$this->assertEquals( $saved['items']->{'plugin.typeid'}, $searched['items'][0]->{'plugin.typeid'} );

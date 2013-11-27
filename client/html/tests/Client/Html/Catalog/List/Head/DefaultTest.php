@@ -3,12 +3,11 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: DefaultTest.php 1352 2012-10-29 16:11:47Z nsendetzky $
  */
 
 class Client_Html_Catalog_List_Head_DefaultTest extends MW_Unittest_Testcase
 {
-	protected $_object;
+	private $_object;
 
 
 	/**
@@ -79,6 +78,18 @@ class Client_Html_Catalog_List_Head_DefaultTest extends MW_Unittest_Testcase
 		$this->assertStringStartsWith( '<div class="catalog-list-head">', $output );
 		$this->assertRegExp( '#<h1>Kaffee</h1>#', $output );
 	}
+
+
+	public function testGetBodySearch()
+	{
+		$view = $this->_object->getView();
+		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-search-text' => '<b>Search result</b>' ) );
+		$view->addHelper( 'param', $helper );
+
+		$output = $this->_object->getBody();
+		$this->assertContains( '&lt;b&gt;Search result&lt;/b&gt;', $output );
+	}
+
 
 	public function testGetSubClient()
 	{

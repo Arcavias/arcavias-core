@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Plugin
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -79,6 +78,20 @@ interface MShop_Plugin_Item_Interface extends MShop_Common_Item_Interface
 	 * @param array $_config Custom configuration values
 	 */
 	public function setConfig( array $config );
+
+	/**
+	 * Returns the position of the plugin item.
+	 *
+	 * @return integer Position of the item
+	 */
+	public function getPosition();
+
+	/**
+	 * Sets the new position of the plugin item.
+	 *
+	 * @param integer $position Position of the item
+	 */
+	public function setPosition($position);
 
 	/**
 	 * Returns the status of the plugin item.

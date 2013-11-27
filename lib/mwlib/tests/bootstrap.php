@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.gnu.org/licenses/lgpl.html
- * @version $Id: bootstrap.php 16606 2012-10-19 12:50:23Z nsendetzky $
  */
 
 
@@ -29,15 +28,16 @@ setlocale(LC_TIME, 'POSIX');
  */
 $testdir =  dirname( __FILE__ );
 $srcdir =  dirname( $testdir ) . DIRECTORY_SEPARATOR . 'src';
+$libdir =  dirname( $testdir ) . DIRECTORY_SEPARATOR . 'lib';
 
-$path = array( $testdir, $srcdir, get_include_path() );
+$path = array( $testdir, $srcdir, $libdir, get_include_path() );
 set_include_path( implode( PATH_SEPARATOR, $path ) );
 
 
 /*
  * Use autoload function for resolving class names
  */
-require_once 'MW/TestHelper.php';
-if( spl_autoload_register( 'MW_TestHelper::autoload' ) === false ) {
+require_once 'TestHelper.php';
+if( spl_autoload_register( 'TestHelper::autoload' ) === false ) {
 	throw new Exception( 'Unable to register autoloader' );
 }

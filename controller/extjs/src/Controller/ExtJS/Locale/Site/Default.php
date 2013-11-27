@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage ExtJS
- * @version $Id: Default.php 14405 2011-12-17 13:19:32Z nsendetzky $
  */
 
 
@@ -131,7 +130,7 @@ class Controller_ExtJS_Locale_Site_Default
 		$manager = $this->_getManager();
 
 		$refId = ( isset( $params->refid ) ? $params->refid : null );
-		$parentId = ( isset( $params->parentid ) ? $params->parentid : null );
+		$parentId = ( ( isset( $params->parentid ) && $params->parentid !== 'root' ) ? $params->parentid : null );
 		$items = ( !is_array( $params->items ) ? array( $params->items ) : $params->items );
 
 		foreach( $items as $entry )
@@ -164,9 +163,13 @@ class Controller_ExtJS_Locale_Site_Default
 	 */
 	public function moveItems( stdClass $params )
 	{
-		$this->_checkParams( $params, array( 'items', 'oldparentid', 'newparentid' ) );
+		$this->_checkParams( $params, array( 'items', 'oldparentid', 'newparentid', 'refid' ) );
 
 		$manager = $this->_getManager();
+
+		if( $params->newparentid === 'root' ) {
+			$params->newparentid = null;
+		}
 
 		$refId = ( isset( $params->refid ) ? $params->refid : null );
 		$items = ( !is_array( $params->items ) ? array( $params->items ) : $params->items );

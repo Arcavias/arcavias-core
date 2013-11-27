@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: MediaField.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -17,7 +16,7 @@ MShop.panel.media.MediaField = Ext.extend(Ext.form.Field, {
      */
     defaultImage: '',
     
-    cls: 'mshop-admin-media-item-preview',
+    cls: 'arcavias-admin-media-item-preview',
     
     defaultAutoCreate : {tag:'input', type:'hidden'},
     handleMouseEvents: true,

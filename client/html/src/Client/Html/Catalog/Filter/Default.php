@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Client
  * @subpackage Html
- * @version $Id: Default.php 1324 2012-10-21 13:17:19Z nsendetzky $
  */
 
 
@@ -20,7 +19,7 @@ class Client_Html_Catalog_Filter_Default
 	implements Client_Html_Interface
 {
 	private $_subPartPath = 'client/html/catalog/filter/default/subparts';
-	private $_subPartNames = array( 'tree' );
+	private $_subPartNames = array( 'tree', 'attribute' );
 
 
 	/**

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Text
- * @version $Id: Default.php 14750 2012-01-09 12:09:16Z nsendetzky $
  */
 
 
@@ -410,36 +409,24 @@ class MShop_Text_Manager_Default
 
 
 	/**
-	 * Deletes the text item specified by the given text ID.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param Integer $id Id of the text item
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/text/manager/default/item/delete');
-			$stmt->bind(1, $id, MW_DB_Statement_Abstract::PARAM_INT);
-			$result = $stmt->execute()->finish();
-
-			$dbm->release($conn);
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$path = 'mshop/text/manager/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
 	/**
 	 * Returns the text item object specified by the given ID.
 	 *
-	 * @param integer $id Id of text item
-	 * @return MShop_Text_Item_Interface Text item
+	 * @param integer $id Id of the text item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Text_Item_Interface Returns the text item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -501,7 +488,7 @@ class MShop_Text_Manager_Default
 			while( ( $row = $results->fetch() ) !== false )
 			{
 				$map[ $row['id'] ] = $row;
-				$typeIds[] = $row['typeid'];
+				$typeIds[ $row['typeid'] ] = null;
 			}
 
 			$dbm->release( $conn );
@@ -512,12 +499,13 @@ class MShop_Text_Manager_Default
 			throw $e;
 		}
 
-		if( count( $typeIds ) > 0 )
+		if( !empty( $typeIds ) )
 		{
 			$typeManager = $this->getSubManager( 'type' );
-			$search = $typeManager->createSearch();
-			$search->setConditions( $search->compare( '==', 'text.type.id', array_unique( $typeIds ) ) );
-			$typeItems = $typeManager->searchItems( $search );
+			$typeSearch = $typeManager->createSearch();
+			$typeSearch->setConditions( $typeSearch->compare( '==', 'text.type.id', array_keys( $typeIds ) ) );
+			$typeSearch->setSlice( 0, $search->getSliceSize() );
+			$typeItems = $typeManager->searchItems( $typeSearch );
 
 			foreach( $map as $id => $row )
 			{

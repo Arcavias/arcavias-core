@@ -3,23 +3,18 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2011
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: TestHelper.php 1326 2012-10-21 15:41:46Z nsendetzky $
  */
 
 
 class TestHelper
 {
-	private static $_mshop;
+	private static $_arcavias;
 	private static $_context = array();
 
 
 	public static function bootstrap()
 	{
-		$mshop = self::_getMShop();
-
-		$includepaths = $mshop->getIncludePaths();
-		$includepaths[] = get_include_path();
-		set_include_path( implode( PATH_SEPARATOR, $includepaths ) );
+		self::_getArcavias();
 	}
 
 
@@ -29,19 +24,19 @@ class TestHelper
 			self::$_context[$site] = self::_createContext( $site );
 		}
 
-		return self::$_context[$site];
+		return clone self::$_context[$site];
 	}
 
 
-	public static function getView()
+	public static function getView( $site = 'unittest' )
 	{
 		$view = new MW_View_Default();
 
-		$trans = new MW_Translation_Zend( self::_getMShop()->getI18nPaths(), 'gettext', 'de_DE', array('disableNotices'=>true) );
+		$trans = new MW_Translation_None( 'de_DE' );
 		$helper = new MW_View_Helper_Translate_Default( $view, $trans );
 		$view->addHelper( 'translate', $helper );
 
-		$helper = new MW_View_Helper_Url_Default( $view, 'baseurl' );
+		$helper = new MW_View_Helper_Url_Default( $view, 'http://baseurl' );
 		$view->addHelper( 'url', $helper );
 
 		$helper = new MW_View_Helper_Number_Default( $view, '.', '' );
@@ -50,7 +45,7 @@ class TestHelper
 		$helper = new MW_View_Helper_Date_Default( $view, 'Y-m-d' );
 		$view->addHelper( 'date', $helper );
 
-		$helper = new MW_View_Helper_Config_Default( $view, self::getContext()->getConfig() );
+		$helper = new MW_View_Helper_Config_Default( $view, self::getContext( $site )->getConfig() );
 		$view->addHelper( 'config', $helper );
 
 		$helper = new MW_View_Helper_Parameter_Default( $view, array() );
@@ -59,40 +54,43 @@ class TestHelper
 		$helper = new MW_View_Helper_FormParam_Default( $view );
 		$view->addHelper( 'formparam', $helper );
 
+		$helper = new MW_View_Helper_Encoder_Default( $view );
+		$view->addHelper( 'encoder', $helper );
+
 		return $view;
 	}
 
 
 	public static function getHtmlTemplatePaths()
 	{
-		return self::_getMShop()->getCustomPaths( 'client/html' );
+		return self::_getArcavias()->getCustomPaths( 'client/html' );
 	}
 
 
-	private static function _getMShop()
+	private static function _getArcavias()
 	{
-		if( !isset( self::$_mshop ) )
+		if( !isset( self::$_arcavias ) )
 		{
-			require_once dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . DIRECTORY_SEPARATOR . 'MShop.php';
-			spl_autoload_register( 'MShop::autoload' );
+			require_once dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) . DIRECTORY_SEPARATOR . 'Arcavias.php';
 
-			self::$_mshop = new MShop( array(), false );
+			self::$_arcavias = new Arcavias( array(), false );
 		}
 
-		return self::$_mshop;
+		return self::$_arcavias;
 	}
 
 
 	private static function _createContext( $site )
 	{
 		$ctx = new MShop_Context_Item_Default();
-		$mshop = self::_getMShop();
+		$arcavias = self::_getArcavias();
 
 
-		$paths = $mshop->getConfigPaths( 'mysql' );
+		$paths = $arcavias->getConfigPaths( 'mysql' );
 		$paths[] = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'config';
 
 		$conf = new MW_Config_Array( array(), $paths );
+		$conf = new MW_Config_Decorator_Memory( $conf );
 		$ctx->setConfig( $conf );
 
 
@@ -100,12 +98,7 @@ class TestHelper
 		$ctx->setDatabaseManager( $dbm );
 
 
-		$writer = new Zend_Log_Writer_Stream( $site . '.log');
-		$zlog = new Zend_Log($writer);
-		$filter = new Zend_Log_Filter_Priority(Zend_Log::DEBUG);
-		$zlog->addFilter($filter);
-
-		$logger = new MW_Logger_Zend( $zlog );
+		$logger = new MW_Logger_File( $site . '.log', MW_Logger_Abstract::DEBUG );
 		$ctx->setLogger( $logger );
 
 
@@ -113,8 +106,8 @@ class TestHelper
 		$ctx->setCache( $cache );
 
 
-		$i18n = new MW_Translation_None( 'en' );
-		$ctx->setI18n( $i18n );
+		$i18n = new MW_Translation_None( 'de' );
+		$ctx->setI18n( array( 'de' => $i18n ) );
 
 
 		$session = new MW_Session_None();

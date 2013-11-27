@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Customer
- * @version $Id: Interface.php 14246 2011-12-09 12:25:12Z nsendetzky $
  */
 
 
@@ -46,9 +45,10 @@ interface MShop_Customer_Item_Interface extends MShop_Common_Item_Interface
 	public function setStatus($value);
 
 	/**
-	 * Returns the code id of the customer item.
+	 * Returns the unique code of the customer item.
+	 * This should be the username or the e-mail address.
 	 *
-	 * @return string
+	 * @return string Unique code of the customer item
 	 */
 	public function getCode();
 
@@ -62,42 +62,56 @@ interface MShop_Customer_Item_Interface extends MShop_Common_Item_Interface
 	/**
 	 * Returns the birthday of the customer item.
 	 *
-	 * @return string
+	 * @return string Birthday date of the customer (YYYY-MM-DD format)
 	 */
 	public function getBirthday();
 
 	/**
 	 * Sets the birthday of the customer item.
 	 *
-	 * @param date $value Birthday of the customer item
+	 * @param date $value Birthday of the customer item (YYYY-MM-DD format)
 	 */
 	public function setBirthday( $value );
 
 	/**
 	 * Returns the billing address of the customer item.
 	 *
-	 * @return MShop_Common_Item_Address_Interface
+	 * @return MShop_Common_Item_Address_Interface Address object
 	 */
-	public function getBillingAddress();
+	public function getPaymentAddress();
 
 	/**
 	 * Sets the billing address of the customer item.
 	 *
 	 * @param MShop_Common_Item_Address_Interface $address Billing address of the customer item
 	 */
-	public function setBillingAddress( MShop_Common_Item_Address_Interface $address );
+	public function setPaymentAddress( MShop_Common_Item_Address_Interface $address );
 
 	/**
 	 * Returns the password of the customer item.
 	 *
-	 * @return string
+	 * @return string Encrypted password
 	 */
 	public function getPassword();
 
 	/**
 	 * Sets the password of the customer item.
 	 *
-	 * @param string $value password of the customer item
+	 * @param string $value Password of the customer item
 	 */
 	public function setPassword( $value );
+
+	/**
+	 * Returns the last verification date of the customer.
+	 *
+	 * @return string|null Last verification date of the customer (YYYY-MM-DD format) or null if unknown
+	 */
+	public function getDateVerified();
+
+	/**
+	 * Sets the latest verification date of the customer.
+	 *
+	 * @param string|null $value Latest verification date of the customer (YYYY-MM-DD format) or null if unknown
+	 */
+	public function setDateVerified( $value );
 }

@@ -12,7 +12,7 @@ class MW_Logger_DBTest extends MW_Unittest_Testcase
 	 * @var    MW_Logger_DB
 	 * @access protected
 	 */
-	protected $_object;
+	private $_object;
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -22,12 +22,12 @@ class MW_Logger_DBTest extends MW_Unittest_Testcase
 	 */
 	protected function setUp()
 	{
-		if( MW_TestHelper::getConfig()->get( 'resource/db/adapter', false ) === false ) {
+		if( TestHelper::getConfig()->get( 'resource/db/adapter', false ) === false ) {
 			$this->markTestSkipped( 'No database configured' );
 		}
 
 
-		$this->_dbm = MW_TestHelper::getDBManager();
+		$this->_dbm = TestHelper::getDBManager();
 
 		$conn = $this->_dbm->acquire();
 

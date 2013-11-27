@@ -3,7 +3,6 @@
 /**
  * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
  * @license LGPLv3, http://www.arcavias.com/en/license
- * @version $Id: ProductAddTestData.php 1365 2012-10-31 13:54:32Z doleiynyk $
  */
 
 
@@ -20,7 +19,7 @@ class MW_Setup_Task_ProductAddTestData extends MW_Setup_Task_Abstract
 	 */
 	public function getPreDependencies()
 	{
-		return array( 'LocaleAddTestData', 'MediaListAddTestData', 'PriceListAddTestData' );
+		return array( 'LocaleAddTestData' );
 	}
 
 

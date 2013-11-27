@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Controller
  * @subpackage ExtJS
- * @version $Id: Default.php 14602 2011-12-27 15:27:08Z gwussow $
  */
 
 
@@ -149,22 +148,15 @@ class Controller_ExtJS_Attribute_Import_Text_Default
 	 */
 	protected function _importFile( $path )
 	{
-		$type = PHPExcel_IOFactory::identify( $path );
-		$reader = PHPExcel_IOFactory::createReader( $type );
-		$reader->setReadDataOnly( true );
-		$phpExcel = $reader->load( $path );
+		$container = $this->_createContainer( $path, 'controller/extjs/attribute/import/text/default/container' );
 
 		$textTypeMap = array();
 		foreach( $this->_getTextTypes( 'attribute' ) as $item ) {
 			$textTypeMap[ $item->getCode() ] = $item->getId();
 		}
 
-		$manager = MShop_Attribute_Manager_Factory::createManager( $this->_getContext() );
-
-		foreach( $phpExcel->getWorksheetIterator() as $sheet )
-		{
-			$itemTextMap = $this->_importTextsFromXLS( $sheet, $textTypeMap, 'attribute' );
-			$this->_importReferences( $manager, $itemTextMap, 'attribute' );
+		foreach( $container as $content ) {
+			$itemTextMap = $this->_importTextsFromContent( $content, $textTypeMap, 'attribute' );
 		}
 	}
 }

@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MW
  * @subpackage View
- * @version $Id: NavTree.php 1338 2012-10-25 17:03:37Z nsendetzky $
  */
 
 
@@ -22,6 +21,7 @@ class MW_View_Helper_NavTree_Default
 	private $_target;
 	private $_controller;
 	private $_action;
+	private $_encoder;
 
 
 	/**
@@ -36,6 +36,8 @@ class MW_View_Helper_NavTree_Default
 		$this->_target = $view->config( 'client/html/catalog/list/url/target' );
 		$this->_controller = $view->config( 'client/html/catalog/list/url/controller', 'catalog' );
 		$this->_action = $view->config( 'client/html/catalog/list/url/action', 'list' );
+
+		$this->_encoder = $view->encoder();
 	}
 
 
@@ -43,29 +45,36 @@ class MW_View_Helper_NavTree_Default
 	 * Returns the HTML for the navigation tree.
 	 *
 	 * @param MShop_Catalog_Item_Interface $item Catalog item with child nodes
+	 * @param array Associative list of catalog IDs as keys and catalog nodes as values
 	 * @return string Rendered HTML of the navigation tree
 	 */
-	public function transform( MShop_Catalog_Item_Interface $item )
+	public function transform( MShop_Catalog_Item_Interface $item, array $path )
 	{
 		if( $item->getStatus() <= 0 ) {
 			return '';
 		}
 
 		$id = $item->getId();
+		$enc = $this->_encoder;
 		$config = $item->getConfig();
-		$trailing = array( $item->getname() );
+
 		$class = ( $item->hasChildren() ? ' withchild' : ' nochild' );
+		$class .= ( isset( $path[ $item->getId() ] ) ? ' active' : '' );
 		$class .= ( isset( $config['css-class'] ) ? ' ' . $config['css-class'] : '' );
-		$url = $this->url( $this->_target, $this->_controller, $this->_action, array( 'f-catalog-id' => $id ), $trailing );
 
-		$output = '<li class="catid-' . $id . $class . '"><a href="' . $url . '">' . $item->getName() . '</a>';
+		$params = array( 'a-name' => str_replace( ' ', '-', $item->getName() ), 'f-catalog-id' => $id );
+		$url = $enc->attr( $this->url( $this->_target, $this->_controller, $this->_action, $params ) );
 
-		if( $item->hasChildren() )
+		$output = '<li class="catid-' . $enc->attr( $id . $class ) . '"><a href="' . $url . '">' . $enc->html( $item->getName() ) . '</a>';
+
+		$children = $item->getChildren();
+
+		if( !empty( $children ) )
 		{
-			$output .= '<ul class="level-' . ( $item->getNode()->level + 1 ) . '">';
+			$output .= '<ul class="level-' . $enc->attr( $item->getNode()->level + 1 ) . '">';
 
-			foreach( $item->getChildren() as $child ) {
-				$output .= $this->transform( $child );
+			foreach( $children as $child ) {
+				$output .= $this->transform( $child, $path );
 			}
 
 			$output .= '</ul>';

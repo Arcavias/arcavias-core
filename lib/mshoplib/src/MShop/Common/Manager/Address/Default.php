@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Common
- * @version $Id: Default.php 14682 2012-01-04 11:30:14Z nsendetzky $
  */
 
 
@@ -31,7 +30,7 @@ class MShop_Common_Manager_Address_Default
 	 * @param MShop_Context_Interface $_context Context object with required objects
 	 */
 	public function __construct( MShop_Context_Item_Interface $context,
-		array $config = array( ), array $searchConfig = array( ) )
+		array $config = array(), array $searchConfig = array() )
 	{
 		$whitelist = array( 'delete', 'insert', 'update', 'search', 'count', 'newid' );
 		$isList = array_keys( $config );
@@ -93,28 +92,13 @@ class MShop_Common_Manager_Address_Default
 
 
 	/**
-	 * Deletes a common address item object.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Unique common address ID referencing an existing address
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_context->getDatabaseManager();
-		$conn = $dbm->acquire();
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, $this->_prefix . 'delete', $this->_config['delete']);
-			$stmt->bind( 1, $id, MW_DB_Statement_Abstract::PARAM_INT );
-			$result = $stmt->execute()->finish();
-
-			$dbm->release( $conn );
-		}
-		catch ( Exception $e )
-		{
-			$dbm->release( $conn );
-			throw $e;
-		}
+		$this->_deleteItems( $ids, $this->_config['delete'] );
 	}
 
 
@@ -122,6 +106,9 @@ class MShop_Common_Manager_Address_Default
 	 * Returns the common address item object specificed by its ID.
 	 *
 	 * @param integer $id Unique common address ID referencing an existing address
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Common_Item_Address_Interface Returns the address item of the given id
+	 * @throws MShop_Exception If address search configuration isn't available
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -234,8 +221,8 @@ class MShop_Common_Manager_Address_Default
 			}
 
 			$level = MShop_Locale_Manager_Abstract::SITE_ALL;
-			$cfgPathSearch = 'mshop/'. $topdomain . '/manager/' . implode('/', $domain) . '/default/item/search';
-			$cfgPathCount =  'mshop/'. $topdomain . '/manager/' . implode('/', $domain) . '/default/item/count';
+			$cfgPathSearch = $this->_config['search'];
+			$cfgPathCount =  $this->_config['count'];
 			$required = array( trim( $this->_prefix, '.' ) );
 
 			$results = $this->_searchItems( $conn, $search, $cfgPathSearch, $cfgPathCount, $required, $total, $level );

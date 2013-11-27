@@ -88,9 +88,9 @@ class MShop_Order_Manager_Base_Service_Default
 			'type' => 'decimal',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
 		),
-		'order.base.service.shipping' => array(
-			'code' => 'order.base.service.shipping',
-			'internalcode' => 'mordbase."shipping"',
+		'order.base.service.costs' => array(
+			'code' => 'order.base.service.costs',
+			'internalcode' => 'mordbase."costs"',
 			'label' => 'Order base service shipping',
 			'type' => 'decimal',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
@@ -200,7 +200,7 @@ class MShop_Order_Manager_Base_Service_Default
 			$stmt->bind(6, $item->getName(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(7, $item->getMediaUrl(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(8, $price->getValue(), MW_DB_Statement_Abstract::PARAM_STR);
-			$stmt->bind(9, $price->getShipping(), MW_DB_Statement_Abstract::PARAM_STR);
+			$stmt->bind(9, $price->getCosts(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(10, $price->getRebate(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(11, $price->getTaxRate(), MW_DB_Statement_Abstract::PARAM_STR);
 			$stmt->bind(12, date('Y-m-d H:i:s', time()), MW_DB_Statement_Abstract::PARAM_STR);
@@ -235,28 +235,14 @@ class MShop_Order_Manager_Base_Service_Default
 
 
 	/**
-	 * Deletes an existing order service item from the storage.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $serviceId Unique order service ID
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $serviceId )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire( $this->_dbname );
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/order/manager/base/service/default/item/delete');
-			$stmt->bind(1, $serviceId);
-			$stmt->execute()->finish();
-
-			$dbm->release( $conn, $this->_dbname );
-		}
-		catch ( Exception $e )
-		{
-			$dbm->release( $conn, $this->_dbname );
-			throw $e;
-		}
+		$path = 'mshop/order/manager/base/service/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -264,7 +250,9 @@ class MShop_Order_Manager_Base_Service_Default
 	 * Returns the order service item object for the given ID.
 	 *
 	 * @param integer $id Order service ID
-	 * @return MShop_Order_Item_Base_Service_Interface Order service item
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Order_Item_Base_Service_Interface Returns order base service item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -307,7 +295,7 @@ class MShop_Order_Manager_Base_Service_Default
 					$price = $priceManager->createItem();
 					$price->setValue($row['price']);
 					$price->setRebate($row['rebate']);
-					$price->setShipping($row['shipping']);
+					$price->setCosts($row['costs']);
 					$price->setTaxRate($row['taxrate']);
 					$items[ $row['id'] ] = array( 'price' => $price, 'item' => $row );
 				}

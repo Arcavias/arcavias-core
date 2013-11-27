@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package Client
  * @subpackage Html
- * @version $Id: Factory.php 1320 2012-10-19 19:57:38Z nsendetzky $
  */
 
 
@@ -37,7 +36,7 @@ class Client_Html_Catalog_Detail_Factory
 		if( ctype_alnum( $name ) === false )
 		{
 			$classname = is_string( $name ) ? 'Client_Html_Catalog_Detail_' . $name : '<not a string>';
-			throw new Client_Html_Exception( sprintf( 'Invalid class name "%1$s"', $classname ) );
+			throw new Client_Html_Exception( sprintf( 'Invalid characters in class name "%1$s"', $classname ) );
 		}
 
 		$iface = 'Client_Html_Interface';

@@ -1,7 +1,6 @@
 /*!
  * Copyright (c) Metaways Infosystems GmbH, 2011
  * LGPLv3, http://www.arcavias.com/en/license
- * $Id: OrderItemUi.js 14263 2011-12-11 16:36:17Z nsendetzky $
  */
 
 
@@ -53,8 +52,8 @@ MShop.panel.order.OrderUi = Ext.extend(Ext.FormPanel, {
 				name : 'order.base.price'
 			}, {
 				xtype : 'displayfield',
-				fieldLabel : _('Shipping'),
-				name : 'order.base.shipping'
+				fieldLabel : _('Costs'),
+				name : 'order.base.costs'
 			}, {
 				xtype : 'displayfield',
 				fieldLabel : _('Comment'),

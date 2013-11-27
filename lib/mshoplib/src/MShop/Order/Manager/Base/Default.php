@@ -5,7 +5,6 @@
  * @license LGPLv3, http://www.arcavias.com/en/license
  * @package MShop
  * @subpackage Order
- * @version $Id: Default.php 14854 2012-01-13 12:54:14Z doleiynyk $
  */
 
 
@@ -72,9 +71,9 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 			'type'=> 'string',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_STR,
 		),
-		'order.base.shipping'=> array(
-			'code'=>'order.base.shipping',
-			'internalcode'=>'mordba."shipping"',
+		'order.base.costs'=> array(
+			'code'=>'order.base.costs',
+			'internalcode'=>'mordba."costs"',
 			'label'=>'Order base shipping amount',
 			'type'=> 'string',
 			'internaltype'=> MW_DB_Statement_Abstract::PARAM_STR,
@@ -160,28 +159,14 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 
 
 	/**
-	 * Deletes an order including its subelements (addresses, delivery, payment, products, coupons) completely.
+	 * Removes multiple items specified by ids in the array.
 	 *
-	 * @param integer $id Id of the order base
+	 * @param array $ids List of IDs
 	 */
-	public function deleteItem( $id )
+	public function deleteItems( array $ids )
 	{
-		$dbm = $this->_getContext()->getDatabaseManager();
-		$conn = $dbm->acquire( $this->_dbname );
-
-		try
-		{
-			$stmt = $this->_getCachedStatement($conn, 'mshop/order/manager/base/default/item/delete');
-			$stmt->bind(1, $id, MW_DB_Statement_Abstract::PARAM_INT);
-			$result = $stmt->execute()->finish();
-
-			$dbm->release( $conn, $this->_dbname );
-		}
-		catch( Exception $e )
-		{
-			$dbm->release( $conn, $this->_dbname );
-			throw $e;
-		}
+		$path = 'mshop/order/manager/base/default/item/delete';
+		$this->_deleteItems( $ids, $this->_getContext()->getConfig()->get( $path, $path ) );
 	}
 
 
@@ -189,7 +174,9 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 	 * Returns the order base item specified by the given ID.
 	 *
 	 * @param integer $id Unique id of the order base
-	 * @return MShop_Order_Item_Base_Interface Order base object including all subelements
+	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @return MShop_Order_Item_Base_Interface Returns Order base item of the given id
+	 * @throws MShop_Exception If item couldn't be found
 	 */
 	public function getItem( $id, array $ref = array() )
 	{
@@ -276,7 +263,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 			$stmt->bind(4, $item->getLocale()->getLanguageId());
 			$stmt->bind(5, $priceItem->getCurrencyId());
 			$stmt->bind(6, $priceItem->getValue());
-			$stmt->bind(7, $priceItem->getShipping());
+			$stmt->bind(7, $priceItem->getCosts());
 			$stmt->bind(8, $priceItem->getRebate());
 			$stmt->bind(9, $item->getComment() );
 			$stmt->bind(10, $item->getStatus() );
@@ -347,7 +334,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 				$price = $priceManager->createItem();
 				$price->setCurrencyId( $row['currencyid'] );
 				$price->setValue( $row['price'] );
-				$price->setShipping( $row['shipping'] );
+				$price->setCosts( $row['costs'] );
 				$price->setRebate( $row['rebate'] );
 
 				// you may need the site object! take care!
@@ -506,7 +493,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 		$price = $priceManager->createItem();
 		$price->setCurrencyId( $row['currencyid'] );
 		$price->setValue( $row['price'] );
-		$price->setShipping( $row['shipping'] );
+		$price->setCosts( $row['costs'] );
 		$price->setRebate( $row['rebate'] );
 
 		// you may need the site object! take care!
