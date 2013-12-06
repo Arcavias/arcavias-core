@@ -22,6 +22,13 @@ setlocale(LC_NUMERIC, 'POSIX');
 setlocale(LC_CTYPE, 'en_US.UTF-8');
 setlocale(LC_TIME, 'POSIX');
 
+/*
+ * Set include path for tests
+ */
+$ds = DIRECTORY_SEPARATOR;
+$mwlibdir =  dirname( dirname( dirname( __FILE__ ) ) ) . $ds . 'mwlib' . $ds . 'lib';
+set_include_path( get_include_path() . PATH_SEPARATOR . $mwlibdir );
+
 
 require_once 'TestHelper.php';
 TestHelper::bootstrap();
