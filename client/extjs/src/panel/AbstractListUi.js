@@ -400,8 +400,12 @@ MShop.panel.AbstractListUi = Ext.extend(Ext.Panel, {
 	},
 
 	typeColumnRenderer : function( typeId, metaData, record, rowIndex, colIndex, store, typeStore, displayField ) {
-		var type = typeStore.getById(typeId);
-		return type ? type.get(displayField) : typeId;
+		var type = [];
+		if(typeStore != null) {
+			type = typeStore.getById(typeId);
+			return type ? type.get(displayField) : typeId;
+		}
+		return typeId;
 	},
 
 	statusColumnRenderer : function(status, metaData) {

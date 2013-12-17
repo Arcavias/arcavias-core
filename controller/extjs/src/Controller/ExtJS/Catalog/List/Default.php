@@ -104,6 +104,8 @@ class Controller_ExtJS_Catalog_List_Default
 	{
 		$this->_checkParams( $params, array( 'site' ) );
 		$this->_setLocale( $params->site );
+		
+		$loadParents = ( isset( $params->condition->parents ) ) ? $params->condition->parents : array();
 
 		$totalList = 0;
 		$search = $this->_initCriteria( $this->_getManager()->createSearch(), $params );
@@ -111,11 +113,17 @@ class Controller_ExtJS_Catalog_List_Default
 
 		$idLists = array();
 		$listItems = array();
-
+		$parents = array();
+		
 		foreach( $result as $item )
 		{
-			if( ( $domain = $item->getDomain() ) != '' ) {
+			if( ( $domain = $item->getDomain() ) != '' )
+			{
 				$idLists[ $domain ][] = $item->getRefId();
+				
+				if( $loadParents ) {
+					$parents['catalog'][] = $item->getParentId();
+				}
 			}
 			$listItems[] = (object) $item->toArray();
 		}
@@ -123,7 +131,7 @@ class Controller_ExtJS_Catalog_List_Default
 		return array(
 			'items' => $listItems,
 			'total' => $totalList,
-			'graph' => $this->_getDomainItems( $idLists ),
+			'graph' => $this->_getDomainItems( $idLists, $parents ),
 			'success' => true,
 		);
 	}

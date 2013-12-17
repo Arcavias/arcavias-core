@@ -47,6 +47,9 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 	 * @cfg {Object} gridConfig (optional)
 	 */
 	gridConfig: null,
+	
+	
+	grid: null,
 
 	/**
 	 * @cfg {String} parentIdProperty (required)
@@ -62,6 +65,12 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 	 * @cfg {String} parentRefIdProperty (required)
 	 */
 	parentRefIdProperty: null,
+	
+	/**
+	 * 
+	 * @cfg {Object} stores ParentItems
+	 */
+	parentStore: null,
 
 	layout: 'fit',
 
@@ -71,10 +80,10 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 
 		this.listTypeStore = MShop.GlobalStoreMgr.get( this.recordName + '_Type', 'Product' );
 		this.productTypeStore = MShop.GlobalStoreMgr.get( 'Product_Type', 'Product' );
-
+		
 		MShop.panel.AbstractUsedByListUi.superclass.initComponent.call( this );
 	},
-
+	
 	initStore: function()
 	{
 		this.store = new Ext.data.DirectStore( Ext.apply( {
@@ -96,9 +105,14 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 			root: 'items',
 			totalProperty: 'total',
 			idProperty: this.idProperty,
+			baseParams: {
+				start: 0,
+				limit: 50
+			},
 			sortInfo: this.sortInfo
 		}, this.storeConfig ) );
-
+		
+		this.store.on( 'load', this.onLoaded, this );
 		this.store.on( 'beforeload', this.onBeforeLoad, this );
 		this.store.on( 'exception', this.onStoreException, this );
 		this.store.on( 'beforewrite', this.onBeforeWrite, this );
@@ -115,13 +129,22 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 		if ( !this.store.autoLoad ) {
 			this.store.load();
 		}
-
-		this.grid = new Ext.grid.GridPanel( Ext.apply( {
+		
+		colModel = new Ext.grid.ColumnModel(
+			this.getColumns()
+		);
+		
+		this.grid = new Ext.grid.GridPanel( {
 			border: false,
+			loadMask: true,
 			store: this.store,
 			autoExpandColumn: this.autoExpandColumn,
-			columns: this.getColumns()
-		}, this.gridConfig ) );
+			cm: colModel,
+			bbar: {
+				xtype: 'MShop.elements.pagingtoolbar',
+				store: this.store
+			}
+		} );
 
 		this.grid.on( 'rowdblclick', this.onOpenEditWindow.createDelegate( this, ['edit']), this );
 		this.add( this.grid );
@@ -151,11 +174,9 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 				 	'==' : domainFilter
 				}, {
 					'==' : refIdFilter
-			} ]
+			} ],
+			'parents': true
 		};
-		
-		options.params.start = 0;
-		options.params.limit = 0x7fffffff;
 	},
 
 	onBeforeWrite: function( store, action, records, options )
@@ -166,12 +187,80 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 			this.setDomainProperty( store, action, records, options );
 		}
 	},
+		
+	onLoaded: function( store, records, options)
+	{
+		this.parentStore = this.getParentStore();
+		
+		colModel = new Ext.grid.ColumnModel(
+			this.getColumns()
+		);
+		
+		this.grid.reconfigure(this.store, colModel);
+		this.doLayout();
+	},
+	
+	getParentStore: function()
+	{
+		var recordName = this.parentItemRecordName,
+		idProperty = this.parentItemIdProperty,
+		data = { items : [], total : 0 };
+
+		if( this.store.reader.jsonData &&
+			this.store.reader.jsonData.graph &&
+			this.store.reader.jsonData.graph[recordName] &&
+			this.store.reader.jsonData.graph[recordName]['parentitems'])
+		{
+			data = this.store.reader.jsonData.graph[recordName]['parentitems'];
+		}
+
+		this.parentStore = new Ext.data.DirectStore( {
+			autoLoad : false,
+			remoteSort : false,
+			hasMultiSort : true,
+			fields : MShop.Schema.getRecord(recordName),
+			api: {
+                read    : MShop.API[recordName].searchItems,
+                create  : MShop.API[recordName].saveItems,
+                update  : MShop.API[recordName].saveItems,
+                destroy : MShop.API[recordName].deleteItems
+            },
+            writer: new Ext.data.JsonWriter({
+                writeAllFields: true,
+                encode: false
+            }),
+            paramsAsHash: true,
+			totalProperty : 'total',
+			idProperty : idProperty,
+			data : data,
+			baseParams: {
+                site: MShop.config.site["locale.site.code"]
+            },
+            listeners: {
+            	'reload' : {
+            		fn: function(listUi, parentStore) {
+            			listUi.parentStore = parentStore;
+		
+						colModel = new Ext.grid.ColumnModel(
+							listUi.getColumns()
+						);
+						
+						listUi.grid.reconfigure(listUi.store, colModel);
+						listUi.doLayout();
+            		}
+            	}
+            }
+		});
+		
+		return this.parentStore;
+	},
 
 	onDestroy: function()
 	{
 		this.store.un( 'beforeload', this.onBeforeLoad, this );
 		this.store.un( 'beforewrite', this.onBeforeWrite, this );
 		this.store.un( 'exception', this.onStoreException, this );
+		this.store.un( 'load', this.onLoaded, this );
 
 		MShop.panel.AbstractUsedByListUi.superclass.onDestroy.apply( this, arguments );
 	},
@@ -218,16 +307,19 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 			record.data[this.domainProperty] = this.domain;
 		}, this );
 	},
-
+	
 	onOpenEditWindow: function( action ) {
 		var record = this.grid.getSelectionModel().getSelected();
-		var parentRecord = this.ParentItemUi.store.getById( record.data[this.parentIdProperty] );
+		var parentRecord = this.parentStore.getById( record.data[this.parentIdProperty] );
 
+		this.parentStore.reader.meta.root = 'items';
+		delete this.parentStore.reader.ef;
+		
 		var itemUi = Ext.ComponentMgr.create( {
 			xtype: this.itemUiXType,
 			domain: this.domain,
 			record: action === 'add' ? null : parentRecord,
-			store: this.ParentItemUi.store,
+			store: this.parentStore,
 			listUI: this
 		} );
 
@@ -235,24 +327,30 @@ MShop.panel.AbstractUsedByListUi = Ext.extend( Ext.Panel, {
 	},
 
 	listTypeColumnRenderer : function( listTypeId, metaData, record, rowIndex, colIndex, store, listTypeStore, displayField ) {
-
-		var list = listTypeStore.getById( listTypeId );
-
-		return list ? list.get( displayField ) : listTypeId;
+		var list = [];
+		if(listTypeStore != null ) {
+			list = listTypeStore.getById( listTypeId );
+			return list ? list.get( displayField ) : listTypeId;
+		}
+		return listTypeId;
 	},
 
 	statusColumnRenderer : function( listTypeId, metaData, record, rowIndex, colIndex, store, listTypeStore, displayField ) {
-
-		var list = listTypeStore.getById( listTypeId );
-
-	    metaData.css = 'statusicon-' + ( list ? Number( list.get( displayField ) ) : 0 );
+		var list = [];
+		if(listTypeStore != null ) {
+			list = listTypeStore.getById( listTypeId );
+			metaData.css = 'statusicon-' + ( list ? Number( list.get( displayField ) ) : 0 );
+		}
 	},
 
 	productTypeColumnRenderer : function( typeId, metaData, record, rowIndex, colIndex, store, typeStore, productTypeStore, prodctId, displayField ) {
-
-		var type = typeStore.getById( typeId );
-		var productType = productTypeStore.getById( type.data[prodctId] );
-
-		return productType ? productType.get( displayField ) : typeId;
+		var type = [];
+		if(typeStore != null ) {
+			type = typeStore.getById( typeId );
+			var productType = productTypeStore.getById( type.data[prodctId] );
+		
+			return productType ? productType.get( displayField ) : typeId;
+		}
+		return typeId;
 	}
 });

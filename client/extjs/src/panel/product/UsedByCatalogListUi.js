@@ -12,6 +12,8 @@ MShop.panel.product.UsedByCatalogListUi = Ext.extend( MShop.panel.AbstractUsedBy
 	idProperty : 'catalog.list.id',
 	siteidProperty : 'catalog.list.siteid',
 	itemUiXType : 'MShop.panel.catalog.itemui',
+	parentItemRecordName: 'Catalog',
+	parentItemIdProperty: 'catalog.id',
 
 	autoExpandColumn : 'catalog-list-autoexpand-column',
 
@@ -27,25 +29,26 @@ MShop.panel.product.UsedByCatalogListUi = Ext.extend( MShop.panel.AbstractUsedBy
 	initComponent : function()
 	{
 		MShop.panel.product.UsedByCatalogListUi.superclass.initComponent.call( this );
-
 		this.title = _( 'Category' );
-
-		this.catalogStore = MShop.GlobalStoreMgr.get( 'Catalog' );
 	},
-
+	
 	onOpenEditWindow: function( action ) {
 		var record = this.grid.getSelectionModel().getSelected();
-		var parentRecord = this.catalogStore.getById( record.data[this.parentIdProperty] );
+		var parentRecord = this.parentStore.getById( record.data[this.parentIdProperty] );
 
+		parentRecord.data['id'] = parentRecord.data['catalog.id'];
 		parentRecord.data['status'] = parentRecord.data['catalog.status'];
 		parentRecord.data['label'] = parentRecord.data['catalog.label'];
 		parentRecord.data['code'] = parentRecord.data['catalog.code'];
 
+		this.parentStore.reader.meta.root = 'items';
+		delete this.parentStore.reader.ef;
+		
 		var itemUi = Ext.ComponentMgr.create( {
 			xtype: this.itemUiXType,
 			domain: this.domain,
 			record: action === 'add' ? null : parentRecord,
-			store: this.catalogStore,
+			store: this.parentStore,
 			listUI: this
 		} );
 
@@ -125,14 +128,14 @@ MShop.panel.product.UsedByCatalogListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				header : _( 'Status' ),
 				sortable : false,
 				width : 50,
-				renderer : this.statusColumnRenderer.createDelegate(this, [this.catalogStore, "catalog.status" ], true)
+				renderer : this.statusColumnRenderer.createDelegate(this, [this.parentStore, "catalog.status" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'catalog.list.parentid',
 				header : _( 'Category code' ),
 				sortable : false,
 				width : 100,
-				renderer : this.listTypeColumnRenderer.createDelegate(this, [this.catalogStore, "catalog.code" ], true)
+				renderer : this.listTypeColumnRenderer.createDelegate(this, [this.parentStore, "catalog.code" ], true)
 			}, {
 				xtype : 'gridcolumn',
 				dataIndex : 'catalog.list.parentid',
@@ -140,7 +143,7 @@ MShop.panel.product.UsedByCatalogListUi = Ext.extend( MShop.panel.AbstractUsedBy
 				sortable : false,
 				width : 100,
 				id : 'catalog-list-autoexpand-column',
-				renderer : this.listTypeColumnRenderer.createDelegate(this, [this.catalogStore, "catalog.label" ], true)
+				renderer : this.listTypeColumnRenderer.createDelegate(this, [this.parentStore, "catalog.label" ], true)
 			}
 		];
 	}
