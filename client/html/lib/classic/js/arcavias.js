@@ -114,35 +114,36 @@ jQuery(document).ready( function($) {
 	});
 
 
-	/* Autocompleter for quick search */
+	/* Autocompleter for quick search if is available */
 	var arcaviasInputComplete = $( ".catalog-filter-search .value" );
-	arcaviasInputComplete.autocomplete( {
-		minLength: 3,
-		delay: 200,
-		source: function( req, add ) {
-			var nameTerm = {};
-			nameTerm[arcaviasInputComplete.attr( "name" )] = req.term;
+	if (arcaviasInputComplete.is("input")) {
+		arcaviasInputComplete.autocomplete( {
+			minLength: 3,
+			delay: 200,
+			source: function( req, add ) {
+				var nameTerm = {};
+				nameTerm[arcaviasInputComplete.attr( "name" )] = req.term;
 
-			$.getJSON(
-				arcaviasInputComplete.data( "url" ),
-				nameTerm,
-				function( data ) {
-					var suggestions = [];
+				$.getJSON(
+					arcaviasInputComplete.data( "url" ),
+					nameTerm,
+					function( data ) {
+						var suggestions = [];
 
-					$.each( data, function( i, val ) {
-						suggestions.push( val.name );
-					} );
-			
-					add( suggestions );
-				}
-			);
-		},
-		select: function(event, ui) {
-			arcaviasInputComplete.val( ui.item.value );
-			$(event.target).parents(".catalog-filter form").submit();
-		}
-	} );
+						$.each( data, function( i, val ) {
+							suggestions.push( val.name );
+						} );
 
+						add( suggestions );
+					}
+				);
+			},
+			select: function(event, ui) {
+				arcaviasInputComplete.val( ui.item.value );
+				$(event.target).parents(".catalog-filter form").submit();
+			}
+		} );
+	}
 
 	/* Lazy product image loading in list view */
 	arcaviasLazyLoader();
