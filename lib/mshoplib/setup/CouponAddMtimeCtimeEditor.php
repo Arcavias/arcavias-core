@@ -58,7 +58,7 @@ class MW_Setup_Task_CouponAddMtimeCtimeEditor extends MW_Setup_Task_Abstract
 	 */
 	public function getPreDependencies()
 	{
-		return array( 'DiscountMoveTablesAndColumesToCoupon', 'OrderRenameTables' );
+		return array( 'OrderRenameTables' );
 	}
 
 
@@ -69,7 +69,7 @@ class MW_Setup_Task_CouponAddMtimeCtimeEditor extends MW_Setup_Task_Abstract
 	 */
 	public function getPostDependencies()
 	{
-		return array( 'TablesCreateMShop' );
+		return array( 'TablesCreateCoupon' );
 	}
 
 

@@ -38,7 +38,7 @@ class MW_Setup_Task_CouponModifyIndexes extends MW_Setup_Task_Abstract
 	 */
 	public function getPreDependencies()
 	{
-		return array( 'DiscountMoveTablesAndColumesToCoupon' );
+		return array();
 	}
 
 
@@ -49,7 +49,7 @@ class MW_Setup_Task_CouponModifyIndexes extends MW_Setup_Task_Abstract
 	 */
 	public function getPostDependencies()
 	{
-		return array( 'TablesCreateMShop' );
+		return array( 'TablesCreateCoupon' );
 	}
 
 

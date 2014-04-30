@@ -31,11 +31,11 @@ class MShop_Coupon_Provider_FreeShipping
 
 		$config = $this->_getItem()->getConfig();
 
-		if( !isset( $config['freeshipping.productcode'] ) )
+		if( !isset( $config['product'] ) )
 		{
 			throw new MShop_Coupon_Exception( sprintf(
 				'Invalid configuration for coupon provider "%1$s", needs "%2$s"',
-				$this->_getItem()->getProvider(), 'freeshipping.productcode'
+				$this->_getItem()->getProvider(), 'product'
 			) );
 		}
 
@@ -43,7 +43,7 @@ class MShop_Coupon_Provider_FreeShipping
 		$price->setRebate( $price->getCosts() );
 		$price->setCosts( -$price->getCosts() );
 
-		$orderProduct = $this->_createProduct( $config['freeshipping.productcode'], 1 );
+		$orderProduct = $this->_createProduct( $config['product'], 1 );
 		$orderProduct->setPrice( $price );
 
 		$base->addCoupon( $this->_getCode(), array( $orderProduct ) );

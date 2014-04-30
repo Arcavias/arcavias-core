@@ -44,8 +44,9 @@ class MShop_Plugin_Provider_Order_CouponTest extends MW_Unittest_Testcase
 		$this->_plugin->setProvider( 'Coupon' );
 		$this->_plugin->setStatus( 1 );
 
-		$priceItem = MShop_Price_Manager_Factory::createManager( $context )->createItem();
-		$this->_order = new MShop_Order_Item_Base_Default( $priceItem, $context->getLocale() );
+		$orderManager = MShop_Order_Manager_Factory::createManager( $context );
+		$orderBaseManager = $orderManager->getSubManager('base');
+		$this->_order = $orderBaseManager->createItem();
 	}
 
 
@@ -57,39 +58,23 @@ class MShop_Plugin_Provider_Order_CouponTest extends MW_Unittest_Testcase
 	 */
 	protected function tearDown()
 	{
-		unset( $this->_plugin );
 		unset( $this->_order );
-
 		MShop_Factory::clear();
 	}
 
 
 	public function testRegister()
 	{
-		$object = new MShop_Plugin_Provider_Order_Coupon( TestHelper::getContext(), $this->_plugin );
+		$object = new MShop_Plugin_Provider_Order_Coupon(TestHelper::getContext(), $this->_plugin );
 		$object->register( $this->_order );
 	}
 
 
 	public function testUpdate()
 	{
-		$this->_order->addCoupon( 'OPQR', array() );
-		$object = new MShop_Plugin_Provider_Order_Coupon( TestHelper::getContext(), $this->_plugin );
-
-		$this->assertTrue( $object->update( $this->_order, 'test' ) );
+		// Remove the following lines when you implement this test.
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
 	}
-
-
-	public function testUpdateInvalidObject()
-	{
-		$object = new MShop_Plugin_Provider_Order_Coupon( TestHelper::getContext(), $this->_plugin );
-
-		$this->setExpectedException( 'MShop_Plugin_Exception' );
-		$object->update( new MShop_Publisher_Test(), 'test' );
-	}
-}
-
-
-class MShop_Publisher_Test extends MW_Observer_Publisher_Abstract
-{
 }

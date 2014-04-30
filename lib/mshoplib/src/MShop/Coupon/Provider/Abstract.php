@@ -47,7 +47,7 @@ abstract class MShop_Coupon_Provider_Abstract
 
 		$this->deleteCoupon( $base );
 
-		if( $this->_getObject()->isAvailable( $base ) !== false ) {
+		if( $this->_checkConstraints( $base, $config ) !== false ) {
 			$this->addCoupon( $base );
 		}
 	}

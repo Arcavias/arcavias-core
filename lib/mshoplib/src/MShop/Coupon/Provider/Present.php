@@ -31,15 +31,15 @@ class MShop_Coupon_Provider_Present
 
 		$config = $this->_getItem()->getConfig();
 
-		if( !isset( $config['present.productcode'] ) || !isset( $config['present.quantity']) )
+		if( !isset( $config['product'] ) || !isset( $config['quantity']) )
 		{
 			throw new MShop_Coupon_Exception( sprintf(
 				'Invalid configuration for coupon provider "%1$s", needs "%2$s"',
-				$this->_getItem()->getProvider(), 'present.productcode, present.quantity'
+				$this->_getItem()->getProvider(), 'product, quantity'
 			) );
 		}
 
-		$orderProduct = $this->_createProduct( $config['present.productcode'], $config['present.quantity'] );
+		$orderProduct = $this->_createProduct( $config['product'], $config['quantity'] );
 
 		$base->addCoupon( $this->_getCode(), array( $orderProduct ) );
 	}

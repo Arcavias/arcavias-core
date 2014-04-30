@@ -12,7 +12,7 @@ MShop.panel.coupon.ConfigUi = Ext.extend(Ext.grid.EditorGridPanel, {
 	autoExpandColumn : 'coupon-config-value',
 
 	initComponent: function() {
-		this.title = MShop.I18n.dt( 'client/extjs', 'Configuration' );
+		this.title = _('Configuration');
 		this.colModel = this.getColumnModel();
 		this.tbar = this.getToolBar();
 		this.store = this.getStore();
@@ -33,13 +33,13 @@ MShop.panel.coupon.ConfigUi = Ext.extend(Ext.grid.EditorGridPanel, {
 		var that = this;
 		return new Ext.Toolbar([
 			{
-				text: MShop.I18n.dt( 'client/extjs', 'Add' ),
+				text: _('Add'),
 				handler: function () {
 					that.store.insert(0, new that.record({name: '', value: ''}));
 				}
 			},
 			{
-				text: MShop.I18n.dt( 'client/extjs', 'Delete' ),
+				text: _('Delete'),
 				handler: function () {
 					var selection = that.getSelectionModel().getSelections()[0];
 					if (selection) {
@@ -59,8 +59,8 @@ MShop.panel.coupon.ConfigUi = Ext.extend(Ext.grid.EditorGridPanel, {
 		return new Ext.grid.ColumnModel({
 			defaults: { width: 250, sortable: true },
 			columns: [
-				{header: MShop.I18n.dt( 'client/extjs', 'Name' ), dataIndex: 'name', editor: { xtype: 'textfield'}},
-				{header: MShop.I18n.dt( 'client/extjs', 'Value' ), dataIndex: 'value', editor: { xtype: 'textfield'}, id:'coupon-config-value'}
+				{header: _('Name'), dataIndex: 'name', editor: { xtype: 'textfield'}},
+				{header: _('Value'), dataIndex: 'value', editor: { xtype: 'textfield'}, id:'coupon-config-value'}
 			]
 		});
 	},

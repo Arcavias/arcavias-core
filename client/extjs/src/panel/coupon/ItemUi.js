@@ -14,7 +14,7 @@ MShop.panel.coupon.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 
 
 	initComponent : function() {
-		this.title = MShop.I18n.dt( 'client/extjs', 'Coupon item details' );
+		this.title = _('Coupon item details');
 
 		this.items = [ {
 			xtype : 'tabpanel',
@@ -24,7 +24,7 @@ MShop.panel.coupon.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 			coupons : [ 'ux.itemregistry' ],
 			items : [ {
 				xtype : 'panel',
-				title : MShop.I18n.dt( 'client/extjs', 'Basic' ),
+				title : _('Basic'),
 				border : false,
 				layout : 'hbox',
 				layoutConfig : {
@@ -51,48 +51,48 @@ MShop.panel.coupon.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 						},
 						items : [ {
 							xtype : 'displayfield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'ID' ),
+							fieldLabel : _( 'ID' ),
 							name : 'coupon.id'
 						}, {
 							xtype : 'MShop.elements.status.combo',
 							name : 'coupon.status'
 						}, {
 							xtype : 'textfield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'Provider' ),
+							fieldLabel : _('Provider'),
 							name : 'coupon.provider',
 							allowBlank : false,
 							maxLength : 255,
-							emptyText : MShop.I18n.dt( 'client/extjs', 'Name of the coupon provider class (required)' )
+							emptyText : _('Name of the coupon provider class (required)')
 						}, {
 							xtype : 'textfield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'Label' ),
+							fieldLabel : _('Label'),
 							name : 'coupon.label',
 							allowBlank : false,
 							maxLength : 255,
-							emptyText : MShop.I18n.dt( 'client/extjs', 'Internal name (required)' )
+							emptyText : _('Internal coupon name (required)')
 						}, {
 							xtype : 'datefield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'Start date'),
+							fieldLabel : _('Available from'),
 							name : 'coupon.datestart',
 							format : 'Y-m-d H:i:s',
-							emptyText : MShop.I18n.dt( 'client/extjs', 'YYYY-MM-DD hh:mm:ss (optional)' )
+							emptyText : _('YYYY-MM-DD hh:mm:ss (optional)')
 						}, {
 							xtype : 'datefield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'End date'),
+							fieldLabel : _('Available until'),
 							name : 'coupon.dateend',
 							format : 'Y-m-d H:i:s',
-							emptyText : MShop.I18n.dt( 'client/extjs', 'YYYY-MM-DD hh:mm:ss (optional)' )
+							emptyText : _('YYYY-MM-DD hh:mm:ss (optional)')
 						}, {
 							xtype : 'displayfield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'Created' ),
+							fieldLabel : _('Created'),
 							name : 'coupon.ctime'
 						}, {
 							xtype : 'displayfield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'Last modified' ),
+							fieldLabel : _('Last modified'),
 							name : 'coupon.mtime'
 						}, {
 							xtype : 'displayfield',
-							fieldLabel : MShop.I18n.dt( 'client/extjs', 'Editor' ),
+							fieldLabel : _('Editor'),
 							name : 'coupon.editor'
 						} ]
 					} ]
@@ -113,12 +113,11 @@ MShop.panel.coupon.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 
 	afterRender : function()
 	{
-		var label = this.record ? this.record.data['coupon.label'] : MShop.I18n.dt( 'client/extjs', 'new' );
-		//#: Coupon item panel title with coupon label ({0}) and site code ({1)}
-		var string = MShop.I18n.dt( 'client/extjs', 'Coupon: {0} ({1})' );
-		this.setTitle( String.format( string, label, MShop.config.site["locale.site.label"] ) );
+		var label = this.record ? this.record.data['coupon.label'] : 'new';
 
-		MShop.panel.coupon.ItemUi.superclass.afterRender.apply( this, arguments );
+		this.setTitle( 'Coupon: ' + label + ' (' + MShop.config.site["locale.site.label"] + ')' );
+
+		MShop.panel.product.ItemUi.superclass.afterRender.apply( this, arguments );
 	},
 
 
@@ -131,7 +130,7 @@ MShop.panel.coupon.ItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
 			Ext.each( first.data, function( item, index ) {
 				Ext.iterate( item, function( key, value, object ) {
 					if( ( key = key.trim() ) !== '' ) {
-						config[key] = (typeof value === "string") ? value.trim() : value;
+						config[key] = value;
 					}
 				}, this);
 			});
