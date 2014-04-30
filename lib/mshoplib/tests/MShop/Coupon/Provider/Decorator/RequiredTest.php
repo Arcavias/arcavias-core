@@ -1,19 +1,20 @@
 <?php
 
 /**
- * @copyright Copyright (c) Metaways Infosystems GmbH, 2012
+ * @copyright Copyright (c) Metaways Infosystems GmbH, 2014
  * @license LGPLv3, http://www.arcavias.com/en/license
  */
 
 
 /**
- * Test class for MShop_Coupon_Provider_Decorator_BasketValues.
+ * Test class for MShop_Coupon_Provider_Decorator_Required.
  */
-class MShop_Coupon_Provider_Decorator_BasketValuesTest extends PHPUnit_Framework_TestCase
+class MShop_Coupon_Provider_Decorator_RequiredTest extends PHPUnit_Framework_TestCase
 {
 	private $_object;
 	private $_orderBase;
 	private $_couponItem;
+
 
 	/**
 	 * Runs the test methods of this class.
@@ -25,9 +26,10 @@ class MShop_Coupon_Provider_Decorator_BasketValuesTest extends PHPUnit_Framework
 	{
 		require_once 'PHPUnit/TextUI/TestRunner.php';
 
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Coupon_Provider_Decorator_BasketValuesTest');
+		$suite  = new PHPUnit_Framework_TestSuite('MShop_Coupon_Provider_Decorator_RequiredTest');
 		$result = PHPUnit_TextUI_TestRunner::run($suite);
 	}
+
 
 	/**
 	 * Sets up the fixture, especially creates products.
@@ -38,12 +40,10 @@ class MShop_Coupon_Provider_Decorator_BasketValuesTest extends PHPUnit_Framework
 	protected function setUp()
 	{
 		$context = TestHelper::getContext();
-
-		$couponManager = MShop_Coupon_Manager_Factory::createManager( $context );
-		$this->_couponItem = $couponManager->createItem();
+		$this->_couponItem = MShop_Coupon_Manager_Factory::createManager( $context )->createItem();
 
 		$provider = new MShop_Coupon_Provider_Example( $context, $this->_couponItem, 'abcd' );
-		$this->_object = new MShop_Coupon_Provider_Decorator_BasketValues( $context, $this->_couponItem, 'abcd', $provider );
+		$this->_object = new MShop_Coupon_Provider_Decorator_Required( $context, $this->_couponItem, 'abcd', $provider );
 		$this->_object->setObject( $this->_object );
 
 		$orderManager = MShop_Order_Manager_Factory::createManager( $context );
@@ -89,43 +89,23 @@ class MShop_Coupon_Provider_Decorator_BasketValuesTest extends PHPUnit_Framework
 
 	public function testIsAvailable()
 	{
-		$config = array(
-			'basketvalues.total-value-min' => array( 'EUR' =>  320 ),
-			'basketvalues.total-value-max' => array( 'EUR' => 1000 ),
-		);
-
-		$this->_couponItem->setConfig( $config );
-		$result = $this->_object->isAvailable( $this->_orderBase );
-
-		$this->assertTrue( $result );
+		$this->assertTrue( $this->_object->isAvailable( $this->_orderBase ) );
 	}
 
-	// // min value higher than order price
-	public function testIsAvailableTestMinValue()
+
+	public function testIsAvailableWithProduct()
 	{
-		$config = array(
-			'basketvalues.total-value-min' => array( 'EUR' =>  700 ),
-			'basketvalues.total-value-max' => array( 'EUR' => 1000 ),
-		);
+		$this->_couponItem->setConfig( array( 'required.productcode' => 'CNC' ) );
 
-		$this->_couponItem->setConfig( $config );
-		$result = $this->_object->isAvailable( $this->_orderBase );
-
-		$this->assertFalse( $result );
+		$this->assertTrue( $this->_object->isAvailable( $this->_orderBase ) );
 	}
 
-	// order price higher than max price
-	public function testIsAvailableTestMaxValue()
+
+	public function testIsAvailableWithoutProduct()
 	{
-		$config = array(
-			'basketvalues.total-value-min' => array( 'EUR' =>  50 ),
-			'basketvalues.total-value-max' => array( 'EUR' => 320 ),
-		);
+		$this->_couponItem->setConfig( array( 'required.productcode' => 'CNE' ) );
 
-		$this->_couponItem->setConfig( $config );
-		$result = $this->_object->isAvailable( $this->_orderBase );
-
-		$this->assertFalse( $result );
+		$this->assertFalse( $this->_object->isAvailable( $this->_orderBase ) );
 	}
 
 }
