@@ -90,7 +90,7 @@ class MShop_Product_Manager_Stock_Warehouse_Default
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
-		return $this->_getSubManager( 'product', 'warehouse/' . $manager, $name );
+		return $this->_getSubManager( 'product', 'stock/warehouse/' . $manager, $name );
 	}
 
 
