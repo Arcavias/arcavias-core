@@ -14,7 +14,9 @@
  * @package MShop
  * @subpackage Customer
  */
-class MShop_Customer_Manager_Default extends MShop_Customer_Manager_Abstract
+class MShop_Customer_Manager_Default
+	extends MShop_Customer_Manager_Abstract
+	implements MShop_Customer_Manager_Interface
 {
 	private $_salt;
 
