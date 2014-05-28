@@ -246,7 +246,7 @@ class MShop_Order_Manager_Base_Product_Attribute_Default
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
-		return $this->_getSubManager( 'order', 'base/product/' . $manager, $name );
+		return $this->_getSubManager( 'order', 'base/product/attribute/' . $manager, $name );
 	}
 
 
