@@ -113,17 +113,28 @@ class Client_Html_Catalog_Detail_Additional_Attribute_Default
 	{
 		if( !isset( $this->_cache ) )
 		{
-			$items = $attributeMap = array();
+			$attrIds = $attributeMap = array();
 
 			if( isset( $view->detailProductItem ) )
 			{
-				$items = $view->detailProductItem->getRefItems( 'attribute', null, 'default' );
-				$items += $view->detailProductItem->getRefItems( 'attribute', null, 'variant' );
+				$attrIds = array_keys( $view->detailProductItem->getRefItems( 'attribute', null, 'default' ) );
+				$attrIds += array_keys( $view->detailProductItem->getRefItems( 'attribute', null, 'variant' ) );
 			}
 
-			foreach( $items as $id => $attribute ) {
-					$attributeMap[ $attribute->getType() ][$id] = $attribute;
+
+			$attrManager = MShop_Attribute_Manager_Factory::createManager( $this->_getContext() );
+
+			$search = $attrManager->createSearch( true );
+			$expr = array(
+				$search->compare( '==', 'attribute.id', $attrIds ),
+				$search->getConditions(),
+			);
+			$search->setConditions( $search->combine( '&&', $expr ) );
+
+			foreach( $attrManager->searchItems( $search, array( 'text', 'media') ) as $id => $item ) {
+				$attributeMap[ $item->getType() ][$id] = $item;
 			}
+
 
 			$view->attributeMap = $attributeMap;
 

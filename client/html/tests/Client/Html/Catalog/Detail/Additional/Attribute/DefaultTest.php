@@ -70,7 +70,7 @@ class Client_Html_Catalog_Detail_Additional_Attribute_DefaultTest extends MW_Uni
 		$output = $this->_object->getBody();
 		$this->assertContains( '<h2 class="header attributes">', $output );
 		$this->assertContains( '<td class="name">size</td>', $output );
-		$this->assertContains( '<span class="attr-name">xs</span>', $output );
+		$this->assertContains( '<span class="attr-name">XS</span>', $output );
 	}
 
 
