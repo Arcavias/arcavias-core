@@ -183,6 +183,13 @@ class MShop_Customer_Manager_Default
 			'type' => 'integer',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
 		),
+		'customer.vdate'=> array(
+			'label' => 'Customer verification date',
+			'code' => 'customer.vdate',
+			'internalcode' => 'mcus."vdate"',
+			'type' => 'date',
+			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
+		),
 		'customer.password'=> array(
 			'label' => 'Customer password',
 			'code' => 'customer.password',
@@ -352,14 +359,15 @@ class MShop_Customer_Manager_Default
 			$stmt->bind( 20, $billingAddress->getWebsite(), MW_DB_Statement_Abstract::PARAM_STR );
 			$stmt->bind( 21, $item->getBirthday(), MW_DB_Statement_Abstract::PARAM_STR );
 			$stmt->bind( 22, $item->getStatus(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 23, $item->getPassword() );
-			$stmt->bind( 24, date( 'Y-m-d H:i:s', time() ) ); // Modification time
-			$stmt->bind( 25, $context->getEditor() );
+			$stmt->bind( 23, $item->getDateVerified() );
+			$stmt->bind( 24, $item->getPassword() );
+			$stmt->bind( 25, date( 'Y-m-d H:i:s' ) ); // Modification time
+			$stmt->bind( 26, $context->getEditor() );
 
 			if( $id !== null ) {
-				$stmt->bind( 26, $id, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 27, $id, MW_DB_Statement_Abstract::PARAM_INT );
 			} else {
-				$stmt->bind( 26, date( 'Y-m-d H:i:s', time() ) ); // Creation time
+				$stmt->bind( 27, date( 'Y-m-d H:i:s' ) ); // Creation time
 			}
 
 			$result = $stmt->execute()->finish();
