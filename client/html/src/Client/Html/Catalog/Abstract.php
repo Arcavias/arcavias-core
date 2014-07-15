@@ -17,8 +17,8 @@
 abstract class Client_Html_Catalog_Abstract
 	extends Client_Html_Abstract
 {
-	static private $_productList;
-	static private $_productTotal = 0;
+	private $_productList;
+	private $_productTotal = 0;
 
 
 	/**
@@ -55,11 +55,11 @@ abstract class Client_Html_Catalog_Abstract
 	 */
 	protected function _getProductList( MW_View_Interface $view )
 	{
-		if( self::$_productList === null ) {
+		if( $this->_productList === null ) {
 			$this->_searchProducts( $view );
 		}
 
-		return self::$_productList;
+		return $this->_productList;
 	}
 
 
@@ -126,11 +126,11 @@ abstract class Client_Html_Catalog_Abstract
 	 */
 	protected function _getProductListTotal( MW_View_Interface $view )
 	{
-		if( self::$_productList === null ) {
+		if( $this->_productList === null ) {
 			$this->_searchProducts( $view );
 		}
 
-		return self::$_productTotal;
+		return $this->_productTotal;
 	}
 
 
@@ -196,6 +196,6 @@ abstract class Client_Html_Catalog_Abstract
 		$productFilter = $this->_getProductListFilter( $view );
 		$controller = Controller_Frontend_Factory::createController( $context, 'catalog' );
 
-		self::$_productList = $controller->getProductList( $productFilter, self::$_productTotal, $domains );
+		$this->_productList = $controller->getProductList( $productFilter, $this->_productTotal, $domains );
 	}
 }
