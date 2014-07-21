@@ -17,7 +17,7 @@
 class Client_Html_Catalog_Filter_Default
 	extends Client_Html_Abstract
 {
-	private static $_countSingleton;
+	private static $_headerSingleton;
 	private $_subPartPath = 'client/html/catalog/filter/default/subparts';
 	private $_subPartNames = array( 'search', 'tree', 'attribute' );
 	private $_cache;
@@ -82,6 +82,12 @@ class Client_Html_Catalog_Filter_Default
 	 */
 	public function getHeader()
 	{
+		if( self::$_headerSingleton !== null ) {
+			return '';
+		}
+
+		self::$_headerSingleton = true;
+
 		try
 		{
 			$view = $this->_setViewParams( $this->getView() );
@@ -183,7 +189,7 @@ class Client_Html_Catalog_Filter_Default
 		{
 			$config = $this->_getContext()->getConfig();
 
-			if( self::$_countSingleton === null && $config->get( 'client/html/catalog/count/enable', true ) == true )
+			if( $config->get( 'client/html/catalog/count/enable', true ) == true )
 			{
 				$target = $config->get( 'client/html/catalog/count/url/target' );
 				$controller = $config->get( 'client/html/catalog/count/url/controller', 'catalog' );
@@ -192,9 +198,6 @@ class Client_Html_Catalog_Filter_Default
 				$params = $this->_getClientParams( $view->param(), array( 'f' ) );
 
 				$view->filterCountUrl = $view->url( $target, $controller, $action, $params, array(), $config );
-
-				/** @todo: Could be a problem in multi-threaded environments */
-				self::$_countSingleton = true;
 			}
 
 			$this->_cache = $view;
