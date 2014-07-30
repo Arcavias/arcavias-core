@@ -11668,6 +11668,8 @@ MShop.panel.coupon.code.ListUi = Ext.extend(MShop.panel.AbstractListUi, {
 				}
 			} ]
 		};
+		
+		return true;
 	},
 
 	
