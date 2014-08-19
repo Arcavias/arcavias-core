@@ -41,8 +41,6 @@ class Controller_ExtJS_Product_Export_Text_Default
 		$this->_setLocale( $params->site );
 
 		$context = $this->_getContext();
-		$config = $context->getConfig();
-		$dir = $config->get( 'controller/extjs/product/export/text/default/exportdir', 'uploads' );
 
 		$items = (array) $params->items;
 		$lang = ( property_exists( $params, 'lang' ) ) ? (array) $params->lang : array();
@@ -327,11 +325,11 @@ class Controller_ExtJS_Product_Export_Text_Default
 	/**
 	 * Adds data for the given language.
 	 *
+	 * @param MW_Container_Content_Interface $contentItem Content object
 	 * @param string $langid Language id
-	 * @param array $items List of of item ids whose texts should be added
-	 * @param MW_Container_Content_Interface $contentItem Content item
+	 * @param array $ids List of product IDs
 	 */
-	protected function _addLanguage( MW_Container_Content_Interface $contentItem, $langid, array $ids)
+	protected function _addLanguage( MW_Container_Content_Interface $contentItem, $langid, array $ids )
 	{
 		$manager = MShop_Product_Manager_Factory::createManager( $this->_getContext() );
 		$search = $manager->createSearch();
@@ -370,7 +368,7 @@ class Controller_ExtJS_Product_Export_Text_Default
 	 */
 	protected function _addItem( MW_Container_Content_Interface $contentItem, MShop_Product_Item_Interface $item, $langid )
 	{
-		$listTypes = $items = array();
+		$listTypes = array();
 		foreach( $item->getListItems( 'text' ) as $listItem ) {
 			$listTypes[ $listItem->getRefId() ] = $listItem->getType();
 		}
@@ -394,14 +392,15 @@ class Controller_ExtJS_Product_Export_Text_Default
 						$items[5] = $textItem->getId();
 						$items[6] = $textItem->getContent();
 					}
+
+					$contentItem->add( $items );
 				}
 			}
 			else
 			{
 				$items = array( $langid, $item->getType(), $item->getCode(), 'default', $textTypeItem->getCode(), '', '' );
+				$contentItem->add( $items );
 			}
-
-			$contentItem->add( $items );
 		}
 	}
 }

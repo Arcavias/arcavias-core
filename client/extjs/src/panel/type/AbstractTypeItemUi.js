@@ -7,15 +7,13 @@
 Ext.ns('MShop.panel');
 
 MShop.panel.AbstractTypeItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
-   /**
-    * Domain to configure fields
-    * 
-    * E.g. attribute.type
-    */
+    /**
+     * Domain to configure fields E.g. attribute.type
+     */
     typeDomain : null,
 
     initComponent : function() {
-        MShop.panel.AbstractItemUi.prototype.setSiteCheck( this );
+        MShop.panel.AbstractItemUi.prototype.setSiteCheck(this);
         this.items = [{
             xtype : 'tabpanel',
             activeTab : 0,
@@ -92,7 +90,7 @@ MShop.panel.AbstractTypeItemUi = Ext.extend(MShop.panel.AbstractItemUi, {
             }]
         }];
 
-       MShop.panel.AbstractTypeItemUi.superclass.initComponent.call(this);
+        MShop.panel.AbstractTypeItemUi.superclass.initComponent.call(this);
     }
 });
 

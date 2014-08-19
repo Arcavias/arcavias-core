@@ -115,13 +115,13 @@ class MW_Setup_Task_ListsOptimizeIndexes extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
 		return array(
 			'AttributeModifyIndexes', 'CatalogModifyIndexes', 'CustomerModifyIndexes', 'MediaModifyIndexes',
-			'ProductModifyIndexes', 'ServiceModifyIndexes', 'TextModifyIndexes'
+			'ProductModifyIndexes', 'ServiceModifyIndexes', 'TextModifyIndexes', 'TablesCreateMShop'
 		);
 	}
 

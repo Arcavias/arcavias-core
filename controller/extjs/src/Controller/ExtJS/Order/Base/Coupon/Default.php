@@ -50,16 +50,8 @@ class Controller_ExtJS_Order_Base_Coupon_Default extends Controller_ExtJS_Abstra
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'order.base.coupon.id'} ) ) { $item->setId( $entry->{'order.base.product.id'} ); }
-			if( isset( $entry->{'order.base.coupon.baseid'} ) ) { $item->setBaseId( $entry->{'order.base.coupon.baseid'} ); }
-			if( isset( $entry->{'order.base.coupon.productid'} ) ) { $item->setProductId( $entry->{'order.base.coupon.productid'} ); }
-			if( isset( $entry->{'order.base.coupon.code'} ) ) { $item->setCode( $entry->{'order.base.coupon.code'} ); }
-
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -76,9 +68,34 @@ class Controller_ExtJS_Order_Base_Coupon_Default extends Controller_ExtJS_Abstra
 
 
 	/**
+	 * Creates a new order base coupon item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "order.base.coupon" prefix
+	 * @return MShop_Order_Item_Base_Coupon_Interface Order coupon item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'order.base.coupon.id': $item->setId( $value ); break;
+				case 'order.base.coupon.code': $item->setCode( $value ); break;
+				case 'order.base.coupon.baseid': $item->setBaseId( $value ); break;
+				case 'order.base.coupon.productid': $item->setProductId( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

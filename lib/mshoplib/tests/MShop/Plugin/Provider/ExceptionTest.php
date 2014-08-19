@@ -7,22 +7,7 @@
 
 class MShop_Plugin_Provider_ExceptionTest extends PHPUnit_Framework_TestCase
 {
-
 	private $_codes;
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Plugin_Provider_ExceptionTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -33,8 +18,6 @@ class MShop_Plugin_Provider_ExceptionTest extends PHPUnit_Framework_TestCase
 	 */
 	protected function setUp()
 	{
-		$context = TestHelper::getContext();
-
 		$this->_codes = array( 'something' => array( 'went', 'terribly', 'wrong' ) );
 
 	}
@@ -53,12 +36,11 @@ class MShop_Plugin_Provider_ExceptionTest extends PHPUnit_Framework_TestCase
 		}
 
 		try {
-			throw new MShop_Plugin_Provider_Exception( 'msg2', 11, $mppe );
+			throw new MShop_Plugin_Provider_Exception( 'msg2', 11 );
 		}
 		catch ( MShop_Plugin_Provider_Exception $e )
 		{
 			$this->assertEquals( array(), $e->getErrorCodes() );
-			$this->assertEquals( $mppe, $e->getPrevious() );
 		}
 	}
 }

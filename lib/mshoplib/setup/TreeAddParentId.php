@@ -44,7 +44,7 @@ class MW_Setup_Task_TreeAddParentId extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -55,7 +55,7 @@ class MW_Setup_Task_TreeAddParentId extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -82,7 +82,7 @@ class MW_Setup_Task_TreeAddParentId extends MW_Setup_Task_Abstract
 		$this->_msg( 'Adding parentid column to catalog and locale_site', 0 );
 		$this->_status( '' );
 
-		foreach( $this->_mysql as $table => $stmt )
+		foreach( $stmts as $table => $stmt )
 		{
 			$this->_msg( sprintf( 'Checking parentid column in "%1$s"', $table ), 1 );
 

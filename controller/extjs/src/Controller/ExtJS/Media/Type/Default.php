@@ -50,14 +50,7 @@ class Controller_ExtJS_Media_Type_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'media.type.id'} ) ) { $item->setId( $entry->{'media.type.id'} ); }
-			if( isset( $entry->{'media.type.code'} ) ) { $item->setCode( $entry->{'media.type.code'} ); }
-			if( isset( $entry->{'media.type.domain'} ) ) { $item->setDomain( $entry->{'media.type.domain'} ); }
-			if( isset( $entry->{'media.type.label'} ) ) { $item->setLabel( $entry->{'media.type.label'} ); }
-			if( isset( $entry->{'media.type.status'} ) ) { $item->setStatus( $entry->{'media.type.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
 
 			$ids[] = $item->getId();
@@ -76,9 +69,35 @@ class Controller_ExtJS_Media_Type_Default
 
 
 	/**
+	 * Creates a new media type item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "media.type" prefix
+	 * @return MShop_Common_Item_Type_Interface Common type item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'media.type.id': $item->setId( $value ); break;
+				case 'media.type.code': $item->setCode( $value ); break;
+				case 'media.type.domain': $item->setDomain( $value ); break;
+				case 'media.type.label': $item->setLabel( $value ); break;
+				case 'media.type.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

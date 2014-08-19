@@ -15,18 +15,6 @@ class MShop_Locale_Manager_Language_DefaultTest extends MW_Unittest_Testcase
 	private $_item;
 
 
-	/**
-	 * Runs the test methods of this class.
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('MShop_Locale_Manager_Language_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
 	protected function setUp()
 	{
 		$this->_object = new MShop_Locale_Manager_Language_Default(TestHelper::getContext());
@@ -50,7 +38,7 @@ class MShop_Locale_Manager_Language_DefaultTest extends MW_Unittest_Testcase
 		// insert case
 		$item = $this->_object->createItem();
 		$item->setLabel( 'new name' );
-		$item->setStatus( true );
+		$item->setStatus( 1 );
 		$item->setCode( 'xx' );
 		$this->_object->saveItem( $item );
 		$itemSaved = $this->_object->getItem( $item->getId() );
@@ -105,8 +93,8 @@ class MShop_Locale_Manager_Language_DefaultTest extends MW_Unittest_Testcase
 	{
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '==', 'locale.language.id', 'de' );
-
 		$expr[] = $search->compare( '>=', 'locale.language.label', 'German' );
 		$expr[] = $search->compare( '==', 'locale.language.code', 'de' );
 		$expr[] = $search->compare( '==', 'locale.language.status', 1 );

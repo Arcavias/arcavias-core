@@ -15,7 +15,7 @@
  * @subpackage Price
  */
 class MShop_Price_Item_Default
-	extends MShop_Common_Item_Abstract
+	extends MShop_Common_Item_ListRef_Abstract
 	implements MShop_Price_Item_Interface
 {
 	private $_values;
@@ -25,10 +25,12 @@ class MShop_Price_Item_Default
 	 * Initalizes the object with the given values
 	 *
 	 * @param array $values Associative array of key/value pairs for price, costs, rebate and currencyid
+	 * @param MShop_Common_List_Item_Interface[] $listItems List of list items
+	 * @param MShop_Common_Item_Interface[] $refItems List of referenced items
 	 */
-	public function __construct( array $values = array( ) )
+	public function __construct( array $values = array(), array $listItems = array(), array $refItems = array() )
 	{
-		parent::__construct( 'price.', $values );
+		parent::__construct( 'price.', $values, $listItems, $refItems );
 
 		$this->_values = $values;
 	}
@@ -136,7 +138,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Sets the quantity the price is valid for.
 	 *
-	 * @param integer Quantity
+	 * @param integer $quantity Quantity
 	 */
 	public function setQuantity( $quantity )
 	{
@@ -150,7 +152,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Returns the amount of money.
 	 *
-	 * @return numeric Price value
+	 * @return string Price value
 	 */
 	public function getValue()
 	{
@@ -161,7 +163,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Sets the new amount of money.
 	 *
-	 * @param numeric $price Amount with two digits precision
+	 * @param integer|double $price Amount with two digits precision
 	 */
 	public function setValue( $price )
 	{
@@ -177,7 +179,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Returns costs.
 	 *
-	 * @return numeric Costs
+	 * @return string Costs
 	 */
 	public function getCosts()
 	{
@@ -188,7 +190,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Sets the new costs.
 	 *
-	 * @param numeric $price Amount with two digits precision
+	 * @param integer|double $price Amount with two digits precision
 	 */
 	public function setCosts( $price )
 	{
@@ -204,7 +206,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Returns the rebate amount.
 	 *
-	 * @return numeric Rebate amount
+	 * @return string Rebate amount
 	 */
 	public function getRebate()
 	{
@@ -215,7 +217,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Sets the new rebate amount.
 	 *
-	 * @param numeric $price Rebate amount with two digits precision
+	 * @param string $price Rebate amount with two digits precision
 	 */
 	public function setRebate( $price )
 	{
@@ -231,7 +233,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Returns the tax rate
 	 *
-	 * @return numeric Tax rate
+	 * @return string Tax rate
 	 */
 	public function getTaxRate()
 	{
@@ -242,7 +244,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Sets the new tax rate.
 	 *
-	 * @param numeric $taxrate Tax rate with two digits precision
+	 * @param string $taxrate Tax rate with two digits precision
 	 */
 	public function setTaxRate( $taxrate )
 	{
@@ -294,7 +296,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Sets the label of the item
 	 *
-	 * @param integer $label Label of the item
+	 * @param string $label Label of the item
 	 */
 	public function setLabel( $label )
 	{
@@ -325,9 +327,42 @@ class MShop_Price_Item_Default
 
 
 	/**
+	 * Compares the properties of the given price item with its own one.
+	 *
+	 * This method compare only the essential price properties:
+	 * * Value
+	 * * Costs
+	 * * Rebate
+	 * * Taxrate
+	 * * Quantity
+	 * * Currency ID
+	 *
+	 * All other item properties are not compared.
+	 *
+	 * @param MShop_Price_Item_Interface $price Price item to compare with
+	 * @return boolean True if equal, false if not
+	 * @since 2014.09
+	 */
+	public function compare( MShop_Price_Item_Interface $price )
+	{
+		if( $this->getValue() === $price->getValue()
+			&& $this->getCosts() === $price->getCosts()
+			&& $this->getRebate() === $price->getRebate()
+			&& $this->getTaxrate() === $price->getTaxrate()
+			&& $this->getQuantity() === $price->getQuantity()
+			&& $this->getCurrencyId() === $price->getCurrencyId()
+		) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Returns the item values as array.
 	 *
-	 * @return Associative list of item properties and their values
+	 * @return array Associative list of item properties and their values
 	 */
 	public function toArray()
 	{
@@ -352,7 +387,7 @@ class MShop_Price_Item_Default
 	/**
 	 * Tests if the price is within the requirements.
 	 *
-	 * @param numeric $value Monetary value
+	 * @param integer|double $value Monetary value
 	 */
 	protected function _checkPrice( $value )
 	{

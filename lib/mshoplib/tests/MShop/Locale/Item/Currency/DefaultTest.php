@@ -10,22 +10,13 @@
  */
 class MShop_Locale_Item_Currency_DefaultTest extends MW_Unittest_Testcase
 {
-
 	private $_object;
-
-
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('MShop_Locale_Item_Currency_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
+	private $_values;
 
 
 	protected function setUp()
 	{
-		$this->values = array(
+		$this->_values = array(
 			'id' => 'EUR',
 			'label' => 'Euro',
 			'siteid' => 1,
@@ -34,7 +25,7 @@ class MShop_Locale_Item_Currency_DefaultTest extends MW_Unittest_Testcase
 			'ctime' => '2011-01-01 00:00:01',
 			'editor' => 'unitTestUser'
 		);
-		$this->_object = new MShop_Locale_Item_Currency_Default($this->values);
+		$this->_object = new MShop_Locale_Item_Currency_Default($this->_values);
 	}
 
 
@@ -143,7 +134,7 @@ class MShop_Locale_Item_Currency_DefaultTest extends MW_Unittest_Testcase
 	{
 		$this->assertEquals( '2011-01-01 00:00:01', $this->_object->getTimeCreated() );
 	}
-	
+
 	public function testGetEditor()
 	{
 		$this->assertEquals( 'unitTestUser', $this->_object->getEditor() );
@@ -152,7 +143,7 @@ class MShop_Locale_Item_Currency_DefaultTest extends MW_Unittest_Testcase
 	public function testToArray()
 	{
 		$arrayObject = $this->_object->toArray();
-		$this->assertEquals((count($this->values) + 1), count($arrayObject));
+		$this->assertEquals((count($this->_values) + 1), count($arrayObject));
 
 		$this->assertEquals($this->_object->getId(), $arrayObject['locale.currency.id']);
 		$this->assertEquals($this->_object->getCode(), $arrayObject['locale.currency.code']);

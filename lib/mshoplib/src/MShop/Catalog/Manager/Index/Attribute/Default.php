@@ -70,18 +70,7 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 		parent::__construct( $context );
 		$this->_setResourceName( 'db-product' );
 
-
 		$site = $context->getLocale()->getSitePath();
-		$types = array( 'siteid' => MW_DB_Statement_Abstract::PARAM_INT );
-
-		$search = $this->createSearch();
-		$expr = array(
-			$search->compare( '==', 'siteid', null ),
-			$search->compare( '==', 'siteid', $site ),
-		);
-		$search->setConditions( $search->combine( '||', $expr ) );
-
-		$string = $search->getConditionString( $types, array( 'siteid' => 'mcatinat."siteid"' ) );
 
 		$this->_replaceSiteMarker( $this->_searchConfig['catalog.index.attribute.code'], 'mcatinat."siteid"', $site );
 		$this->_replaceSiteMarker( $this->_searchConfig['catalog.index.attributecount'], 'mcatinat2."siteid"', $site );
@@ -105,7 +94,7 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -211,7 +200,7 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g stock, tags, locations, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g stock, tags, locations, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -411,7 +400,7 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 	 * Rebuilds the catalog index attribute for searching products or specified list of products.
 	 * This can be a long lasting operation.
 	 *
-	 * @param array $items Associative list of product IDs and items implementing MShop_Product_Item_Interface
+	 * @param MShop_Common_Item_Interface[] $items Associative list of product IDs and items implementing MShop_Product_Item_Interface
 	 */
 	public function rebuildIndex( array $items = array() )
 	{
@@ -461,7 +450,7 @@ class MShop_Catalog_Manager_Index_Attribute_Default
 						$stmt->bind( 9, $date ); // ctime
 
 						try {
-							$result = $stmt->execute()->finish();
+							$stmt->execute()->finish();
 						} catch( MW_DB_Exception $e ) { ; } // Ignore duplicates
 					}
 				}

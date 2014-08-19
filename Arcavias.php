@@ -28,8 +28,6 @@ class Arcavias
 	 */
 	public function __construct( array $extdirs = array(), $defaultdir = true, $basedir = null )
 	{
-		$ds = DIRECTORY_SEPARATOR;
-
 		if( $basedir === null ) {
 			$basedir = dirname( __FILE__ );
 		}
@@ -151,7 +149,7 @@ class Arcavias
 	 * Returns the paths containing the required configuration files.
 	 *
 	 * @param string $dbtype Name of the database type, e.g. "mysql"
-	 * @return array List of configuration paths
+	 * @return string[] List of configuration paths
 	 */
 	public function getConfigPaths( $dbtype )
 	{

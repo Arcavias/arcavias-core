@@ -11,21 +11,6 @@
  */
 class MShop_FactoryTest extends MW_Unittest_Testcase
 {
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_FactoryTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
 	public function testCreateManager()
 	{
 		$manager = MShop_Factory::createManager( TestHelper::getContext(), 'attribute' );
@@ -92,7 +77,7 @@ class MShop_FactoryTest extends MW_Unittest_Testcase
 
 		$managerA1 = MShop_Factory::createManager( $context, 'attribute' );
 		$managerB1 = MShop_Factory::createManager( $context, 'attribute/list/type' );
-		MShop_Factory::clear( $context->getLocale()->getSiteId() );
+		MShop_Factory::clear( (string) $context );
 
 		$managerA2 = MShop_Factory::createManager( $context, 'attribute' );
 		$managerB2 = MShop_Factory::createManager( $context, 'attribute/list/type' );
@@ -112,7 +97,7 @@ class MShop_FactoryTest extends MW_Unittest_Testcase
 
 		$managerA1 = MShop_Factory::createManager( $context, 'attribute' );
 		$managerB1 = MShop_Factory::createManager( $context, 'attribute/list/type' );
-		MShop_Factory::clear( $context->getLocale()->getSiteId(), 'attribute' );
+		MShop_Factory::clear( (string) $context, 'attribute' );
 
 		$managerA2 = MShop_Factory::createManager( $context, 'attribute' );
 		$managerB2 = MShop_Factory::createManager( $context, 'attribute/list/type' );

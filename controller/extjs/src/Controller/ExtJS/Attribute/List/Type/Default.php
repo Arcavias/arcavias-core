@@ -51,14 +51,7 @@ class Controller_ExtJS_Attribute_List_Type_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'attribute.list.type.id'} ) ) { $item->setId( $entry->{'attribute.list.type.id'} ); }
-			if( isset( $entry->{'attribute.list.type.code'} ) ) { $item->setCode( $entry->{'attribute.list.type.code'} ); }
-			if( isset( $entry->{'attribute.list.type.domain'} ) ) { $item->setDomain( $entry->{'attribute.list.type.domain'} ); }
-			if( isset( $entry->{'attribute.list.type.label'} ) ) {	$item->setLabel( $entry->{'attribute.list.type.label'} ); }
-			if( isset( $entry->{'attribute.list.type.status'} ) ) { $item->setStatus( $entry->{'attribute.list.type.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
 
 			$ids[] = $item->getId();
@@ -77,9 +70,35 @@ class Controller_ExtJS_Attribute_List_Type_Default
 
 
 	/**
+	 * Creates a new attribute list type item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "attribute.list.type" prefix
+	 * @return MShop_Common_Item_Type_Interface Common type item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'attribute.list.type.id': $item->setId( $value ); break;
+				case 'attribute.list.type.code': $item->setCode( $value ); break;
+				case 'attribute.list.type.domain': $item->setDomain( $value ); break;
+				case 'attribute.list.type.label': $item->setLabel( $value ); break;
+				case 'attribute.list.type.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

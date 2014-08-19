@@ -95,7 +95,7 @@ class MShop_Product_Manager_Tag_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -225,7 +225,7 @@ class MShop_Product_Manager_Tag_Default
 				$stmt->bind( 7, $date ); //ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if( $id === null && $fetch === true )
 			{
@@ -366,7 +366,7 @@ class MShop_Product_Manager_Tag_Default
 	 */
 	public function searchItems( MW_Common_Criteria_Interface $search, array $ref = array(), &$total = null )
 	{
-		$map = $typeIds = array();
+		$items = $map = $typeIds = array();
 		$context = $this->_getContext();
 
 		$dbm = $context->getDatabaseManager();
@@ -504,12 +504,14 @@ class MShop_Product_Manager_Tag_Default
 			foreach( $map as $id => $row )
 			{
 				if( isset( $typeItems[ $row['typeid'] ] ) ) {
-					$map[$id]['type'] = $typeItems[ $row['typeid'] ]->getCode();
+					$row['type'] = $typeItems[ $row['typeid'] ]->getCode();
 				}
+
+				$items[$id] = $this->_createItem( $row );
 			}
 		}
 
-		return $this->_buildItems( $map, $ref, 'product.tag' );
+		return $items;
 	}
 
 
@@ -519,7 +521,7 @@ class MShop_Product_Manager_Tag_Default
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from
 	 * configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g tag types, tag lists etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g tag types, tag lists etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{

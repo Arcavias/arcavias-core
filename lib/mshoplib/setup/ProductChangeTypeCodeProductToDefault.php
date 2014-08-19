@@ -17,7 +17,7 @@ class MW_Setup_Task_ProductChangeTypeCodeProductToDefault extends MW_Setup_Task_
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -28,11 +28,11 @@ class MW_Setup_Task_ProductChangeTypeCodeProductToDefault extends MW_Setup_Task_
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
-		return array();
+		return array( 'TablesCreateMShop' );
 	}
 
 
@@ -47,6 +47,8 @@ class MW_Setup_Task_ProductChangeTypeCodeProductToDefault extends MW_Setup_Task_
 
 	/**
 	 * Executes the task.
+	 *
+	 * @param string $stmt SQL statement to execute
 	 */
 	protected function _process( $stmt )
 	{

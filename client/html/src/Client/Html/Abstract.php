@@ -83,16 +83,17 @@ abstract class Client_Html_Abstract
 	 * Modifies the cached body content to replace content based on sessions or cookies.
 	 *
 	 * @param string $content Cached content
+	 * @param string $uid Unique identifier for the output if the content is placed more than once on the same page
 	 * @return string Modified body content
 	 */
-	public function modifyBody( $content )
+	public function modifyBody( $content, $uid )
 	{
 		$view = $this->getView();
 
 		foreach( $this->_getSubClients() as $subclient )
 		{
 			$subclient->setView( $view );
-			$content = $subclient->modifyBody( $content );
+			$content = $subclient->modifyBody( $content, $uid );
 		}
 
 		return $content;
@@ -103,16 +104,17 @@ abstract class Client_Html_Abstract
 	 * Modifies the cached header content to replace content based on sessions or cookies.
 	 *
 	 * @param string $content Cached content
+	 * @param string $uid Unique identifier for the output if the content is placed more than once on the same page
 	 * @return string Modified header content
 	 */
-	public function modifyHeader( $content )
+	public function modifyHeader( $content, $uid )
 	{
 		$view = $this->getView();
 
 		foreach( $this->_getSubClients() as $subclient )
 		{
 			$subclient->setView( $view );
-			$content = $subclient->modifyHeader( $content );
+			$content = $subclient->modifyHeader( $content, $uid );
 		}
 
 		return $content;
@@ -124,8 +126,6 @@ abstract class Client_Html_Abstract
 	 * A view must be available and this method doesn't generate any output
 	 * besides setting view variables.
 	 *
-	 * @param string $confpath Path to the configuration that contains the configured sub-clients
-	 * @param array $default List of sub-client names that should be used if no other configuration is available
 	 * @return boolean False if processing is stopped, otherwise all processing was completed successfully
 	 */
 	public function process()
@@ -161,7 +161,7 @@ abstract class Client_Html_Abstract
 	/**
 	 * Adds the cache tags to the given list and sets a new expiration date if necessary based on the given item.
 	 *
-	 * @param MShop_Common_Item_ListRef_Interface|array $items Item or list of items, maybe with associated list items
+	 * @param array|MShop_Common_Item_Interface $items Item or list of items, maybe with associated list items
 	 * @param string $domain Name of the domain the item is from
 	 * @param string|null &$expire Expiration date that will be overwritten if an earlier date is found
 	 * @param array &$tags List of tags the new tags will be added to
@@ -185,21 +185,21 @@ abstract class Client_Html_Abstract
 		 * request.
 		 *
 		 * Important: As a list or detail view can use several hundred items,
-		 * this configuration option would also add this number of tags to the
-		 * cache entry. When using the default database cache, this slows down
-		 * the initial cache insert (and therefore the page speed) drastically!
-		 * It's not recommended to enable this option unless you use a cache
-		 * implementation that can insert all tags at once!
+		 * this configuration option will also add this number of tags to the
+		 * cache entry. When using a cache adapter that can't insert all tags
+		 * at once, this slows down the initial cache insert (and therefore the
+		 * page speed) drastically! It's only recommended to enable this option
+		 * if you use the DB, Mysql or Redis adapter that can insert all tags
+		 * at once.
 		 *
 		 * @param boolean True to add tags for all items, false to use only a domain tag
 		 * @since 2014.07
 		 * @category Developer
 		 * @category User
+		 * @see classes/cache/manager/name
+		 * @see classes/cache/name
 		 */
 		$tagAll = $this->_context->getConfig()->get( 'client/html/common/cache/tag-all', false );
-
-		$listIface = 'MShop_Common_Item_ListRef_Interface';
-		$expires = array();
 
 		if( !is_array( $items ) ) {
 			$items = array( $items );
@@ -209,33 +209,50 @@ abstract class Client_Html_Abstract
 			$tags[] = $domain;
 		}
 
-		foreach( $items as $item )
+		foreach( $items as $item ) {
+			$this->_addMetaItemSingle( $item, $domain, $expire, $tags, $tagAll );
+		}
+	}
+
+
+	/**
+	 * Adds expire date and tags for a single item.
+	 *
+	 * @param MShop_Common_Item_Interface $item Item, maybe with associated list items
+	 * @param string $domain Name of the domain the item is from
+	 * @param string|null &$expire Expiration date that will be overwritten if an earlier date is found
+	 * @param array &$tags List of tags the new tags will be added to
+	 * @param boolean $tagAll True of tags for all items should be added, false if only for the main item
+	 */
+	private function _addMetaItemSingle( MShop_Common_Item_Interface $item, $domain, &$expire, array &$tags, $tagAll )
+	{
+		$listIface = 'MShop_Common_Item_ListRef_Interface';
+		$expires = array();
+
+		if( $tagAll === true ) {
+			$tags[] = $domain . '-' . $item->getId();
+		}
+
+		if( method_exists( $item, 'getDateEnd' ) && ( $date = $item->getDateEnd() ) !== null ) {
+			$expires[] = $date;
+		}
+
+		if( $item instanceof $listIface )
 		{
-			if( $tagAll === true ) {
-				$tags[] = $domain . '-' . $item->getId();
-			}
-
-			if( method_exists( $item, 'getDateEnd' ) && ( $date = $item->getDateEnd() ) !== null ) {
-				$expires[] = $date;
-			}
-
-			if( $item instanceof $listIface )
+			foreach( $item->getListItems() as $listitem )
 			{
-				foreach( $item->getListItems() as $listitem )
-				{
-					if( $tagAll === true ) {
-						$tags[] = $listitem->getDomain() . '-' . $listitem->getRefId();
-					}
+				if( $tagAll === true ) {
+					$tags[] = $listitem->getDomain() . '-' . $listitem->getRefId();
+				}
 
-					if( ( $date = $listitem->getDateEnd() ) !== null ) {
-						$expires[] = $date;
-					}
+				if( ( $date = $listitem->getDateEnd() ) !== null ) {
+					$expires[] = $date;
 				}
 			}
+		}
 
-			if( !empty( $expires ) ) {
-				$expire = min( $expires );
-			}
+		if( !empty( $expires ) ) {
+			$expire = min( $expires );
 		}
 	}
 
@@ -372,6 +389,7 @@ abstract class Client_Html_Abstract
 	 */
 	protected function _getParamHash( array $prefixes = array( 'f', 'l', 'd' ), $key = '', array $config = array() )
 	{
+		$locale = $this->_getContext()->getLocale();
 		$params = $this->_getClientParams( $this->getView()->param(), $prefixes );
 		ksort( $params );
 
@@ -379,7 +397,7 @@ abstract class Client_Html_Abstract
 			throw new Client_Html_Exception( 'Unable to encode parameters or configuration options' );
 		}
 
-		return md5( $key . $pstr . $cstr );
+		return md5( $key . $pstr . $cstr . $locale->getLanguageId() . $locale->getCurrencyId() );
 	}
 
 
@@ -428,9 +446,9 @@ abstract class Client_Html_Abstract
 	 * Returns the absolute path to the given template file.
 	 * It uses the first one found from the configured paths in the manifest files, but in reverse order.
 	 *
-	 * @param string $file Relative file path segments and its name separated by slashes
 	 * @param string|array $default Relative file name or list of file names to use when nothing else is configured
-	 * @return Absolute path the to the template file
+	 * @param string $confpath Configuration key of the path to the template file
+	 * @return string path the to the template file
 	 * @throws Client_Html_Exception If no template file was found
 	 */
 	protected function _getTemplate( $confpath, $default )
@@ -522,6 +540,26 @@ abstract class Client_Html_Abstract
 		}
 
 		return true;
+	}
+
+
+	/**
+	 * Replaces the section in the content that is enclosed by the marker.
+	 *
+	 * @param string $content Cached content
+	 * @param string $section New section content
+	 * @param string $marker Name of the section marker without "<!-- " and " -->" parts
+	 */
+	protected function _replaceSection( $content, $section, $marker )
+	{
+		$marker = '<!-- ' . $marker . ' -->';
+		$start = strpos( $content, $marker );
+
+		if( $start !== false && ( $end = $end = strpos( $content, $marker, $start+1 ) ) !== false ) {
+			return substr_replace( $content, $section, $start, $end - $start + strlen( $marker) );
+		}
+
+		return $content;
 	}
 
 

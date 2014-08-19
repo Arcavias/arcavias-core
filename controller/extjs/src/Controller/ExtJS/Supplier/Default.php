@@ -49,14 +49,8 @@ class Controller_ExtJS_Supplier_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'supplier.id'} ) ) { $item->setId( $entry->{'supplier.id'} ); }
-			if( isset( $entry->{'supplier.label'} ) ) { $item->setLabel( $entry->{'supplier.label'} ); }
-			if( isset( $entry->{'supplier.status'} ) ) { $item->setStatus( $entry->{'supplier.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -75,9 +69,33 @@ class Controller_ExtJS_Supplier_Default
 
 
 	/**
+	 * Creates a new supplier item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "supplier" prefix
+	 * @return MShop_Supplier_Item_Interface Supplier item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'supplier.id': $item->setId( $value ); break;
+				case 'supplier.label': $item->setLabel( $value ); break;
+				case 'supplier.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

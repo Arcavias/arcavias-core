@@ -16,14 +16,7 @@
  */
 class MW_Logger_File extends MW_Logger_Abstract implements MW_Logger_Interface
 {
-	/**
-	 * @var filters
-	 */
 	private $_loglevel = MW_Logger_Abstract::ERR;
-
-	/**
-	 * @var stream handle
-	 */
 	private $_stream;
 
 
@@ -33,20 +26,20 @@ class MW_Logger_File extends MW_Logger_Abstract implements MW_Logger_Interface
 	 * @param string $filename Log file name
 	 * @param integer $priority Default priority
 	 */
-	public function __construct( $filename, $filterPriority = MW_Logger_Abstract::ERR )
+	public function __construct( $filename, $priority = MW_Logger_Abstract::ERR )
 	{
 		if ( !$this->_stream = fopen( $filename, 'a', false ) ) {
 			throw new MW_Logger_Exception( sprintf( 'Unable to open file "%1$s" for appending' ), $filename );
 		}
 
-		$this->_loglevel = $filterPriority;
+		$this->_loglevel = $priority;
 	}
 
 
 	/**
 	 * Writes a message to the configured log facility.
 	 *
-	 * @param string $message Message text that should be written to the log facility
+	 * @param string|array|object $message Message text that should be written to the log facility
 	 * @param integer $priority Priority of the message for filtering
 	 * @param string $facility Facility for logging different types of messages (e.g. message, auth, user, changelog)
 	 * @throws MW_Logger_Exception If an error occurs in Zend_Log

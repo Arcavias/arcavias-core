@@ -105,7 +105,7 @@ class MAdmin_Cache_Manager_None
 	/**
 	 * Returns the attributes that can be used for searching.
 	 *
-	 * @param boolean $withSub Return also attributes of sub-managers if true
+	 * @param boolean $withsub Return also attributes of sub-managers if true
 	 * @return array Returns a list of attribtes implementing MW_Common_Criteria_Attribute_Interface
 	 */
 	public function getSearchAttributes( $withsub = true )
@@ -121,7 +121,7 @@ class MAdmin_Cache_Manager_None
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g stock, tags, locations, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g stock, tags, locations, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{

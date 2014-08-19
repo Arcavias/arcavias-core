@@ -15,7 +15,7 @@
  * @subpackage Catalog
  */
 class MShop_Catalog_Manager_Default
-	extends MShop_Common_Manager_Abstract
+	extends MShop_Common_Manager_ListRef_Abstract
 	implements MShop_Catalog_Manager_Interface, MShop_Common_Manager_Factory_Interface
 {
 	private $_treeManagers = array();
@@ -135,7 +135,7 @@ class MShop_Catalog_Manager_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -185,12 +185,9 @@ class MShop_Catalog_Manager_Default
 	 */
 	public function createItem()
 	{
-		$siteid = $this->_getContext()->getLocale()->getSiteId();
+		$values = array( 'siteid' => $this->_getContext()->getLocale()->getSiteId() );
 
-		$node = $this->_createTreeManager( $siteid )->createNode();
-		$node->siteid = $siteid;
-
-		return $this->_createItem( $node );
+		return $this->_createItem( $values );
 	}
 
 
@@ -322,7 +319,7 @@ class MShop_Catalog_Manager_Default
 	 * @param mixed $id ID of the item that should be moved
 	 * @param mixed $oldParentId ID of the old parent item which currently contains the item that should be removed
 	 * @param mixed $newParentId ID of the new parent item where the item should be moved to
-	 * @param mixed $newRefId ID of the item where the item should be inserted before (null to append)
+	 * @param mixed $refId ID of the item where the item should be inserted before (null to append)
 	 */
 	public function moveItem( $id, $oldParentId, $newParentId, $refId = null )
 	{
@@ -382,6 +379,7 @@ class MShop_Catalog_Manager_Default
 	 * @param MW_Common_Criteria_Interface $search Criteria object with conditions, sortations, etc.
 	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @param integer|null &$total No function. Reference will be set to null in this case.
+	 * @param integer $total
 	 * @return array List of items implementing MShop_Common_Item_Interface
 	 */
 	public function searchItems( MW_Common_Criteria_Interface $search, array $ref = array(), &$total = null )
@@ -514,7 +512,7 @@ class MShop_Catalog_Manager_Default
 				$refItems = $refItemMap[ $nodeid ];
 			}
 
-			$item = $this->_createItem( $node, array(), $listItems, $refItems );
+			$item = $this->_createItem( array(), $listItems, $refItems, array(), $node );
 			$this->_createTree( $node, $item, $listItemMap, $refItemMap );
 
 			return $item;
@@ -686,7 +684,7 @@ class MShop_Catalog_Manager_Default
 				$refItems = $refItemMap[$id];
 			}
 
-			$items[ $id ] = $this->_createItem( $node, array(), $listItems, $refItems );
+			$items[ $id ] = $this->_createItem( array(), $listItems, $refItems, array(), $node );
 		}
 
 		return $items;
@@ -702,9 +700,19 @@ class MShop_Catalog_Manager_Default
 	 * @param array $refItems Associative list of referenced items grouped by domain
 	 * @return MShop_Catalog_Item_Interface New catalog item
 	 */
-	protected function _createItem( MW_Tree_Node_Interface $node = null, array $children = array(),
-		array $listItems = array(), array $refItems = array() )
+	protected function _createItem( array $values = array(), array $listItems = array(), array $refItems = array(),
+		array $children = array(), MW_Tree_Node_Interface $node = null )
 	{
+		if( $node === null )
+		{
+			if( !isset( $values['siteid'] ) ) {
+				throw new MShop_Catalog_Exception( 'No site ID available for creating a catalog item' );
+			}
+
+			$node = $this->_createTreeManager( $values['siteid'] )->createNode();
+			$node->siteid = $values['siteid'];
+		}
+
 		if( isset( $node->config ) && ( $result = json_decode( $node->config, true ) ) !== null ) {
 			$node->config = $result;
 		}
@@ -736,7 +744,7 @@ class MShop_Catalog_Manager_Default
 				$refItems = $refItemMap[ $child->getId() ];
 			}
 
-			$newItem = $this->_createItem( $child, array(), $listItems, $refItems );
+			$newItem = $this->_createItem( array(), $listItems, $refItems, array(), $child );
 			$item->addChild( $newItem );
 
 			$this->_createTree( $child, $newItem, $listItemMap, $refItemMap );
@@ -758,46 +766,27 @@ class MShop_Catalog_Manager_Default
 			$config = $context->getConfig();
 			$dbm = $context->getDatabaseManager();
 
-			$treeConfig['search'] = $this->_searchConfig;
-			$treeConfig['dbname'] = $this->_getResourceName();
-			$treeConfig['sql'] = array(
-				'delete' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/delete' ) ),
-				'get' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/get' ) ),
-				'insert' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/insert' ) ),
-				'move-left' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/move-left' ) ),
-				'move-right' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/move-right' ) ),
-				'search' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/search' ) ),
-				'update' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/update' ) ),
-				'update-parentid' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/update-parentid' ) ),
-				'newid' => $config->get( 'mshop/catalog/manager/default/item/newid' ),
+
+			$treeConfig = array(
+				'search' => $this->_searchConfig,
+				'dbname' => $this->_getResourceName(),
+				'sql' => array(
+					'delete' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/delete' ) ),
+					'get' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/get' ) ),
+					'insert' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/insert' ) ),
+					'move-left' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/move-left' ) ),
+					'move-right' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/move-right' ) ),
+					'search' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/search' ) ),
+					'update' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/update' ) ),
+					'update-parentid' => str_replace( ':siteid', $siteid, $config->get( 'mshop/catalog/manager/default/item/update-parentid' ) ),
+					'newid' => $config->get( 'mshop/catalog/manager/default/item/newid' ),
+				),
 			);
 
 			$this->_treeManagers[$siteid] = MW_Tree_Factory::createManager( 'DBNestedSet', $treeConfig, $dbm );
 		}
 
 		return $this->_treeManagers[$siteid];
-	}
-
-
-	/**
-	 * Returns the list search config array.
-	 *
-	 * @return array List of associative arrays which contains the search config
-	 */
-	protected function _getListSearchConfig()
-	{
-		return $this->_listSearchConfig;
-	}
-
-
-	/**
-	 * Returns the list type search config array.
-	 *
-	 * @return array List of associative arrays which contains the search config
-	 */
-	protected function _getListTypeSearchConfig()
-	{
-		return $this->_listTypeSearchConfig;
 	}
 
 
@@ -825,17 +814,17 @@ class MShop_Catalog_Manager_Default
 	 * Updates the usage information of a node.
 	 *
 	 * @param integer $id Id of the record
-	 * @param MShop_Common_Item_Interface $item Catalog item
+	 * @param MShop_Catalog_Item_Interface $item Catalog item
 	 * @param boolean $case True if the record shoud be added or false for an update
 	 *
 	 */
-	private function _updateUsage( $id, MShop_Common_Item_Interface $item, $case = false )
+	private function _updateUsage( $id, MShop_Catalog_Item_Interface $item, $case = false )
 	{
 		$date = date( 'Y-m-d H:i:s' );
 		$context = $this->_getContext();
 
-		$dbname = $this->_getResourceName( 'db-catalog' );
 		$dbm = $context->getDatabaseManager();
+		$dbname = $this->_getResourceName();
 		$conn = $dbm->acquire( $dbname );
 
 		try
@@ -865,7 +854,7 @@ class MShop_Catalog_Manager_Default
 				$stmt->bind( 6, $id, MW_DB_Statement_Abstract::PARAM_INT );
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			$dbm->release( $conn, $dbname );
 		}

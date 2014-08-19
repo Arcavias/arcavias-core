@@ -11,15 +11,6 @@ class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
 	private static $_basket;
 
 
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('Controller_Frontend_Service_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
 	protected function setUp()
 	{
 		$this->_object = new Controller_Frontend_Service_Default( TestHelper::getContext() );
@@ -95,7 +86,7 @@ class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
 	public function testGetServiceAttributesNoItems()
 	{
 		$this->setExpectedException( 'Controller_Frontend_Service_Exception' );
-		$attributes = $this->_object->getServiceAttributes( 'invalid', -1, self::$_basket );
+		$this->_object->getServiceAttributes( 'invalid', -1, self::$_basket );
 	}
 
 
@@ -136,7 +127,7 @@ class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
 		$basket = $orderManager->getSubManager( 'base' )->createItem();
 
 		$this->setExpectedException( 'Controller_Frontend_Service_Exception' );
-		$attributes = $this->_object->getServicePrice( 'invalid', -1, $basket );
+		$this->_object->getServicePrice( 'invalid', -1, $basket );
 	}
 
 
@@ -149,6 +140,9 @@ class Controller_Frontend_Service_DefaultTest extends MW_Unittest_Testcase
 	}
 
 
+	/**
+	 * @return MShop_Order_Item_Base_Interface
+	 */
 	protected function _getServiceItem()
 	{
 		$serviceManager = MShop_Service_Manager_Factory::createManager( TestHelper::getContext() );

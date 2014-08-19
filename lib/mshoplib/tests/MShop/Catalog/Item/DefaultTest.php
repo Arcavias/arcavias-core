@@ -10,24 +10,10 @@
  */
 class MShop_Catalog_Item_DefaultTest extends MW_Unittest_Testcase
 {
+	private $_node;
 	private $_object;
 	private $_values;
 	private $_listItems;
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Catalog_Item_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**

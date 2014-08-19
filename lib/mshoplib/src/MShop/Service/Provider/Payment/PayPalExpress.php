@@ -160,7 +160,7 @@ class MShop_Service_Provider_Payment_PayPalExpress
 	 * separately isn't supported or not configured by the shop owner.
 	 *
 	 * @param MShop_Order_Item_Interface $order Order invoice object
-	 * @return MW_Common_Form_Interface Form object with URL, action and parameters to redirect to
+	 * @return MShop_Common_Item_Helper_Form_Default Form object with URL, action and parameters to redirect to
 	 * 	(e.g. to an external server of the payment provider or to a local success page)
 	 */
 	public function process( MShop_Order_Item_Interface $order )
@@ -199,12 +199,8 @@ class MShop_Service_Provider_Payment_PayPalExpress
 	public function query( MShop_Order_Item_Interface $order )
 	{
 		$orderManager = MShop_Factory::createManager( $this->_getContext(), 'order' );
-		$orderBaseManager = MShop_Factory::createManager( $this->_getContext(), 'order/base' );
 
-		$baseid = $order->getBaseId();
-		$baseItem = $orderBaseManager->getItem( $baseid );
-
-		if( ( $tid = $this->_getOrderServiceItem( $baseid )->getAttribute('TRANSACTIONID') ) === null )
+		if( ( $tid = $this->_getOrderServiceItem( $order->getBaseId() )->getAttribute('TRANSACTIONID') ) === null )
 		{
 			$msg = sprintf( 'PayPal Express: Payment transaction ID for order ID "%1$s" not available', $order->getId() );
 			throw new MShop_Service_Exception( $msg );
@@ -278,11 +274,8 @@ class MShop_Service_Provider_Payment_PayPalExpress
 	public function refund( MShop_Order_Item_Interface $order )
 	{
 		$orderManager = MShop_Factory::createManager( $this->_getContext(), 'order' );
-		$orderBaseManager = MShop_Factory::createManager( $this->_getContext(), 'order/base' );
 
-		$baseid = $order->getBaseId();
-		$baseItem = $orderBaseManager->getItem( $baseid );
-		$serviceItem = $this->_getOrderServiceItem( $baseid );
+		$serviceItem = $this->_getOrderServiceItem( $order->getBaseId() );
 
 		if( ( $tid = $serviceItem->getAttribute('TRANSACTIONID') ) === null )
 		{
@@ -317,12 +310,8 @@ class MShop_Service_Provider_Payment_PayPalExpress
 	public function cancel( MShop_Order_Item_Interface $order )
 	{
 		$orderManager = MShop_Factory::createManager( $this->_getContext(), 'order' );
-		$orderBaseManager = MShop_Factory::createManager( $this->_getContext(), 'order/base' );
 
-		$baseid = $order->getBaseId();
-		$baseItem = $orderBaseManager->getItem( $baseid );
-
-		if( ( $tid = $this->_getOrderServiceItem( $baseid )->getAttribute('TRANSACTIONID') ) === null )
+		if( ( $tid = $this->_getOrderServiceItem( $order->getBaseId() )->getAttribute('TRANSACTIONID') ) === null )
 		{
 			$msg = sprintf( 'PayPal Express: Payment transaction ID for order ID "%1$s" not available', $order->getId() );
 			throw new MShop_Service_Exception( $msg );
@@ -334,7 +323,7 @@ class MShop_Service_Provider_Payment_PayPalExpress
 
 		$urlQuery = http_build_query( $values, '', '&' );
 		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
-		$rvals = $this->_checkResponse( $order->getId(), $response, __METHOD__ );
+		$this->_checkResponse( $order->getId(), $response, __METHOD__ );
 
 		$order->setPaymentStatus( MShop_Order_Item_Abstract::PAY_CANCELED );
 		$orderManager->saveItem( $order );
@@ -382,7 +371,8 @@ class MShop_Service_Provider_Payment_PayPalExpress
 
 		$this->_checkIPN( $orderBaseManager, $baseItem, $additional );
 
-		$status['PAYMENTSTATUS'] = $additional['payment_status'];
+		$status = array( 'PAYMENTSTATUS' => $additional['payment_status'] );
+
 		if( isset( $additional['pending_reason'] ) ) {
 			$status['PENDINGREASON'] = $additional['pending_reason'];
 		}
@@ -441,7 +431,7 @@ class MShop_Service_Provider_Payment_PayPalExpress
 		$values['PAYMENTACTION'] = $this->_getConfigValue( array( 'paypalexpress.PaymentAction' ), 'Sale' );
 		$values['CURRENCYCODE'] = $baseItem->getPrice()->getCurrencyId();
 		$values['NOTIFYURL'] = $this->_getConfigValue( array( 'payment.url-update', 'payment.url-success' ) );
-		$values['AMT'] = $amount = ( $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getCosts() );
+		$values['AMT'] = ( $baseItem->getPrice()->getValue() + $baseItem->getPrice()->getCosts() );
 
 		$urlQuery = http_build_query( $values, '', '&' );
 		$response = $this->_getCommunication()->transmit( $this->_apiendpoint, 'POST', $urlQuery );
@@ -622,7 +612,7 @@ class MShop_Service_Provider_Payment_PayPalExpress
 			$values['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE'] = $orderAddressDelivery->getCountryId();
 			$values['PAYMENTREQUEST_0_SHIPTOZIP'] = $orderAddressDelivery->getPostal();
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // If no address is available
 
 		$lastPos = 0;
 		foreach( $orderBase->getProducts() as $product )
@@ -645,7 +635,6 @@ class MShop_Service_Provider_Payment_PayPalExpress
 			}
 		}
 
-		$paymentCosts = '0.00';
 		$paymentItem = $orderBase->getService('payment');
 		if( ( $paymentCosts = $paymentItem->getPrice()->getCosts() ) > '0.00' )
 		{
@@ -678,7 +667,7 @@ class MShop_Service_Provider_Payment_PayPalExpress
 			$values['L_SHIPPINGOPTIONNAME0'] = $orderServiceDeliveryItem->getCode();
 			$values['L_SHIPPINGOPTIONISDEFAULT0'] = 'true';
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // If no delivery service is available
 
 
 		return $values;
@@ -705,7 +694,7 @@ class MShop_Service_Provider_Payment_PayPalExpress
 	 * Saves a list of attributes for the order service.
 	 *
 	 * @param array $attributes Attributes which have to be saved
-	 * @param MShop_Order_Item_Base_Serive_Interface $serviceItem Service Item which saves the attributes
+	 * @param MShop_Order_Item_Base_Service_Interface $serviceItem Service Item which saves the attributes
 	 */
 	protected function _saveAttributes( array $attributes, MShop_Order_Item_Base_Service_Interface $serviceItem, $type = 'payment/paypal' )
 	{

@@ -27,10 +27,10 @@ Ext.extend(MShop.elements.siteLanguage.ComboBox, Ext.form.ComboBox, {
         this.on('select', this.onSiteLanguageSelect, this);
 
         var index;
-        if ( ( index = this.store.findExact('id', MShop.urlManager.getLanguageCode() ) ) >= 0 ) {
-            this.setValue( this.store.getAt(index).get('label') );
+        if((index = this.store.findExact('id', MShop.urlManager.getLanguageCode())) >= 0) {
+            this.setValue(this.store.getAt(index).get('label'));
         } else {
-            this.setValue( this.store.getAt( this.store.findExact('id', 'en') ).get('label') );
+            this.setValue(this.store.getAt(this.store.findExact('id', 'en')).get('label'));
         }
 
         MShop.elements.siteLanguage.ComboBox.superclass.initComponent.call(this);
@@ -58,11 +58,10 @@ Ext.reg('MShop.elements.siteLanguage.combo', MShop.elements.siteLanguage.ComboBo
 
 /**
  * @static
- *
  * @return {Ext.data.DirectStore}
  */
 MShop.elements.siteLanguage.getStore = function() {
-    if (!MShop.elements.siteLanguage.store) {
+    if(!MShop.elements.siteLanguage.store) {
         MShop.elements.siteLanguage.store = new Ext.data.JsonStore({
             fields : ['id', 'label'],
             data : MShop.i18n.available

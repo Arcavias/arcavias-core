@@ -53,7 +53,7 @@ class Controller_Jobs_Customer_Email_Watch_Default
 		$mailer = $context->getMail();
 		$view = $context->getView();
 
-		$i18nPaths = $arcavias->getI18nPaths();
+
 		$templatePaths = $arcavias->getCustomPaths( 'client/html' );
 
 		$helper = new MW_View_Helper_Config_Default( $view, $config );
@@ -188,10 +188,11 @@ class Controller_Jobs_Customer_Email_Watch_Default
 			if( isset( $products[$refId] ) )
 			{
 				$prices = $products[$refId]->getRefItems( 'price', 'default', 'default' );
+				$price = reset( $prices );
 
 				if( isset( $config['stock'] ) && $config['stock'] == 1 ||
 					isset( $config['price'] ) && $config['price'] == 1 &&
-					( $price = reset( $prices ) ) !== false && $config['price-value'] > $price->getValue()
+					$price !== false && $config['price-value'] > $price->getValue()
 				) {
 					$result[$id] = $products[$refId];
 				}

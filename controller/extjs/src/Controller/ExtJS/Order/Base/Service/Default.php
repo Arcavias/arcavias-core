@@ -52,16 +52,8 @@ class Controller_ExtJS_Order_Base_Service_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'order.base.service.id'} ) ) { $item->setId( $entry->{'order.base.service.id'} ); }
-			if( isset( $entry->{'order.base.service.baseid'} ) ) { $item->setBaseId( $entry->{'order.base.service.baseid'} ); }
-			if( isset( $entry->{'order.base.service.code'} ) ) { $item->setCode( $entry->{'order.base.service.code'} ); }
-			if( isset( $entry->{'order.base.service.name'} ) ) { $item->setName( $entry->{'order.base.service.name'} ); }
-			if( isset( $entry->{'order.base.service.type'} ) ) { $item->setType( $entry->{'order.base.service.type'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -78,9 +70,35 @@ class Controller_ExtJS_Order_Base_Service_Default
 
 
 	/**
+	 * Creates a new order base service item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "order.base.service" prefix
+	 * @return MShop_Order_Item_Base_Product_Interface Order service item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'order.base.service.id': $item->setId( $value ); break;
+				case 'order.base.service.type': $item->setType( $value ); break;
+				case 'order.base.service.baseid': $item->setBaseId( $value ); break;
+				case 'order.base.service.code': $item->setCode( $value ); break;
+				case 'order.base.service.name': $item->setName( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

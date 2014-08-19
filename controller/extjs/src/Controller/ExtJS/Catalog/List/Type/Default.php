@@ -51,14 +51,7 @@ class Controller_ExtJS_Catalog_List_Type_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'catalog.list.type.id'} ) ) { $item->setId( $entry->{'catalog.list.type.id'} ); }
-			if( isset( $entry->{'catalog.list.type.code'} ) ) { $item->setCode( $entry->{'catalog.list.type.code'} ); }
-			if( isset( $entry->{'catalog.list.type.domain'} ) ) { $item->setDomain( $entry->{'catalog.list.type.domain'} ); }
-			if( isset( $entry->{'catalog.list.type.label'} ) ) {	$item->setLabel( $entry->{'catalog.list.type.label'} ); }
-			if( isset( $entry->{'catalog.list.type.status'} ) ) { $item->setStatus( $entry->{'catalog.list.type.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
 
 			$ids[] = $item->getId();
@@ -77,9 +70,35 @@ class Controller_ExtJS_Catalog_List_Type_Default
 
 
 	/**
+	 * Creates a new catalog list type item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "catalog.list.type" prefix
+	 * @return MShop_Common_Item_Type_Interface Common type item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'catalog.list.type.id': $item->setId( $value ); break;
+				case 'catalog.list.type.code': $item->setCode( $value ); break;
+				case 'catalog.list.type.domain': $item->setDomain( $value ); break;
+				case 'catalog.list.type.label': $item->setLabel( $value ); break;
+				case 'catalog.list.type.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

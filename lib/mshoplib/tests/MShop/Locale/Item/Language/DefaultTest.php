@@ -10,13 +10,13 @@
  */
 class MShop_Locale_Item_Language_DefaultTest extends MW_Unittest_Testcase
 {
-
 	private $_object;
+	private $_values;
 
 
 	protected function setUp()
 	{
-		$this->values = array(
+		$this->_values = array(
 			'id' => 'es',
 			'label' => 'spanish',
 			'siteid' => 1,
@@ -25,22 +25,13 @@ class MShop_Locale_Item_Language_DefaultTest extends MW_Unittest_Testcase
 			'ctime' => '2011-01-01 00:00:01',
 			'editor' => 'unitTestUser'
 		);
-		$this->_object = new MShop_Locale_Item_Language_Default($this->values);
+		$this->_object = new MShop_Locale_Item_Language_Default($this->_values);
 	}
 
 
 	protected function tearDown()
 	{
 		$this->_object = null;
-	}
-
-
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('MShop_Locale_Item_Language_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
 	}
 
 
@@ -153,7 +144,7 @@ class MShop_Locale_Item_Language_DefaultTest extends MW_Unittest_Testcase
 	public function testToArray()
 	{
 		$arrayObject = $this->_object->toArray();
-		$this->assertEquals((count($this->values) + 1), count($arrayObject));
+		$this->assertEquals((count($this->_values) + 1), count($arrayObject));
 
 		$this->assertEquals($this->_object->getId(), $arrayObject['locale.language.id']);
 		$this->assertEquals($this->_object->getCode(), $arrayObject['locale.language.code']);

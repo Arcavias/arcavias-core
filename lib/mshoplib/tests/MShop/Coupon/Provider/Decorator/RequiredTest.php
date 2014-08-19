@@ -17,21 +17,6 @@ class MShop_Coupon_Provider_Decorator_RequiredTest extends PHPUnit_Framework_Tes
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Coupon_Provider_Decorator_RequiredTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, especially creates products.
 	 * This method is called before a test is executed.
 	 *
@@ -39,6 +24,7 @@ class MShop_Coupon_Provider_Decorator_RequiredTest extends PHPUnit_Framework_Tes
 	 */
 	protected function setUp()
 	{
+		$orderProducts = array();
 		$context = TestHelper::getContext();
 		$this->_couponItem = MShop_Coupon_Manager_Factory::createManager( $context )->createItem();
 

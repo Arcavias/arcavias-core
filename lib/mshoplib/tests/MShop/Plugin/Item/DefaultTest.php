@@ -12,18 +12,7 @@
 class MShop_Plugin_Item_DefaultTest extends MW_Unittest_Testcase
 {
 	private $_object;
-
-
-	/**
-	 * Runs the test methods of this class.
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Plugin_Item_DefaultTest');
-		PHPUnit_TextUI_TestRunner::run($suite);
-	}
+	private $_values;
 
 
 	/**
@@ -31,7 +20,7 @@ class MShop_Plugin_Item_DefaultTest extends MW_Unittest_Testcase
 	 */
 	protected function setUp()
 	{
-		$this->values = array(
+		$this->_values = array(
 			'id' => 123,
 			'siteid'=>99,
 			'typeid' => 2,
@@ -46,7 +35,7 @@ class MShop_Plugin_Item_DefaultTest extends MW_Unittest_Testcase
 			'editor' => 'unitTestUser'
 		);
 
-		$this->_object = new MShop_Plugin_Item_Default( $this->values );
+		$this->_object = new MShop_Plugin_Item_Default( $this->_values );
 	}
 
 
@@ -183,7 +172,7 @@ class MShop_Plugin_Item_DefaultTest extends MW_Unittest_Testcase
 	public function testToArray()
 	{
 		$arrayObject = $this->_object->toArray();
-		$this->assertEquals( count( $this->values ), count( $arrayObject ) );
+		$this->assertEquals( count( $this->_values ), count( $arrayObject ) );
 
 		$this->assertEquals( $this->_object->getId(), $arrayObject['plugin.id'] );
 		$this->assertEquals( $this->_object->getSiteId(), $arrayObject['plugin.siteid'] );

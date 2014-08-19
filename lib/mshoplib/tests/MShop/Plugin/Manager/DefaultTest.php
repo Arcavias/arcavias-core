@@ -19,26 +19,7 @@ class MShop_Plugin_Manager_DefaultTest extends MW_Unittest_Testcase
 	private $_object;
 	private $_examplePlugin;
 	private $_examplePlugin2;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Plugin_Manager_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -83,7 +64,7 @@ class MShop_Plugin_Manager_DefaultTest extends MW_Unittest_Testcase
 	 */
 	protected function tearDown()
 	{
-		unset($this->_object);
+		unset( $this->_object, $this->_context );
 	}
 
 

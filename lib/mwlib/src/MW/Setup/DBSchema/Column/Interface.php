@@ -24,8 +24,9 @@ interface MW_Setup_DBSchema_Column_Interface
 	 * @param string $type Type of the column
 	 * @param integer $length Length of the column if the column type is of variable length
 	 * @param string $default Default value if not specified
-	 * @param boolean $nullable If NULL values are allowed
+	 * @param string $nullable "YES" if null values are allowed, "NO" if not
 	 * @param string $collation collation type of the column
+	 * @return void
 	 */
 	public function __construct( $tablename, $name, $type, $length, $default, $nullable, $collation );
 
@@ -46,7 +47,7 @@ interface MW_Setup_DBSchema_Column_Interface
 	/**
 	 * Returns the default of the column.
 	 *
-	 * @return mixed Default of the column
+	 * @return string Default of the column
 	 */
 	public function getDefaultValue();
 

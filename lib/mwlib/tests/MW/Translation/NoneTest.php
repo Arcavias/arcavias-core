@@ -8,22 +8,7 @@
  */
 class MW_Translation_NoneTest extends MW_Unittest_Testcase
 {
-	/**
-	 * @var MW_Translation_None
-	 */
 	private $_object;
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		$suite  = new PHPUnit_Framework_TestSuite('MW_Translation_None');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -52,34 +37,34 @@ class MW_Translation_NoneTest extends MW_Unittest_Testcase
 
 	public function testConstructTwoLetterLocale()
 	{
-		$object = new MW_Translation_None( 'de' );
+		new MW_Translation_None( 'de' );
 	}
 
 
 	public function testConstructFiveLetterLocale()
 	{
-		$object = new MW_Translation_None( 'de_DE' );
+		new MW_Translation_None( 'de_DE' );
 	}
 
 
 	public function testConstructInvalidUnderscoreLocale()
 	{
 		$this->setExpectedException( 'MW_Translation_Exception' );
-		$object = new MW_Translation_None( 'de_' );
+		new MW_Translation_None( 'de_' );
 	}
 
 
 	public function testConstructInvalidCaseLocale()
 	{
 		$this->setExpectedException( 'MW_Translation_Exception' );
-		$object = new MW_Translation_None( 'de_de' );
+		new MW_Translation_None( 'de_de' );
 	}
 
 
 	public function testConstructInvalidCharLocale()
 	{
 		$this->setExpectedException( 'MW_Translation_Exception' );
-		$object = new MW_Translation_None( 'd' );
+		new MW_Translation_None( 'd' );
 	}
 
 

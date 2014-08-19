@@ -12,12 +12,8 @@
 class MShop_Product_Manager_Stock_Warehouse_DefaultTest extends MW_Unittest_Testcase
 {
 	private $_object;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
+
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -43,21 +39,6 @@ class MShop_Product_Manager_Stock_Warehouse_DefaultTest extends MW_Unittest_Test
 	public function testCleanup()
 	{
 		$this->_object->cleanup( array( -1 ) );
-	}
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite( 'MShop_Product_Manager_Stock_Warehouse_DefaultTest' );
-		$result = PHPUnit_TextUI_TestRunner::run( $suite );
 	}
 
 
@@ -152,6 +133,7 @@ class MShop_Product_Manager_Stock_Warehouse_DefaultTest extends MW_Unittest_Test
 		$total = 0;
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '!=', 'product.stock.warehouse.id', null );
 		$expr[] = $search->compare( '!=', 'product.stock.warehouse.siteid', null );
 		$expr[] = $search->compare( '==', 'product.stock.warehouse.code', 'unit_warehouse1' );

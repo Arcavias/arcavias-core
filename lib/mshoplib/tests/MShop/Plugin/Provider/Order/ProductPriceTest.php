@@ -8,23 +8,9 @@
 class MShop_Plugin_Provider_Order_ProductPriceTest extends PHPUnit_Framework_TestCase
 {
 	private $_order;
+	private $_price;
 	private $_plugin;
 	private $_product;
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Plugin_Provider_Order_ProductPriceTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**

@@ -22,6 +22,7 @@ class MW_Container_Content_CSV
 	private $_enclosure;
 	private $_escape;
 	private $_lineend;
+	private $_endsubst;
 	private $_fh;
 	private $_data;
 	private $_position = 0;
@@ -35,24 +36,18 @@ class MW_Container_Content_CSV
 	 * - csv-enclosure (default: '"')
 	 * - csv-escape (default: '"')
 	 * - csv-lineend (default: LF)
+	 * - csv-lineend-subst (default: ' ')
 	 *
-	 * @param resource|string $resource File pointer or path to the actual file
+	 * @param string $resource Path to the actual file
 	 * @param string $name Name of the CSV file
 	 * @param array $options Associative list of key/value pairs for configuration
 	 */
 	public function __construct( $resource, $name, array $options = array() )
 	{
-		if( !is_resource( $resource ) )
-		{
-			if( ( $this->_fh = @fopen( $resource, 'a+' ) ) === false
-				&& ( $this->_fh = fopen( $resource, 'r' ) ) === false
-			) {
-				throw new MW_Container_Exception( sprintf( 'Unable to open file "%1$s"', $resource ) );
-			}
-		}
-		else
-		{
-			$this->_fh = $resource;
+		if( ( $this->_fh = @fopen( $resource, 'a+' ) ) === false
+			&& ( $this->_fh = fopen( $resource, 'r' ) ) === false
+		) {
+			throw new MW_Container_Exception( sprintf( 'Unable to open file "%1$s"', $resource ) );
 		}
 
 		if( substr( $name, -4 ) !== '.csv' ) {
@@ -65,6 +60,7 @@ class MW_Container_Content_CSV
 		$this->_enclosure = $this->_getOption( 'csv-enclosure', '"' );
 		$this->_escape = $this->_getOption( 'csv-escape', '"' );
 		$this->_lineend = $this->_getOption( 'csv-lineend', chr( 10 ) );
+		$this->_endsubst = $this->_getOption( 'csv-lineend-subst', ' ' );
 		$this->_data = $this->_getData();
 	}
 
@@ -77,11 +73,11 @@ class MW_Container_Content_CSV
 	public function close()
 	{
 		if( fflush( $this->_fh ) === false ) {
-			throw new MW_Container_Exception( sprintf( 'Unable to flush file "%1$s"', $this->_resource ) );
+			throw new MW_Container_Exception( sprintf( 'Unable to flush file "%1$s"', $this->getResource() ) );
 		}
 
 		if( fclose( $this->_fh ) === false ) {
-			throw new MW_Container_Exception( sprintf( 'Unable to close file "%1$s"', $this->_resource ) );
+			throw new MW_Container_Exception( sprintf( 'Unable to close file "%1$s"', $this->getResource() ) );
 		}
 	}
 
@@ -89,18 +85,20 @@ class MW_Container_Content_CSV
 	/**
 	 * Adds row to the content object.
 	 *
-	 * @param mixed $data Data to add
+	 * @param string[] $data Data to add
 	 */
 	public function add( $data )
 	{
 		$enclosure = $this->_enclosure;
 
-		foreach( $data as $key => $entry ) {
+		foreach( (array) $data as $key => $entry )
+		{
+			$entry = str_replace( $this->_lineend, $this->_endsubst, $entry );
 			$data[$key] = $enclosure . str_replace( $enclosure, $this->_escape . $enclosure, $entry ) . $enclosure;
 		}
 
 		if( fwrite( $this->_fh, implode( $this->_separator, $data ) . $this->_lineend ) === false ) {
-			throw new MW_Container_Exception( sprintf( 'Unable to add content to file "%1$s"', $this->_filename ) );
+			throw new MW_Container_Exception( sprintf( 'Unable to add content to file "%1$s"', $this->getName() ) );
 		}
 	}
 
@@ -119,7 +117,7 @@ class MW_Container_Content_CSV
 	/**
 	 * Returns the key of the current element.
 	 *
-	 * @return integer Position within the CSV file
+	 * @return integer|null Position within the CSV file or null if end of file is reached
 	 */
 	function key()
 	{
@@ -168,7 +166,7 @@ class MW_Container_Content_CSV
 	 */
 	function valid()
 	{
-		return !feof( $this->_fh );
+		return ( $this->_data === null ? !feof( $this->_fh ) : true );
 	}
 
 

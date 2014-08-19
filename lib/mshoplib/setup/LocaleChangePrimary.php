@@ -26,7 +26,7 @@ class MW_Setup_Task_LocaleChangePrimary extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -37,7 +37,7 @@ class MW_Setup_Task_LocaleChangePrimary extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -73,7 +73,6 @@ class MW_Setup_Task_LocaleChangePrimary extends MW_Setup_Task_Abstract
 		foreach( $stmts as $table => $stmt )
 		{
 			$this->_msg( sprintf( 'Checking table "%1$s" for PRIMARY": ', $table ), 1 );
-			$counter = 0;
 			$counter = $this->_getValue( sprintf( $search, $table ), 'counter' );
 
 			if( $counter == 2 )

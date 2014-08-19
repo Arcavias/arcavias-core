@@ -369,7 +369,7 @@ class MShop_Price_Manager_Default
 				$stmt->bind( 14, $date ); //ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if( $id === null && $fetch === true )
 			{
@@ -594,8 +594,10 @@ class MShop_Price_Manager_Default
 
 			if( $currencyid !== null )
 			{
-				$expr[] = $object->compare( '==', 'price.currencyid', $currencyid );
-				$expr[] = $object->getConditions();
+				$expr = array(
+					$object->compare( '==', 'price.currencyid', $currencyid ),
+					$object->getConditions(),
+				);
 
 				$object->setConditions( $object->combine( '&&', $expr ) );
 			}
@@ -612,7 +614,7 @@ class MShop_Price_Manager_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g type, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g type, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -733,10 +735,12 @@ class MShop_Price_Manager_Default
 	 * Creates a new price item
 	 *
 	 * @param array $values List of attributes for price item
+	 * @param array $listItems List of items implementing MShop_Common_Item_List_Interface
+	 * @param array $refItems List of items implementing MShop_Common_Item_Interface
 	 * @return MShop_Price_Item_Interface New price item
 	 */
-	protected function _createItem( array $values = array() )
+	protected function _createItem( array $values = array(), array $listItems = array(), array $refItems = array() )
 	{
-		return new MShop_Price_Item_Default( $values );
+		return new MShop_Price_Item_Default( $values, $listItems, $refItems );
 	}
 }

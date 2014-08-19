@@ -39,19 +39,15 @@ class MShop_Coupon_Provider_PercentRebate
 			) );
 		}
 
-		$sum = 0.00;
+
+		$sum = 0;
 		foreach( $base->getProducts() as $product ) {
-			$sum += $product->getPrice()->getValue() * $product->getQuantity();
+			$sum += $product->getPrice()->getValue() + $product->getPrice()->getCosts();
 		}
 
 		$rebate = round( $sum * (float) $config['percentrebate.rebate'] / 100, 2 );
-		$price = MShop_Factory::createManager( $this->_getContext(), 'price' )->createItem();
-		$price->setValue( -$rebate );
-		$price->setRebate( $rebate );
+		$orderProducts = $this->_createMonetaryRebateProducts( $base, $config['percentrebate.productcode'], $rebate );
 
-		$orderProduct = $this->_createProduct( $config['percentrebate.productcode'], 1 );
-		$orderProduct->setPrice( $price );
-
-		$base->addCoupon( $this->_getCode(), array( $orderProduct ) );
+		$base->addCoupon( $this->_getCode(), $orderProducts );
 	}
 }

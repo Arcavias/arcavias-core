@@ -11,21 +11,6 @@ class Client_Html_Catalog_Detail_Basket_Selection_DefaultTest extends MW_Unittes
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Catalog_Detail_Basket_Selection_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -60,7 +45,7 @@ class Client_Html_Catalog_Detail_Basket_Selection_DefaultTest extends MW_Unittes
 		$expire = null;
 		$output = $this->_object->getHeader( 1, $tags, $expire );
 
-		$this->assertEquals( '', $output );
+		$this->assertNotNull( $output );
 		$this->assertEquals( null, $expire );
 		$this->assertEquals( 1, count( $tags ) );
 	}
@@ -102,6 +87,9 @@ class Client_Html_Catalog_Detail_Basket_Selection_DefaultTest extends MW_Unittes
 	}
 
 
+	/**
+	 * @param string $code
+	 */
 	protected function _getProductItem( $code )
 	{
 		$manager = MShop_Product_Manager_Factory::createManager( TestHelper::getContext() );

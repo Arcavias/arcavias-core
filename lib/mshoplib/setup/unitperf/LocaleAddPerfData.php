@@ -14,7 +14,7 @@ class MW_Setup_Task_LocaleAddPerfData extends MW_Setup_Task_MShopAddLocaleData
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -25,7 +25,7 @@ class MW_Setup_Task_LocaleAddPerfData extends MW_Setup_Task_MShopAddLocaleData
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -45,7 +45,6 @@ class MW_Setup_Task_LocaleAddPerfData extends MW_Setup_Task_MShopAddLocaleData
 	/**
 	 * Insert records from file containing the SQL records.
 	 *
-	 * @param string $filename Name of the file
 	 */
 	protected function _process()
 	{
@@ -78,7 +77,9 @@ class MW_Setup_Task_LocaleAddPerfData extends MW_Setup_Task_MShopAddLocaleData
 		$search = $localeSiteManager->createSearch();
 		$search->setConditions( $search->compare( '==', 'locale.site.code', 'unitperf' ) );
 
-		foreach( $localeSiteManager->searchItems( $search ) as $site ) {
+		foreach( $localeSiteManager->searchItems( $search ) as $site )
+		{
+			$this->_additional->setLocale( $localeManager->bootstrap( $site->getCode(), '', '', false ) );
 			$localeSiteManager->deleteItem( $site->getId() );
 		}
 

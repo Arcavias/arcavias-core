@@ -8,17 +8,7 @@
 class MShop_Media_Item_DefaultTest extends MW_Unittest_Testcase
 {
 	private $_object;
-
-	/**
-	 * Runs the test methods of this class.
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Media_Item_DefaultTest');
-		PHPUnit_TextUI_TestRunner::run($suite);
-	}
+	private $_values;
 
 
 	/**
@@ -26,7 +16,7 @@ class MShop_Media_Item_DefaultTest extends MW_Unittest_Testcase
 	 */
 	protected function setUp()
 	{
-		$this->values = array(
+		$this->_values = array(
 			'id' => 1,
 			'siteid' => 123,
 			'typeid' => 2,
@@ -43,7 +33,7 @@ class MShop_Media_Item_DefaultTest extends MW_Unittest_Testcase
 			'editor' => 'unitTestUser'
 		);
 
-		$this->_object = new MShop_Media_Item_Default( $this->values );
+		$this->_object = new MShop_Media_Item_Default( $this->_values );
 	}
 
 
@@ -231,7 +221,7 @@ class MShop_Media_Item_DefaultTest extends MW_Unittest_Testcase
 	{
 		$arrayObject = $this->_object->toArray();
 
-		$this->assertEquals( count( $this->values ), count( $arrayObject ) );
+		$this->assertEquals( count( $this->_values ), count( $arrayObject ) );
 
 		$this->assertEquals( $this->_object->getId(), $arrayObject['media.id'] );
 		$this->assertEquals( $this->_object->getSiteId(), $arrayObject['media.siteid'] );

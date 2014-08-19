@@ -183,7 +183,7 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 	 *
 	 * @param integer|null $id Retrieve nodes starting from the given ID
 	 * @param integer $level One of the level constants from MW_Tree_Manager_Abstract
-	 * @param MW_Common_Criteria_Interface|null $criteria Optional criteria object with conditions
+	 * * @param MW_Common_Criteria_Interface|null $condition Optional criteria object with conditions
 	 * @return MW_Tree_Node_Interface Node, maybe with subnodes
 	 */
 	public function getNode( $id = null, $level = MW_Tree_Manager_Abstract::LEVEL_TREE, MW_Common_Criteria_Interface $condition = null )
@@ -345,10 +345,10 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 	/**
 	 * Moves an existing node to the new parent in the storage.
 	 *
-	 * @param mixed $id ID of the node that should be moved
-	 * @param mixed $oldParentId ID of the old parent node which currently contains the node that should be removed
-	 * @param mixed $newParentId ID of the new parent node where the node should be moved to
-	 * @param mixed $newRefId ID of the node where the node should be inserted before (null to append)
+	 * @param string|null $id ID of the node that should be moved
+	 * @param string|null $oldParentId ID of the old parent node which currently contains the node that should be removed
+	 * @param string|null $newParentId ID of the new parent node where the node should be moved to
+	 * @param null|string $newRefId ID of the node where the node should be inserted before (null to append)
 	 */
 	public function moveNode( $id, $oldParentId, $newParentId, $newRefId = null )
 	{
@@ -513,7 +513,7 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 			$stmt->bind( 2, $node->getCode() );
 			$stmt->bind( 3, $node->getStatus() );
 			$stmt->bind( 4, $node->getId() );
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			$this->_dbm->release( $conn, $this->_dbname );
 		}
@@ -603,8 +603,10 @@ class MW_Tree_Manager_DBNestedSet extends MW_Tree_Manager_Abstract
 
 		$search = $this->createSearch();
 
-		$expr[] = $search->compare( '<=', $this->_searchConfig['left']['code'], $node->left );
-		$expr[] = $search->compare( '>=', $this->_searchConfig['right']['code'], $node->right );
+		$expr = array(
+			$search->compare( '<=', $this->_searchConfig['left']['code'], $node->left ),
+			$search->compare( '>=', $this->_searchConfig['right']['code'], $node->right ),
+		);
 
 		$search->setConditions( $search->combine( '&&', $expr ) );
 		$search->setSortations( array( $search->sort( '+', $this->_searchConfig['left']['code'] ) ) );

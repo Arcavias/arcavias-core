@@ -14,11 +14,11 @@ class MW_Setup_Task_MShopAddPluginData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
-		return array();
+		return array( 'TablesCreateMShop' );
 	}
 
 
@@ -114,7 +114,7 @@ class MW_Setup_Task_MShopAddPluginData extends MW_Setup_Task_Abstract
 			try {
 				$pluginManager->saveItem( $item );
 				$num++;
-			} catch( Exception $e ) { ; }
+			} catch( Exception $e ) { ; } // if plugin configuration was already available
 		}
 
 		$this->_status( $num > 0 ? $num . '/' . $total : 'OK' );

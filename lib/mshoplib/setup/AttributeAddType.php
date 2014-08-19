@@ -26,22 +26,22 @@ class MW_Setup_Task_AttributeAddType extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
-		return array('TablesCreateMShop');
+		return array();
 	}
 
 
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
-		return array();
+		return array( 'TablesCreateMShop' );
 	}
 
 

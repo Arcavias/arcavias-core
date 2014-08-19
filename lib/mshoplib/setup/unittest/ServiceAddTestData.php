@@ -14,7 +14,7 @@ class MW_Setup_Task_ServiceAddTestData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -96,8 +96,8 @@ class MW_Setup_Task_ServiceAddTestData extends MW_Setup_Task_Abstract
 			$typeIds[ $key ] = $type->getId();
 		}
 
-		$parentIds = array ();
 		$parent = $serviceManager->createItem();
+
 		foreach( $testdata['service'] as $key => $dataset )
 		{
 			if( !isset( $typeIds[ $dataset['typeid'] ] ) ) {

@@ -14,7 +14,7 @@ class MW_Setup_Task_AttributeListAddTestData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -25,7 +25,7 @@ class MW_Setup_Task_AttributeListAddTestData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -237,7 +237,7 @@ class MW_Setup_Task_AttributeListAddTestData extends MW_Setup_Task_Abstract
 			$typeids[] = $item->getId();
 		}
 
-		$serch = $attributeManager->createSearch();
+		$search = $attributeManager->createSearch();
 		$expr = array(
 			$search->compare( '==', 'attribute.code', $codes ),
 			$search->compare( '==', 'attribute.typeid', $typeids ),

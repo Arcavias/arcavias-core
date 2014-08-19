@@ -14,7 +14,7 @@ class MW_Setup_Task_ProductAddAttributeVariantPerfData extends MW_Setup_Task_Pro
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -25,7 +25,7 @@ class MW_Setup_Task_ProductAddAttributeVariantPerfData extends MW_Setup_Task_Pro
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -146,7 +146,7 @@ class MW_Setup_Task_ProductAddAttributeVariantPerfData extends MW_Setup_Task_Pro
 
 		$this->_txBegin();
 
-		$start = $num = 0;
+		$start = 0;
 
 		do
 		{

@@ -45,48 +45,21 @@ class Controller_ExtJS_Catalog_List_Default
 		$this->_checkParams( $params, array( 'site', 'items' ) );
 		$this->_setLocale( $params->site );
 
-		$ids = array();
+		$ids = $refIds = $domains = array();
 		$items = ( !is_array( $params->items ) ? array( $params->items ) : $params->items );
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'catalog.list.id'} ) ) { $item->setId( $entry->{'catalog.list.id'} ); }
-			if( isset( $entry->{'catalog.list.domain'} ) ) { $item->setDomain( $entry->{'catalog.list.domain'} ); }
-			if( isset( $entry->{'catalog.list.parentid'} ) ) { $item->setParentId( $entry->{'catalog.list.parentid'} ); }
-			if( isset( $entry->{'catalog.list.refid'} ) ) { $item->setRefId( $entry->{'catalog.list.refid'} ); }
-			if( isset( $entry->{'catalog.list.position'} ) ) { $item->setPosition( $entry->{'catalog.list.position'} ); }
-			if( isset( $entry->{'catalog.list.status'} ) ) { $item->setStatus( $entry->{'catalog.list.status'} );	}
-			if( isset( $entry->{'catalog.list.config'} ) ) { $item->setConfig( (array) $entry->{'catalog.list.config'} ); }
-
-
-			if( isset( $entry->{'catalog.list.typeid'} ) && $entry->{'catalog.list.typeid'} != '' ) {
-				$item->setTypeId( $entry->{'catalog.list.typeid'} );
-			}
-
-			if( isset( $entry->{'catalog.list.datestart'} ) && $entry->{'catalog.list.datestart'} != '' )
-			{
-				$datetime = str_replace( 'T', ' ', $entry->{'catalog.list.datestart'} );
-				$entry->{'catalog.list.datestart'} = $datetime;
-				$item->setDateStart( $datetime );
-			}
-
-			if( isset( $entry->{'catalog.list.dateend'} ) && $entry->{'catalog.list.dateend'} != '' )
-			{
-				$datetime = str_replace( 'T', ' ', $entry->{'catalog.list.dateend'} );
-				$entry->{'catalog.list.dateend'} = $datetime;
-				$item->setDateEnd( $datetime );
-			}
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
 
+			$domains[ $item->getDomain() ] = true;
 			$refIds[] = $item->getRefId();
 			$ids[] = $item->getId();
 		}
 
 
-		if( $item->getDomain() === 'product' )
+		if( isset( $domains['product'] ) )
 		{
 			$context = $this->_getContext();
 			$productManager = MShop_Factory::createManager( $context, 'product' );
@@ -148,9 +121,54 @@ class Controller_ExtJS_Catalog_List_Default
 
 
 	/**
+	 * Creates a new catalog list item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "catalog.list" prefix
+	 * @return MShop_Common_Item_List_Interface Common list item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( (array) $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'catalog.list.id': $item->setId( $value ); break;
+				case 'catalog.list.domain': $item->setDomain( $value ); break;
+				case 'catalog.list.parentid': $item->setParentId( $value ); break;
+				case 'catalog.list.position': $item->setPosition( $value ); break;
+				case 'catalog.list.config': $item->setConfig( (array) $value ); break;
+				case 'catalog.list.status': $item->setStatus( $value ); break;
+				case 'catalog.list.typeid': $item->setTypeId( $value ); break;
+				case 'catalog.list.refid': $item->setRefId( $value ); break;
+				case 'catalog.list.datestart':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'catalog.list.datestart'} = $value;
+						$item->setDateStart( $value );
+					}
+					break;
+				case 'catalog.list.dateend':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'catalog.list.dateend'} = $value;
+						$item->setDateEnd( $value );
+					}
+					break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

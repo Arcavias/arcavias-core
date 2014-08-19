@@ -14,7 +14,7 @@ class MW_Setup_Task_CatalogAddTestData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -78,7 +78,7 @@ class MW_Setup_Task_CatalogAddTestData extends MW_Setup_Task_Abstract
 	{
 		$catalogManager = MShop_Catalog_Manager_Factory::createManager( $this->_additional, 'Default' );
 
-		$parentIds['init'] = null;
+		$parentIds = array( 'init' => null );
 		$catalog = $catalogManager->createItem();
 
 		foreach( $testdata['catalog'] as $key => $dataset )

@@ -172,7 +172,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	/**
 	 * Sets the customer ID of the customer who has ordered.
 	 *
-	 * @param string $customerId Unique ID of the customer
+	 * @param string $customerid Unique ID of the customer
 	 */
 	public function setCustomerId( $customerid )
 	{
@@ -230,7 +230,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	/**
 	 * Returns the product item of an (future) order specified by its key.
 	 *
-	 * @param mixed $key Key returned by getProducts() identifying the requested product
+	 * @param integer $key Key returned by getProducts() identifying the requested product
 	 * @return MShop_Order_Item_Base_Product_Interface Product item of an order
 	 */
 	public function getProduct( $key )
@@ -482,7 +482,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 	 * Adds a coupon code entered by the customer and the given product item to the basket.
 	 *
 	 * @param string $code Coupon code
-	 * @param array $products List of coupon products implementing MShop_Order_Item_Base_Product_Interface
+	 * @param MShop_Order_Item_Base_Product_Interface[] $products List of coupon products
 	 */
 	public function addCoupon( $code, array $products = array() )
 	{
@@ -604,7 +604,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 			}
 		}
 
-		return clone $this->_price;
+		return $this->_price;
 	}
 
 
@@ -750,35 +750,7 @@ class MShop_Order_Item_Base_Default extends MShop_Order_Item_Base_Abstract
 
 		foreach( $this->_products as $position => $product )
 		{
-			if( $product->getProductCode() !== $item->getProductCode() ) {
-				continue;
-			}
-
-			if( $product->getSupplierCode() !== $item->getSupplierCode() ) {
-				continue;
-			}
-
-			if( $product->getFlags() !== $item->getFlags() ) {
-				continue;
-			}
-
-			if( $product->getName() !== $item->getName() ) {
-				continue;
-			}
-
-			if( $product->getPrice()->getValue() !== $item->getPrice()->getValue() ) {
-				continue;
-			}
-
-			if( $product->getPrice()->getCosts() !== $item->getPrice()->getCosts() ) {
-				continue;
-			}
-
-			if( $product->getPrice()->getRebate() !== $item->getPrice()->getRebate() ) {
-				continue;
-			}
-
-			if( $product->getPrice()->getTaxRate() !== $item->getPrice()->getTaxRate() ) {
+			if( $product->compare( $item ) === false ) {
 				continue;
 			}
 

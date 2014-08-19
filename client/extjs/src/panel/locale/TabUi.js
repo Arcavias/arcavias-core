@@ -14,24 +14,24 @@ Ext.ns('MShop.panel.locale');
  */
 MShop.panel.locale.TabUi = Ext.extend(Ext.Panel, {
 
-	maximized : true,
-	layout : 'fit',
-	modal : true,
+    maximized : true,
+    layout : 'fit',
+    modal : true,
 
-	initComponent : function() {
+    initComponent : function() {
 
-		this.title = MShop.I18n.dt( 'client/extjs', 'Locale' );
+        this.title = MShop.I18n.dt('client/extjs', 'Locale');
 
-		this.items = [{
-			xtype : 'tabpanel',
-			activeTab : 0,
-			border : false,
-			itemId : 'MShop.panel.locale.tabui',
-			plugins : [ 'ux.itemregistry' ]
-		}];
+        this.items = [{
+            xtype : 'tabpanel',
+            activeTab : 0,
+            border : false,
+            itemId : 'MShop.panel.locale.tabui',
+            plugins : ['ux.itemregistry']
+        }];
 
-		MShop.panel.locale.TabUi.superclass.initComponent.call(this);
-	}
+        MShop.panel.locale.TabUi.superclass.initComponent.call(this);
+    }
 });
 
 Ext.reg('MShop.panel.locale.tabui', MShop.panel.locale.TabUi);

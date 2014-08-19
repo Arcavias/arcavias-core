@@ -316,7 +316,7 @@ class MShop_Order_Manager_Base_Address_Default
 				$stmt->bind( 26, date( 'Y-m-d H:i:s' ), MW_DB_Statement_Abstract::PARAM_STR ); // ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 
 			if( $fetch === true )
@@ -407,8 +407,6 @@ class MShop_Order_Manager_Base_Address_Default
 	public function searchItems( MW_Common_Criteria_Interface $search, array $ref = array(), &$total = null )
 	{
 		$context = $this->_getContext();
-		$logger = $context->getLogger();
-		$config = $context->getConfig();
 
 		$dbm = $context->getDatabaseManager();
 		$dbname = $this->_getResourceName();
@@ -455,7 +453,7 @@ class MShop_Order_Manager_Base_Address_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions
+	 * @return MShop_Common_Manager_Interface Manager for different extensions
 	 * @throws MShop_Order_Exception If creating manager failed
 	 */
 

@@ -41,7 +41,8 @@ class Client_Html_Checkout_Confirm_Retry_DefaultTest extends MW_Unittest_Testcas
 
 	public function testGetHeader()
 	{
-		$this->_object->getHeader();
+		$output = $this->_object->getHeader();
+		$this->assertNotNull( $output );
 	}
 
 
@@ -78,13 +79,6 @@ class Client_Html_Checkout_Confirm_Retry_DefaultTest extends MW_Unittest_Testcas
 	{
 		$this->setExpectedException( 'Client_Html_Exception' );
 		$this->_object->getSubClient( '$$$', '$$$' );
-	}
-
-
-	public function testIsCachable()
-	{
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_BODY ) );
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_HEADER ) );
 	}
 
 

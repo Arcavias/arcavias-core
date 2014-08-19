@@ -11,21 +11,6 @@ class Client_Html_Catalog_Detail_Additional_Attribute_DefaultTest extends MW_Uni
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Catalog_Detail_Additional_Attribute_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -60,6 +45,7 @@ class Client_Html_Catalog_Detail_Additional_Attribute_DefaultTest extends MW_Uni
 		$expire = null;
 		$output = $this->_object->getHeader( 1, $tags, $expire );
 
+		$this->assertNotNull( $output );
 		$this->assertEquals( null, $expire );
 		$this->assertEquals( 2, count( $tags ) );
 	}

@@ -12,21 +12,6 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Basket_Standard_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -380,6 +365,11 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 	}
 
 
+	/**
+	 * @param string $code
+	 * @param integer $quantity
+	 * @param string $warehouse
+	 */
 	protected function _addProduct( $code, $quantity, $warehouse )
 	{
 		$manager = MShop_Product_Manager_Factory::createManager( $this->_context );
@@ -406,6 +396,9 @@ class Client_Html_Basket_Standard_DefaultTest extends MW_Unittest_Testcase
 	}
 
 
+	/**
+	 * @param string $code
+	 */
 	protected function _getProductItem( $code )
 	{
 		$manager = MShop_Product_Manager_Factory::createManager( $this->_context );

@@ -13,21 +13,6 @@ class MShop_Plugin_Provider_Order_AutofillTest extends PHPUnit_Framework_TestCas
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Plugin_Provider_Order_ServicesAvailableTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -44,7 +29,6 @@ class MShop_Plugin_Provider_Order_AutofillTest extends PHPUnit_Framework_TestCas
 
 		$this->_orderManager = MShop_Order_Manager_Factory::createManager( $context );
 		$orderBaseManager = $this->_orderManager->getSubManager('base');
-		$orderBaseServiceManager = $orderBaseManager->getSubManager('service');
 
 		$this->_order = $orderBaseManager->createItem();
 	}
@@ -197,8 +181,11 @@ class MShop_Plugin_Provider_Order_AutofillTest extends PHPUnit_Framework_TestCas
 
 		$item1 = $orderBaseServiceStub->createItem();
 		$item1->setType( MShop_Order_Item_Base_Service_Abstract::TYPE_DELIVERY );
+		$item1->setCode( 'unitcode' );
+
 		$item2 = $orderBaseServiceStub->createItem();
 		$item2->setType( MShop_Order_Item_Base_Service_Abstract::TYPE_PAYMENT );
+		$item2->setCode( 'unitpaymentcode' );
 
 		$orderStub->expects( $this->any() )->method( 'getSubManager' )->will( $this->returnValue( $orderBaseStub ) );
 		$orderBaseStub->expects( $this->any() )->method( 'getSubManager' )->will( $this->returnValue( $orderBaseServiceStub ) );
