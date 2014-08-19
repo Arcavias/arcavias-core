@@ -6,6 +6,28 @@
  */
 
 return array(
+	'aggregateAllProductsInOrders' => '
+		SELECT DISTINCT :key AS "key", COUNT(:key) AS "count"
+		FROM mshop_order_base_product AS mordbapr
+		WHERE :cond
+		GROUP BY "key"
+	',
+
+	'countAll' => '
+		SELECT 0 AS "key", COUNT( DISTINCT :key) AS "count"
+		FROM mshop_order_base_product AS mordbapr
+	',
+
+	'aggregateProductsInOrders' => '
+		SELECT DISTINCT :key AS "key", COUNT(:key) AS "count"
+		FROM mshop_order_base_product AS mordbapr
+		WHERE mordbapr.baseid IN
+			(SELECT DISTINCT mordbapr.baseid
+			FROM mshop_order_base_product AS mordbapr
+			WHERE :cond )
+		GROUP BY "key"
+	',
+
 	'item' => array(
 		'delete' => '
 			DELETE FROM "mshop_order_base_product"
