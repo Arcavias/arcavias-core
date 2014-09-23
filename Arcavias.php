@@ -43,7 +43,7 @@ class Arcavias
 
 		foreach ( $this->_getManifests( $extdirs ) as $location => $manifest )
 		{
-			$this->guradManifestIsValid( $location, $manifest );
+			$this->guardManifestIsValid( $location, $manifest );
 
 			$manifest['location'] = $location;
 			$this->_extensions[$manifest['name']] = $manifest;
@@ -320,7 +320,7 @@ class Arcavias
 	* @param string $location
 	* @param array $manifest
 	*/
-	protected function guradManifestIsValid ( $location, array $manifest)
+	protected function guardManifestIsValid ( $location, array $manifest)
 	{
 		if ( isset( $this->_extensions[$manifest['name']] ) ) {
 			$location2 = $this->_extensions[$manifest['name']]['location'];
