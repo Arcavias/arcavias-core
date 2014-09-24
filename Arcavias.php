@@ -43,7 +43,7 @@ class Arcavias
 
 		foreach ( $this->_getManifests( $extdirs ) as $location => $manifest )
 		{
-			$this->guardManifestIsValid( $location, $manifest );
+			$this->_checkManifestIsValid( $location, $manifest );
 
 			$manifest['location'] = $location;
 			$this->_extensions[$manifest['name']] = $manifest;
@@ -315,12 +315,12 @@ class Arcavias
 
 
 	/**
-	* Guard that manifest has valid name and depends
+	* Check that manifest has valid name and depends
 	*
 	* @param string $location
 	* @param array $manifest
 	*/
-	protected function guardManifestIsValid ( $location, array $manifest)
+	protected function _checkManifestIsValid ( $location, array $manifest)
 	{
 		if ( isset( $this->_extensions[$manifest['name']] ) ) {
 			$location2 = $this->_extensions[$manifest['name']]['location'];
