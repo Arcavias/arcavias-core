@@ -183,37 +183,40 @@ class Client_Html_Common_Summary_Detail_Default
 		foreach( $basket->getProducts() as $product )
 		{
 			$price = $product->getPrice();
+			$taxrate = $price->getTaxrate();
 
-			if( isset( $taxrates[ $price->getTaxrate() ] ) ) {
-				$taxrates[ $price->getTaxrate() ] += ( $price->getValue() + $price->getCosts() ) * $product->getQuantity();
+			if( isset( $taxrates[$taxrate] ) ) {
+				$taxrates[$taxrate] += ( $price->getValue() + $price->getCosts() ) * $product->getQuantity();
 			} else {
-				$taxrates[ $price->getTaxrate() ] = ( $price->getValue() + $price->getCosts() ) * $product->getQuantity();
+				$taxrates[$taxrate] = ( $price->getValue() + $price->getCosts() ) * $product->getQuantity();
 			}
 		}
 
 		try
 		{
 			$price = $basket->getService( 'delivery' )->getPrice();
+			$taxrate = $price->getTaxrate();
 
-			if( isset( $taxrates[ $price->getTaxrate() ] ) ) {
-				$taxrates[ $price->getTaxrate() ] += $price->getValue() + $price->getCosts();
+			if( isset( $taxrates[$taxrate] ) ) {
+				$taxrates[$taxrate] += $price->getValue() + $price->getCosts();
 			} else {
-				$taxrates[ $price->getTaxrate() ] = $price->getValue() + $price->getCosts();
+				$taxrates[$taxrate] = $price->getValue() + $price->getCosts();
 			}
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // if delivery service isn't available
 
 		try
 		{
 			$price = $basket->getService( 'payment' )->getPrice();
+			$taxrate = $price->getTaxrate();
 
-			if( isset( $taxrates[ $price->getTaxrate() ] ) ) {
-				$taxrates[ $price->getTaxrate() ] += $price->getValue() + $price->getCosts();
+			if( isset( $taxrates[$taxrate] ) ) {
+				$taxrates[$taxrate] += $price->getValue() + $price->getCosts();
 			} else {
-				$taxrates[ $price->getTaxrate() ] = $price->getValue() + $price->getCosts();
+				$taxrates[$taxrate] = $price->getValue() + $price->getCosts();
 			}
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // if payment service isn't available
 
 		return $taxrates;
 	}

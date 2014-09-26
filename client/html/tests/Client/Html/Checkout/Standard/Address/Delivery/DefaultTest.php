@@ -12,21 +12,6 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Checkout_Standard_Address_DeliveryDefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -57,7 +42,8 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 
 	public function testGetHeader()
 	{
-		$this->_object->getHeader();
+		$output = $this->_object->getHeader();
+		$this->assertNotNull( $output );
 	}
 
 
@@ -84,13 +70,6 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 	{
 		$this->setExpectedException( 'Client_Html_Exception' );
 		$this->_object->getSubClient( '$$$', '$$$' );
-	}
-
-
-	public function testIsCachable()
-	{
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_BODY ) );
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_HEADER ) );
 	}
 
 
@@ -160,6 +139,144 @@ class Client_Html_Checkout_Standard_Address_Delivery_DefaultTest extends MW_Unit
 		}
 
 		$this->fail( 'Expected exception not thrown' );
+	}
+
+
+	public function testProcessNewAddressUnknown()
+	{
+		$view = TestHelper::getView();
+
+		$param = array(
+			'ca-delivery-option' => 'null',
+			'ca-delivery' => array(
+				'order.base.address.salutation' => 'mr',
+				'order.base.address.firstname' => 'test',
+				'order.base.address.lastname' => 'user',
+				'order.base.address.address1' => 'mystreet 1',
+				'order.base.address.postal' => '20000',
+				'order.base.address.city' => 'hamburg',
+				'order.base.address.languageid' => 'en',
+				'order.base.address.flag' => '1',
+			),
+		);
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+		$this->_object->process();
+
+		$basket = Controller_Frontend_Basket_Factory::createController( $this->_context )->get();
+		$this->assertEquals( 0, $basket->getAddress( 'delivery' )->getFlag() );
+	}
+
+
+	public function testProcessNewAddressInvalid()
+	{
+		$view = TestHelper::getView();
+
+		$config = $this->_context->getConfig();
+		$config->set( 'client/html/common/address/validate/postal', '/^[0-9]{5}$/' );
+		$helper = new MW_View_Helper_Config_Default( $view, $config );
+		$view->addHelper( 'config', $helper );
+
+		$param = array(
+			'ca-delivery-option' => 'null',
+			'ca-delivery' => array(
+				'order.base.address.salutation' => 'mr',
+				'order.base.address.firstname' => 'test',
+				'order.base.address.lastname' => 'user',
+				'order.base.address.address1' => 'mystreet 1',
+				'order.base.address.postal' => '20AB',
+				'order.base.address.city' => 'hamburg',
+				'order.base.address.email' => 'me@localhost',
+				'order.base.address.languageid' => 'en',
+			),
+		);
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+
+		try
+		{
+			$this->_object->process();
+		}
+		catch( Client_Html_Exception $e )
+		{
+			$this->assertEquals( 1, count( $view->deliveryError ) );
+			$this->assertArrayHasKey( 'order.base.address.postal', $view->deliveryError );
+			return;
+		}
+
+		$this->fail( 'Expected exception not thrown' );
+	}
+
+
+	public function testProcessAddressDelete()
+	{
+		$manager = MShop_Customer_Manager_Factory::createManager( $this->_context )->getSubManager( 'address' );
+		$search = $manager->createSearch();
+		$search->setSlice( 0, 1 );
+		$result = $manager->searchItems( $search );
+
+		if( ( $item = reset( $result ) ) === false ) {
+			throw new Exception( 'No customer address found' );
+		}
+
+		$item->setId( null );
+		$manager->saveItem( $item );
+
+		$view = TestHelper::getView();
+		$this->_context->setUserId( $item->getRefId() );
+
+		$param = array( 'ca-delivery-delete' => $item->getId() );
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+		$this->_object->process();
+
+		$this->setExpectedException( 'MShop_Exception' );
+		$manager->getItem( $item->getId() );
+	}
+
+
+	public function testProcessAddressDeleteUnknown()
+	{
+		$view = TestHelper::getView();
+
+		$param = array( 'ca-delivery-delete' => '-1' );
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+
+		$this->setExpectedException( 'MShop_Exception' );
+		$this->_object->process();
+	}
+
+
+	public function testProcessAddressDeleteNoLogin()
+	{
+		$manager = MShop_Customer_Manager_Factory::createManager( $this->_context )->getSubManager( 'address' );
+		$search = $manager->createSearch();
+		$search->setSlice( 0, 1 );
+		$result = $manager->searchItems( $search );
+
+		if( ( $item = reset( $result ) ) === false ) {
+			throw new Exception( 'No customer address found' );
+		}
+
+		$view = TestHelper::getView();
+
+		$param = array( 'ca-delivery-delete' => $item->getId() );
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+
+		$this->setExpectedException( 'Client_Html_Exception' );
+		$this->_object->process();
 	}
 
 

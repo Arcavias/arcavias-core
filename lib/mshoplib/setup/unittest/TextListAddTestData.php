@@ -14,7 +14,7 @@ class MW_Setup_Task_TextListAddTestData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -120,7 +120,6 @@ class MW_Setup_Task_TextListAddTestData extends MW_Setup_Task_Abstract
 	private function _addTextData( array $testdata, array $refIds )
 	{
 		$textManager = MShop_Text_Manager_Factory::createManager( $this->_additional, 'Default' );
-		$textTypeManager = $textManager->getSubManager( 'type', 'Default' );
 		$textListManager = $textManager->getSubManager( 'list', 'Default' );
 		$textListTypeManager = $textListManager->getSubmanager( 'type', 'Default' );
 

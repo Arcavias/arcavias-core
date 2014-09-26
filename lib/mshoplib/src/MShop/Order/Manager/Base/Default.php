@@ -136,7 +136,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -234,7 +234,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g address, coupon, product, service, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g address, coupon, product, service, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -354,7 +354,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 	/**
 	 * Adds or updates an order base item in the storage.
 	 *
-	 * @param MShop_Order_Item_Base_Interface $base Order base object without sub-elements
+	 * @param MShop_Common_Item_Interface $item Order base object (sub-items are not saved)
 	 * @param boolean $fetch True if the new ID should be returned in the item
 	 */
 	public function saveItem( MShop_Common_Item_Interface $item, $fetch = true )
@@ -403,7 +403,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 				$stmt->bind(13, date( 'Y-m-d H:i:s', time() ), MW_DB_Statement_Abstract::PARAM_STR );// ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if( $fetch === true )
 			{
@@ -498,8 +498,9 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 		$session = $context->getSession();
 		$locale = $context->getLocale();
 		$currency = $locale->getCurrencyId();
+		$language = $locale->getLanguageId();
 		$sitecode = $locale->getSite()->getCode();
-		$key = 'arcavias/basket/' . $sitecode . '-' . $currency . '-' . strval( $type );
+		$key = 'arcavias/basket/content-' . $sitecode . '-' . $language . '-' . $currency . '-' . strval( $type );
 
 		if( ( $serorder = $session->get( $key ) ) === null ) {
 			return $this->createItem();
@@ -533,8 +534,9 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 		$session = $context->getSession();
 		$locale = $context->getLocale();
 		$currency = $locale->getCurrencyId();
+		$language = $locale->getLanguageId();
 		$sitecode = $locale->getSite()->getCode();
-		$key = 'arcavias/basket-lock/' . $sitecode . '-' . $currency . '-' . strval( $type );
+		$key = 'arcavias/basket/lock-' . $sitecode . '-' . $language . '-' . $currency . '-' . strval( $type );
 
 		if( ( $value = $session->get( $key ) ) !== null ) {
 			return (int) $value;
@@ -556,8 +558,9 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 		$session = $context->getSession();
 		$locale = $context->getLocale();
 		$currency = $locale->getCurrencyId();
+		$language = $locale->getLanguageId();
 		$sitecode = $locale->getSite()->getCode();
-		$key = 'arcavias/basket/' . $sitecode . '-' . $currency . '-' . strval( $type );
+		$key = 'arcavias/basket/content-' . $sitecode . '-' . $language . '-' . $currency . '-' . strval( $type );
 
 		$session->set( $key, serialize( clone $order ) );
 	}
@@ -579,8 +582,9 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 		$session = $context->getSession();
 		$locale = $context->getLocale();
 		$currency = $locale->getCurrencyId();
+		$language = $locale->getLanguageId();
 		$sitecode = $locale->getSite()->getCode();
-		$key = 'arcavias/basket-lock/' . $sitecode . '-' . $currency . '-' . strval( $type );
+		$key = 'arcavias/basket/lock-' . $sitecode . '-' . $language . '-' . $currency . '-' . strval( $type );
 
 		$session->set( $key, strval( $lock ) );
 	}
@@ -991,7 +995,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 	 * @param MShop_Price_Item $price
 	 * @param MShop_Locale_Item $localeItem
 	 * @param array $row Array of values with all relevant order information
-	 * @return MShop_Order_Base_Item The loaded order item for the given ID
+	 * @return MShop_Order_Item_Base_Default The loaded order item for the given ID
 	 */
 	protected function _load( $id, $price, $localeItem, $row )
 	{
@@ -1013,7 +1017,7 @@ class MShop_Order_Manager_Base_Default extends MShop_Order_Manager_Base_Abstract
 	 * @param MShop_Price_Item $price
 	 * @param MShop_Locale_Item $localeItem
 	 * @param array $row Array of values with all relevant order information
-	 * @return MShop_Order_Base_Item The loaded order item for the given ID
+	 * @return MShop_Order_Item_Base_Default The loaded order item for the given ID
 	 */
 	protected function _loadFresh( $id, $price, $localeItem, $row )
 	{

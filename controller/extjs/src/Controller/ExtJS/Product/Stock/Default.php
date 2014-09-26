@@ -50,28 +50,8 @@ class Controller_ExtJS_Product_Stock_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'product.stock.id'} ) ) { $item->setId( $entry->{'product.stock.id'} ); }
-			if( isset( $entry->{'product.stock.productid'} ) ) { $item->setProductId( $entry->{'product.stock.productid'} ); }
-
-			if( isset( $entry->{'product.stock.warehouseid'} ) && $entry->{'product.stock.warehouseid'} !== '' ) {
-				$item->setWarehouseId( $entry->{'product.stock.warehouseid'} );
-			}
-
-			if( isset( $entry->{'product.stock.stocklevel'} ) && $entry->{'product.stock.stocklevel'} !== '' ) {
-				$item->setStocklevel( $entry->{'product.stock.stocklevel'} );
-			}
-
-			if( isset( $entry->{'product.stock.dateback'} ) && $entry->{'product.stock.dateback'} !== '' )
-			{
-				$datetime = str_replace( 'T', ' ', $entry->{'product.stock.dateback'} );
-				$entry->{'product.stock.dateback'} = $datetime;
-				$item->setDateBack( $datetime );
-			}
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -88,9 +68,46 @@ class Controller_ExtJS_Product_Stock_Default
 
 
 	/**
+	 * Creates a new product stock item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "product.stock" prefix
+	 * @return MShop_Product_Item_Stock_Interface Product stock item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'product.stock.id': $item->setId( $value ); break;
+				case 'product.stock.productid': $item->setProductId( $value ); break;
+				case 'product.stock.warehouseid': $item->setWarehouseId( $value ); break;
+				case 'product.stock.stocklevel':
+					if( $value != '' ) {
+						$item->setStocklevel( $value );
+					}
+					break;
+				case 'product.stock.dateback':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'product.stock.dateback'} = $value;
+						$item->setDateBack( $value );
+					}
+					break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

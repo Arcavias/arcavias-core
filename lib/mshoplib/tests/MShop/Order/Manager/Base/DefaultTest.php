@@ -11,31 +11,9 @@
  */
 class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 {
-	/**
-	 * @var    MShop_Order_Manager_Base_Default
-	 * @access protected
-	 */
 	private $_object;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
+	private $_context;
 	private $_editor = '';
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Order_Manager_Default_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -184,6 +162,7 @@ class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 		$total = 0;
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '!=', 'order.base.id', null );
 		$expr[] = $search->compare( '==', 'order.base.siteid', $siteid );
 		$expr[] = $search->compare( '==', 'order.base.sitecode', 'unittest' );
@@ -436,15 +415,13 @@ class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 	{
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '==', 'order.base.rebate', 14.50 );
 		$expr[] = $search->compare( '==', 'order.base.sitecode', 'unittest' );
 		$expr[] = $search->compare( '==', 'order.base.price', 53.50 );
 		$expr[] = $search->compare( '==', 'order.base.editor', $this->_editor );
 		$search->setConditions( $search->combine('&&', $expr) );
 		$results = $this->_object->searchItems($search);
-
-		$search->setConditions( $search->combine( '&&', $expr ) );
-		$results = $this->_object->searchItems( $search );
 
 		if ( ( $item = reset($results) ) === false ) {
 			throw new Exception('No order found');
@@ -497,12 +474,11 @@ class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 	{
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '==', 'order.base.rebate', 14.50 );
 		$expr[] = $search->compare( '==', 'order.base.sitecode', 'unittest' );
 		$expr[] = $search->compare( '==', 'order.base.price', 53.50 );
 		$expr[] = $search->compare( '==', 'order.base.editor', $this->_editor );
-		$search->setConditions( $search->combine('&&', $expr) );
-		$results = $this->_object->searchItems($search);
 
 		$search->setConditions( $search->combine( '&&', $expr ) );
 		$results = $this->_object->searchItems( $search );
@@ -548,6 +524,8 @@ class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 	public function testStoreBundles()
 	{
 		$search = $this->_object->createSearch();
+
+		$expr = array();
 		$expr[] = $search->compare( '==', 'order.base.sitecode', 'unittest' );
 		$expr[] = $search->compare( '==', 'order.base.price', 4800.00 );
 		$search->setConditions( $search->combine( '&&', $expr ) );
@@ -617,13 +595,11 @@ class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetSetSession()
 	{
-		$manager = new MShop_Common_Manager_Decorator_Sitecheck( TestHelper::getContext(), $this->_object );
-
-		$order = $manager->createItem();
+		$order = $this->_object->createItem();
 		$order->setComment( 'test comment' );
 
-		$manager->setSession( $order, 'test' );
-		$session = $manager->getSession( 'test' );
+		$this->_object->setSession( $order, 'test' );
+		$session = $this->_object->getSession( 'test' );
 
 		$this->assertInstanceof( 'MShop_Order_Item_Base_Interface', $session );
 		$this->assertEquals( 'test comment', $order->getComment() );
@@ -633,14 +609,12 @@ class MShop_Order_Manager_Base_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetSetSessionLock()
 	{
-		$manager = new MShop_Common_Manager_Decorator_Sitecheck( TestHelper::getContext(), $this->_object );
-
-		$lock = $manager->getSessionLock( 'test' );
+		$lock = $this->_object->getSessionLock( 'test' );
 		$this->assertEquals( MShop_Order_Manager_Base_Abstract::LOCK_DISABLE, $lock );
 
-		$manager->setSessionLock( MShop_Order_Manager_Base_Abstract::LOCK_ENABLE, 'test' );
+		$this->_object->setSessionLock( MShop_Order_Manager_Base_Abstract::LOCK_ENABLE, 'test' );
 
-		$lock = $manager->getSessionLock( 'test' );
+		$lock = $this->_object->getSessionLock( 'test' );
 		$this->assertEquals( MShop_Order_Manager_Base_Abstract::LOCK_ENABLE, $lock );
 	}
 

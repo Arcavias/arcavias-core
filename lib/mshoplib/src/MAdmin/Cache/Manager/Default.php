@@ -164,16 +164,44 @@ class MAdmin_Cache_Manager_Default
 			 */
 
 			$context = $this->_getContext();
+			$config = $context->getConfig();
 
+			$name = $config->get( 'resource/db/adapter' );
+			$name = $config->get( 'resource/db-cache/adapter', $name );
+
+			/** classes/cache/name
+			 * Specifies the name of the cache class implementation
+			 *
+			 * There are several implementations available for integrating caches
+			 * or providing optimized implementations for certain environments.
+			 * This configuration option allows to change the cache implementation
+			 * by setting the name of the MW_Cache_* class.
+			 *
+			 * @param string Name of the cache class
+			 * @since 2014.09
+			 * @category Developer
+			 */
+			$name = $config->get( 'classes/cache/name', $name );
 			$config = array(
 				'search' => $this->_searchConfig,
 				'dbname' => $this->_getResourceName(),
 				'siteid' => $context->getLocale()->getSiteId(),
-				'sql' => $context->getConfig()->get( 'madmin/cache/manager/default', array() ),
+				'sql' => array(
+					'delete' => $config->get( 'madmin/cache/manager/default/delete' ),
+					'deletebytag' => $config->get( 'madmin/cache/manager/default/deletebytag' ),
+					'getbytag' => $config->get( 'madmin/cache/manager/default/getbytag' ),
+					'get' => $config->get( 'madmin/cache/manager/default/get' ),
+					'set' => $config->get( 'madmin/cache/manager/default/set' ),
+					'settag' => $config->get( 'madmin/cache/manager/default/settag' ),
+				),
 			);
 			$dbm = $context->getDatabaseManager();
 
-			$this->_object = MW_Cache_Factory::createManager( 'DB', $config, $dbm );
+			try {
+				$this->_object = MW_Cache_Factory::createManager( $name, $config, $dbm );
+			} catch( Exception $e ) {
+				$this->_object = MW_Cache_Factory::createManager( 'DB', $config, $dbm );
+			}
 		}
 
 		return $this->_object;
@@ -183,7 +211,7 @@ class MAdmin_Cache_Manager_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -365,15 +393,14 @@ class MAdmin_Cache_Manager_Default
 	 * Search for cache entries based on the given criteria.
 	 *
 	 * @param MW_Common_Criteria_Interface $search Search object containing the conditions
+	 * @param array $ref List of domains to fetch list items and referenced items for
 	 * @param integer &$total Number of items that are available in total
-	 *
 	 * @return array List of cache items implementing MAdmin_Cache_Item_Interface
 	 */
 	public function searchItems( MW_Common_Criteria_Interface $search, array $ref = array(), &$total = null )
 	{
 		$items = array();
 		$context = $this->_getContext();
-		$logger = $context->getLogger();
 
 		$dbm = $context->getDatabaseManager();
 		$dbname = $this->_getResourceName();
@@ -478,7 +505,7 @@ class MAdmin_Cache_Manager_Default
 	/**
 	 * Returns the attributes that can be used for searching.
 	 *
-	 * @param boolean $withSub Return also attributes of sub-managers if true
+	 * @param boolean $withsub Return also attributes of sub-managers if true
 	 * @return array Returns a list of attribtes implementing MW_Common_Criteria_Attribute_Interface
 	 */
 	public function getSearchAttributes( $withsub = true )
@@ -511,7 +538,7 @@ class MAdmin_Cache_Manager_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g stock, tags, locations, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g stock, tags, locations, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{

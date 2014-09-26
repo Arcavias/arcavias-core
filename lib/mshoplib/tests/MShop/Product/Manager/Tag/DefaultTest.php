@@ -12,12 +12,8 @@
 class MShop_Product_Manager_Tag_DefaultTest extends MW_Unittest_Testcase
 {
 	private $_object;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
+
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -29,6 +25,7 @@ class MShop_Product_Manager_Tag_DefaultTest extends MW_Unittest_Testcase
 		$this->_object = new MShop_Product_Manager_Tag_Default( TestHelper::getContext() );
 	}
 
+
 	/**
 	 * Tears down the fixture, for example, closes a network connection.
 	 * This method is called after a test is executed.
@@ -36,21 +33,6 @@ class MShop_Product_Manager_Tag_DefaultTest extends MW_Unittest_Testcase
 	protected function tearDown()
 	{
 		unset( $this->_object );
-	}
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Product_Manager_Tag_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
 	}
 
 
@@ -151,6 +133,7 @@ class MShop_Product_Manager_Tag_DefaultTest extends MW_Unittest_Testcase
 		$total = 0;
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '!=', 'product.tag.id', null );
 		$expr[] = $search->compare( '!=', 'product.tag.siteid', null );
 		$expr[] = $search->compare( '!=', 'product.tag.typeid', null );

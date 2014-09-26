@@ -15,7 +15,7 @@
  * @subpackage Text
  */
 class MShop_Text_Manager_Default
-	extends MShop_Common_Manager_Abstract
+	extends MShop_Common_Manager_ListRef_Abstract
 	implements MShop_Text_Manager_Interface
 {
 	private $_searchConfig = array(
@@ -116,7 +116,7 @@ class MShop_Text_Manager_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -250,7 +250,7 @@ class MShop_Text_Manager_Default
 				$stmt->bind( 10, $date ); // ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if ( $id === null && $fetch === true )
 			{
@@ -542,7 +542,7 @@ class MShop_Text_Manager_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g types, lists etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g types, lists etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -674,11 +674,15 @@ class MShop_Text_Manager_Default
 
 			if( $langid !== null )
 			{
-				$temp[] = $object->compare( '==', 'text.languageid', $langid );
-				$temp[] = $object->compare( '==', 'text.languageid', null );
+				$temp = array(
+					$object->compare( '==', 'text.languageid', $langid ),
+					$object->compare( '==', 'text.languageid', null ),
+				);
 
-				$expr[] = $object->getConditions();
-				$expr[] = $object->combine( '||', $temp );
+				$expr = array(
+					$object->getConditions(),
+					$object->combine( '||', $temp ),
+				);
 
 				$object->setConditions( $object->combine( '&&', $expr ) );
 			}
@@ -694,7 +698,7 @@ class MShop_Text_Manager_Default
 	 * Creates a new text item instance.
 	 *
 	 * @param array $values Associative list of key/value pairs
-	 * @param array $listitems List of items implementing MShop_Common_Item_List_Interface
+	 * @param array $listItems List of items implementing MShop_Common_Item_List_Interface
 	 * @param array $refItems List of items implementing MShop_Text_Item_Interface
 	 * @return MShop_Text_Item_Interface New product item
 	 */

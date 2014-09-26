@@ -43,8 +43,6 @@ abstract class MShop_Coupon_Provider_Abstract
 	 */
 	public function updateCoupon( MShop_Order_Item_Base_Interface $base )
 	{
-		$config = $this->_getItem()->getConfig();
-
 		if( $this->_getObject()->isAvailable( $base ) !== true )
 		{
 			$base->deleteCoupon( $this->_code );
@@ -164,7 +162,7 @@ abstract class MShop_Coupon_Provider_Abstract
 	 * @param string $productCode Unique product code
 	 * @param integer $quantity Number of products in basket
 	 * @param string $warehouse Unique code of the warehouse the product is from
-	 * @return MShop_Order_Base_Product_Interface Ordered product
+	 * @return MShop_Order_Item_Base_Product_Interface Ordered product
 	 */
 	protected function _createProduct( $productCode, $quantity = 1, $warehouse = 'default' )
 	{
@@ -182,7 +180,6 @@ abstract class MShop_Coupon_Provider_Abstract
 
 		if( empty( $prices ) ) {
 			$price = $priceManager->createItem();
-			$price->setCurrencyId( $this->_context->getLocale()->getCurrencyId() );
 		} else {
 			$price = $priceManager->getLowestPrice( $prices, $quantity );
 		}
@@ -197,5 +194,114 @@ abstract class MShop_Coupon_Provider_Abstract
 		$orderProduct->setFlags( MShop_Order_Item_Base_Product_Abstract::FLAG_IMMUTABLE );
 
 		return $orderProduct;
+	}
+
+
+	/**
+	 * Creates the order products for monetary rebates.
+	 *
+	 * @param MShop_Order_Item_Base_Interface Basket object
+	 * @param string $productCode Unique product code
+	 * @param float $rebate Rebate amount that should be granted
+	 * @param integer $quantity Number of products in basket
+	 * @param string $warehouse Unique code of the warehouse the product is from
+	 * @return MShop_Order_Item_Base_Product_Interface[] Order products with monetary rebates
+	 */
+	protected function _createMonetaryRebateProducts( MShop_Order_Item_Base_Interface $base,
+		$productCode, $rebate, $quantity = 1, $warehouse = 'default' )
+	{
+		$orderProducts = array();
+		$prices = $this->_getPriceByTaxRate( $base );
+
+		krsort( $prices );
+
+		if( empty( $prices ) ) {
+			$prices = array( '0.00' => MShop_Factory::createManager( $this->_getContext(), 'price' )->createItem() );
+		}
+
+		foreach( $prices as $taxrate => $price )
+		{
+			if( abs( $rebate ) < 0.01 ) {
+				break;
+			}
+
+			$amount = $price->getValue() + $price->getCosts();
+
+			if( $amount > 0 && $amount < $rebate )
+			{
+				$value = $price->getValue() + $price->getCosts();
+				$rebate -= $value;
+			}
+			else
+			{
+				$value = $rebate;
+				$rebate = '0.00';
+			}
+
+			$orderProduct = $this->_createProduct( $productCode, $quantity, $warehouse );
+
+			$price = $orderProduct->getPrice();
+			$price->setValue( -$value );
+			$price->setRebate( $value );
+			$price->setTaxRate( $taxrate );
+
+			$orderProduct->setPrice( $price );
+
+			$orderProducts[] = $orderProduct;
+		}
+
+		return $orderProducts;
+	}
+
+
+	/**
+	 * Returns a list of tax rates and their price items for the given basket.
+	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket containing the products, services, etc.
+	 * @return array Associative list of tax rates as key and corresponding price items as value
+	 */
+	protected function _getPriceByTaxRate( MShop_Order_Item_Base_Interface $basket )
+	{
+		$taxrates = array();
+
+		foreach( $basket->getProducts() as $product )
+		{
+			$price = $product->getPrice();
+			$taxrate = $price->getTaxRate();
+
+			if( isset( $taxrates[$taxrate] ) ) {
+				$taxrates[$taxrate]->addItem( $price );
+			} else {
+				$taxrates[$taxrate] = $price;
+			}
+		}
+
+		try
+		{
+			$price = $basket->getService( 'delivery' )->getPrice();
+			$taxrate = $price->getTaxRate();
+
+			if( isset( $taxrates[$taxrate] ) ) {
+				$taxrates[$taxrate]->addItem( $price );
+			} else {
+				$taxrates[$taxrate] = $price;
+			}
+		}
+		catch( Exception $e ) { ; } // if delivery service isn't available
+
+		try
+		{
+			$price = $basket->getService( 'payment' )->getPrice();
+			$taxrate = $price->getTaxRate();
+
+			if( isset( $taxrates[$taxrate] ) ) {
+				$taxrates[$taxrate]->addItem( $price );
+			} else {
+				$taxrates[$taxrate] = $price;
+			}
+		}
+		catch( Exception $e ) { ; } // if payment service isn't available
+
+		return $taxrates;
 	}
 }

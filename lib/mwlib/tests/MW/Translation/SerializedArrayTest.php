@@ -8,22 +8,7 @@
  */
 class MW_Translation_SerializedArrayTest extends MW_Unittest_Testcase
 {
-	/**
-	 * @var MW_Translation_SerialisedArray
-	 */
 	private $_object;
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		$suite  = new PHPUnit_Framework_TestSuite('MW_Translation_SerializedArray');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -165,15 +150,6 @@ class MW_Translation_SerializedArrayTest extends MW_Unittest_Testcase
 	 */
 	public function testGetAll()
 	{
-		$ds = DIRECTORY_SEPARATOR;
-
-		$translationSources = array(
-			'testDomain' => array(
-				dirname(__FILE__) . $ds . 'testfiles' . $ds . 'case1',
-				dirname(__FILE__) . $ds . 'testfiles' . $ds . 'case2',
-			),
-		);
-
 		$result = $this->_object->getAll( 'testDomain' );
 
 		$this->assertArrayHasKey( 'File', $result );

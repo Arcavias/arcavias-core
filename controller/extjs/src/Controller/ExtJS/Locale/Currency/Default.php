@@ -67,15 +67,8 @@ class Controller_ExtJS_Locale_Currency_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'locale.currency.id'} ) ) { $item->setId( $entry->{'locale.currency.id'} ); }
-			if( isset( $entry->{'locale.currency.code'} ) ) { $item->setCode( $entry->{'locale.currency.code'} ); }
-			if( isset( $entry->{'locale.currency.label'} ) ) { $item->setLabel( $entry->{'locale.currency.label'} ); }
-			if( isset( $entry->{'locale.currency.status'} ) ) { $item->setStatus( $entry->{'locale.currency.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -152,9 +145,34 @@ class Controller_ExtJS_Locale_Currency_Default
 
 
 	/**
+	 * Creates a new locale currency item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "locale.currency" prefix
+	 * @return MShop_Locale_Item_Currency_Interface Locale currency item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'locale.currency.id': $item->setId( $value ); break;
+				case 'locale.currency.code': $item->setCode( $value ); break;
+				case 'locale.currency.label': $item->setLabel( $value ); break;
+				case 'locale.currency.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

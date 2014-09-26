@@ -221,7 +221,7 @@ class Controller_ExtJS_Catalog_Import_Text_Default
 			}
 
 			foreach( $container as $content ) {
-				$itemTextMap = $this->_importTextsFromContent( $content, $textTypeMap, 'catalog' );
+				$this->_importTextsFromContent( $content, $textTypeMap, 'catalog' );
 			}
 
 			unlink( $path );
@@ -289,8 +289,10 @@ class Controller_ExtJS_Catalog_Import_Text_Default
 			do
 			{
 				$criteria = $listManager->createSearch();
-				$expr[] = $criteria->compare( '==', 'catalog.list.parentid', $catalogIds );
-				$expr[] = $criteria->compare( '==', 'catalog.list.domain', 'text' );
+				$expr = array(
+					$criteria->compare( '==', 'catalog.list.parentid', $catalogIds ),
+					$criteria->compare( '==', 'catalog.list.domain', 'text' ),
+				);
 				$criteria->setConditions( $criteria->combine( '&&', $expr ) );
 				$listItems = $listManager->searchItems( $criteria, array(), $listTotal );
 				$listStart += count( $catalogItems );

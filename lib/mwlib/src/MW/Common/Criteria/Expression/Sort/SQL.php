@@ -19,7 +19,9 @@ class MW_Common_Criteria_Expression_Sort_SQL
 	implements MW_Common_Criteria_Expression_Sort_Interface
 {
 	private static $_operators = array( '+' => 'ASC', '-' => 'DESC' );
-	private $_operator = '+';
+	private $_operator;
+	private $_conn;
+	private $_name;
 
 
 	/**
@@ -35,8 +37,8 @@ class MW_Common_Criteria_Expression_Sort_SQL
 			throw new MW_Common_Exception( sprintf( 'Invalid operator "%1$s"', $operator ) );
 		}
 
-		$this->_conn = $conn;
 		$this->_operator = $operator;
+		$this->_conn = $conn;
 		$this->_name = $name;
 	}
 
@@ -77,7 +79,7 @@ class MW_Common_Criteria_Expression_Sort_SQL
 	/**
 	 * Generates a string from the expression objects.
 	 *
-	 * @param array $names Associative list of variable or column names as keys and their corresponding types
+	 * @param array $types Associative list of variable or column names as keys and their corresponding types
 	 * @param array $translations Associative list of variable or column names that should be translated
 	 * @param array $plugins Associative list of item names and plugins implementing MW_Common_Criteria_Plugin_Interface
 	 * @return string Expression that evaluates to a boolean result

@@ -12,21 +12,6 @@ class Client_Html_Catalog_Stage_DefaultTest extends MW_Unittest_Testcase
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Catalog_Stage_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -72,6 +57,18 @@ class Client_Html_Catalog_Stage_DefaultTest extends MW_Unittest_Testcase
 
 	public function testGetBody()
 	{
+		$tags = array();
+		$expire = null;
+		$output = $this->_object->getBody( 1, $tags, $expire );
+
+		$this->assertStringStartsWith( '<section class="arcavias catalog-stage">', $output );
+		$this->assertEquals( null, $expire );
+		$this->assertEquals( 0, count( $tags ) );
+	}
+
+
+	public function testGetBodyCatId()
+	{
 		$view = $this->_object->getView();
 		$helper = new MW_View_Helper_Parameter_Default( $view, array( 'f-catalog-id' => $this->_getCatalogItem()->getId() ) );
 		$view->addHelper( 'param', $helper );
@@ -88,13 +85,13 @@ class Client_Html_Catalog_Stage_DefaultTest extends MW_Unittest_Testcase
 
 	public function testModifyBody()
 	{
-		$this->assertEquals( 'test', $this->_object->modifyBody( 'test' ) );
+		$this->assertEquals( 'test', $this->_object->modifyBody( 'test', 1 ) );
 	}
 
 
 	public function testModifyHeader()
 	{
-		$this->assertEquals( 'test', $this->_object->modifyHeader( 'test' ) );
+		$this->assertEquals( 'test', $this->_object->modifyHeader( 'test', 1 ) );
 	}
 
 

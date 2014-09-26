@@ -15,7 +15,7 @@
  * @subpackage Media
  */
 class MShop_Media_Manager_Default
-	extends MShop_Common_Manager_Abstract
+	extends MShop_Common_Manager_ListRef_Abstract
 	implements MShop_Media_Manager_Interface
 {
 	private $_searchConfig = array(
@@ -347,7 +347,7 @@ class MShop_Media_Manager_Default
 				$stmt->bind( 12, $date ); // ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if( $id === null && $fetch === true )
 			{
@@ -569,11 +569,15 @@ class MShop_Media_Manager_Default
 
 			if( $langid !== null )
 			{
-				$temp[] = $object->compare( '==', 'media.languageid', $langid );
-				$temp[] = $object->compare( '==', 'media.languageid', null );
+				$temp = array(
+					$object->compare( '==', 'media.languageid', $langid ),
+					$object->compare( '==', 'media.languageid', null ),
+				);
 
-				$expr[] = $object->getConditions();
-				$expr[] = $object->combine( '||', $temp );
+				$expr = array(
+					$object->getConditions(),
+					$object->combine( '||', $temp ),
+				);
 
 				$object->setConditions( $object->combine( '&&', $expr ) );
 			}
@@ -590,7 +594,7 @@ class MShop_Media_Manager_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g stock, tags, locations, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g stock, tags, locations, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -710,7 +714,7 @@ class MShop_Media_Manager_Default
 	 * Creates a new media item instance.
 	 *
 	 * @param array $values Associative list of key/value pairs
-	 * @param array $listitems List of items implementing MShop_Common_Item_List_Interface
+	 * @param array $listItems List of items implementing MShop_Common_Item_List_Interface
 	 * @param array $refItems List of items reference to this item
 	 * @return MShop_Media_Item_Interface New product item
 	 */

@@ -12,26 +12,8 @@
 class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 {
 	private $_object;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
 
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Price_Manager_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -170,6 +152,7 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 		$total = 0;
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '!=', 'price.id', null );
 		$expr[] = $search->compare( '!=', 'price.siteid', null );
 		$expr[] = $search->compare( '!=', 'price.typeid', null );
@@ -262,7 +245,7 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 	public function testGetLowestPriceNoPrice()
 	{
 		$this->setExpectedException( 'MShop_Price_Exception' );
-		$lowest = $this->_object->getLowestPrice( array(), 1 );
+		$this->_object->getLowestPrice( array(), 1 );
 	}
 
 
@@ -273,13 +256,13 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 		$item->setQuantity( 5 );
 
 		$this->setExpectedException( 'MShop_Price_Exception' );
-		$lowest = $this->_object->getLowestPrice( array( $item ), 1 );
+		$this->_object->getLowestPrice( array( $item ), 1 );
 	}
 
 
 	public function testGetLowestPriceWrongItem()
 	{
 		$this->setExpectedException( 'MShop_Price_Exception' );
-		$lowest = $this->_object->getLowestPrice( array( new stdClass() ), 1 );
+		$this->_object->getLowestPrice( array( new stdClass() ), 1 );
 	}
 }

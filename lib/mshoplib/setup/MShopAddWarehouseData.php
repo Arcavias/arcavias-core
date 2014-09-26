@@ -15,7 +15,7 @@ class MW_Setup_Task_MShopAddWarehouseData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -81,7 +81,7 @@ class MW_Setup_Task_MShopAddWarehouseData extends MW_Setup_Task_Abstract
 			try {
 				$warehouseManager->saveItem( $item );
 				$num++;
-			} catch( MW_DB_Exception $e ) { ; }
+			} catch( MW_DB_Exception $e ) { ; } // if warehouse was already available
 		}
 
 		$this->_status( $num > 0 ? $num . '/' . $total : 'OK' );

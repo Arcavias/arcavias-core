@@ -138,7 +138,7 @@ class MShop_Order_Manager_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -190,7 +190,7 @@ class MShop_Order_Manager_Default
 	/**
 	 * Creates a one-time order in the storage from the given invoice object.
 	 *
-	 * @param MShop_Order_Item_Interface $item Invoice with necessary values
+	 * @param MShop_Common_Item_Interface $item Order item with necessary values
 	 * @param boolean $fetch True if the new ID should be returned in the item
 	 */
 	public function saveItem( MShop_Common_Item_Interface $item, $fetch = true )
@@ -301,7 +301,7 @@ class MShop_Order_Manager_Default
 				$stmt->bind( 11, $date ); //ctime
 			}
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if( $id === null && $fetch === true )
 			{
@@ -348,29 +348,7 @@ class MShop_Order_Manager_Default
 		}
 
 
-		if( $item->getPaymentStatus() != $item->oldPaymentStatus )
-		{
-			$statusManager = MShop_Factory::createManager( $this->_getContext(), 'order/status' );
-
-			$statusItem = $statusManager->createItem();
-			$statusItem->setParentId( $item->getId() );
-			$statusItem->setType( MShop_Order_Item_Status_Abstract::STATUS_PAYMENT );
-			$statusItem->setValue( $item->getPaymentStatus() );
-
-			$statusManager->saveItem( $statusItem, false );
-		}
-
-		if( $item->getDeliveryStatus() != $item->oldDeliveryStatus )
-		{
-			$statusManager = MShop_Factory::createManager( $this->_getContext(), 'order/status' );
-
-			$statusItem = $statusManager->createItem();
-			$statusItem->setParentId( $item->getId() );
-			$statusItem->setType( MShop_Order_Item_Status_Abstract::STATUS_DELIVERY );
-			$statusItem->setValue( $item->getDeliveryStatus() );
-
-			$statusManager->saveItem( $statusItem, false );
-		}
+		$this->_addStatus( $item );
 	}
 
 
@@ -460,6 +438,7 @@ class MShop_Order_Manager_Default
 	 * Searches for orders based on the given criteria.
 	 *
 	 * @param MW_Common_Criteria_Interface $search Search object containing the conditions
+	 * @param array $ref Not used
 	 * @param integer &$total Number of items that are available in total
 	 * @return array List of items implementing MShop_Order_Item_Interface
 	 * @throws MShop_Order_Exception If creating items failed
@@ -468,8 +447,6 @@ class MShop_Order_Manager_Default
 	public function searchItems( MW_Common_Criteria_Interface $search, array $ref = array(), &$total = null )
 	{
 		$context = $this->_getContext();
-		$logger = $context->getLogger();
-		$config = $context->getConfig();
 
 		$dbm = $context->getDatabaseManager();
 		$dbname = $this->_getResourceName();
@@ -614,7 +591,7 @@ class MShop_Order_Manager_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g base, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g base, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -728,6 +705,38 @@ class MShop_Order_Manager_Default
 		 */
 
 		return $this->_getSubManager( 'order', $manager, $name );
+	}
+
+
+	/**
+	 * Adds the new payment and delivery values to the order status log.
+	 *
+	 * @param MShop_Order_Item_Interface $item Order item object
+	 */
+	protected function _addStatus( MShop_Order_Item_Interface $item )
+	{
+		$statusManager = MShop_Factory::createManager( $this->_getContext(), 'order/status' );
+
+		$statusItem = $statusManager->createItem();
+		$statusItem->setParentId( $item->getId() );
+
+		if( $item->getPaymentStatus() != $item->oldPaymentStatus )
+		{
+			$statusItem->setId( null );
+			$statusItem->setType( MShop_Order_Item_Status_Abstract::STATUS_PAYMENT );
+			$statusItem->setValue( $item->getPaymentStatus() );
+
+			$statusManager->saveItem( $statusItem, false );
+		}
+
+		if( $item->getDeliveryStatus() != $item->oldDeliveryStatus )
+		{
+			$statusItem->setId( null );
+			$statusItem->setType( MShop_Order_Item_Status_Abstract::STATUS_DELIVERY );
+			$statusItem->setValue( $item->getDeliveryStatus() );
+
+			$statusManager->saveItem( $statusItem, false );
+		}
 	}
 
 

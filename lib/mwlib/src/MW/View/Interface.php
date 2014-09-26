@@ -11,6 +11,16 @@
 /**
  * Common interface for all view classes.
  *
+ * @method string|array config(string $name = null, string|array $default = null) Returns the config value for the given key
+ * @method string date(string $date) Returns the formatted date
+ * @method MW_View_Helper_Interface encoder() Returns the encoder object
+ * @method string formparam(string|array $names) Returns the name for the HTML form parameter
+ * @method MW_Mail_Message_Interface mail() Returns the e-mail message object
+ * @method string number(integer|float|decimal $number, integer $decimals = 2) Returns the formatted number
+ * @method string|array param(string|null $name, string|array $default) Returns the parameter value
+ * @method string translate(string $domain, string $singular, string $plural = '', integer $number = 1) Returns the translated string or the original one if no translation is available
+ * @method string url(string|null $target, string|null $controller = null, string|null $action = null, array $params = array(), array $trailing = array(), array $config = array()) Returns the URL assembled from the given arguments
+ *
  * @package MW
  * @subpackage View
  */
@@ -46,6 +56,7 @@ interface MW_View_Interface
 	 * Removes a key from the stored values.
 	 *
 	 * @param string $key Name of the value that should be removed
+	 * @return void
 	 */
 	public function __unset( $key );
 
@@ -54,6 +65,7 @@ interface MW_View_Interface
 	 *
 	 * @param string $key Name of the value that should be set
 	 * @param mixed $value Value associated to the given key
+	 * @return void
 	 */
 	public function __set( $key, $value );
 
@@ -62,6 +74,7 @@ interface MW_View_Interface
 	 *
 	 * @param string $name Name of the view helper as called in the template
 	 * @param MW_View_Helper_Interface $helper View helper instance
+	 * @return void
 	 */
 	public function addHelper( $name, MW_View_Helper_Interface $helper );
 
@@ -70,6 +83,7 @@ interface MW_View_Interface
 	 * This method overwrites already existing key/value pairs set by the magic method.
 	 *
 	 * @param array $values Associative list of key/value pairs
+	 * @return void
 	 */
 	public function assign( array $values );
 

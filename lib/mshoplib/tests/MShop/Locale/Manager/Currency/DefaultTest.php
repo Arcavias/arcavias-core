@@ -26,15 +26,6 @@ class MShop_Locale_Manager_Currency_DefaultTest extends MW_Unittest_Testcase
 	}
 
 
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('MShop_Locale_Manager_Currency_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
 	public function testCreateItem()
 	{
 		$this->assertInstanceOf('MShop_Locale_Item_Currency_Interface', $this->_object->createItem());
@@ -46,7 +37,7 @@ class MShop_Locale_Manager_Currency_DefaultTest extends MW_Unittest_Testcase
 		// insert case
 		$item = $this->_object->createItem();
 		$item->setLabel( 'new name' );
-		$item->setStatus( true );
+		$item->setStatus( 1 );
 		$item->setCode( 'XXX' );
 
 		$this->_object->saveItem( $item );
@@ -102,8 +93,8 @@ class MShop_Locale_Manager_Currency_DefaultTest extends MW_Unittest_Testcase
 	{
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '==', 'locale.currency.id', 'EUR' );
-
 		$expr[] = $search->compare( '==', 'locale.currency.label', 'Euro' );
 		$expr[] = $search->compare( '==', 'locale.currency.code', 'EUR' );
 		$expr[] = $search->compare( '==', 'locale.currency.status', 1 );

@@ -50,36 +50,8 @@ class Controller_ExtJS_Price_List_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'price.list.id'} ) ) { $item->setId( $entry->{'price.list.id'} ); }
-			if( isset( $entry->{'price.list.domain'} ) ) { $item->setDomain( $entry->{'price.list.domain'} ); }
-			if( isset( $entry->{'price.list.parentid'} ) ) { $item->setParentId( $entry->{'price.list.parentid'} ); }
-			if( isset( $entry->{'price.list.refid'} ) ) { $item->setRefId( $entry->{'price.list.refid'} ); }
-			if( isset( $entry->{'price.list.config'} ) ) { $item->setConfig( (array) $entry->{'price.list.config'} ); }
-			if( isset( $entry->{'price.list.position'} ) ) { $item->setPosition( $entry->{'price.list.position'} ); }
-			if( isset( $entry->{'price.list.status'} ) ) { $item->setStatus( $entry->{'price.list.status'} ); }
-
-			if( isset( $entry->{'price.list.typeid'} ) && $entry->{'price.list.typeid'} != '' ) {
-				$item->setTypeId( $entry->{'price.list.typeid'} );
-			}
-
-			if( isset( $entry->{'price.list.datestart'} ) && $entry->{'price.list.datestart'} != '' )
-			{
-				$datetime = str_replace( 'T', ' ', $entry->{'price.list.datestart'} );
-				$entry->{'price.list.datestart'} = $datetime;
-				$item->setDateStart( $datetime );
-			}
-
-			if( isset( $entry->{'price.list.dateend'} ) && $entry->{'price.list.dateend'} != '' )
-			{
-				$datetime = str_replace( 'T', ' ', $entry->{'price.list.dateend'} );
-				$entry->{'price.list.dateend'} = $datetime;
-				$item->setDateEnd( $datetime );
-			}
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -131,9 +103,54 @@ class Controller_ExtJS_Price_List_Default
 
 
 	/**
+	 * Creates a new price list item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "price.list" prefix
+	 * @return MShop_Common_Item_List_Interface Common list item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'price.list.id': $item->setId( $value ); break;
+				case 'price.list.domain': $item->setDomain( $value ); break;
+				case 'price.list.parentid': $item->setParentId( $value ); break;
+				case 'price.list.position': $item->setPosition( $value ); break;
+				case 'price.list.config': $item->setConfig( (array) $value ); break;
+				case 'price.list.status': $item->setStatus( $value ); break;
+				case 'price.list.typeid': $item->setTypeId( $value ); break;
+				case 'price.list.refid': $item->setRefId( $value ); break;
+				case 'price.list.datestart':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'price.list.datestart'} = $value;
+						$item->setDateStart( $value );
+					}
+					break;
+				case 'price.list.dateend':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'price.list.dateend'} = $value;
+						$item->setDateEnd( $value );
+					}
+					break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

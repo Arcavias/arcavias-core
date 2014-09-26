@@ -35,6 +35,8 @@ class Controller_Frontend_Basket_Default
 
 		$this->_domainManager = MShop_Factory::createManager( $context, 'order/base' );
 		$this->_basket = $this->_domainManager->getSession();
+
+		$this->_checkLocale();
 	}
 
 
@@ -77,11 +79,10 @@ class Controller_Frontend_Basket_Default
 	 * @param string $warehouse Unique code of the warehouse to deliver the products from
 	 * @throws Controller_Frontend_Basket_Exception If the product isn't available
 	 */
-	public function addProduct( $prodid, $quantity = 1, $options = array(), $variantAttributeIds = array(),
-		$configAttributeIds = array(), $hiddenAttributeIds = array(), $warehouse = 'default' )
+	public function addProduct( $prodid, $quantity = 1, array $options = array(), array $variantAttributeIds = array(),
+		array $configAttributeIds = array(), array $hiddenAttributeIds = array(), $warehouse = 'default' )
 	{
 		$this->_checkCategory( $prodid );
-
 
 		$context = $this->_getContext();
 
@@ -96,46 +97,9 @@ class Controller_Frontend_Basket_Default
 		$attr = array();
 		$prices = $productItem->getRefItems( 'price', 'default', 'default' );
 
-
-		if( $productItem->getType() === 'select' )
-		{
-			$productItems = $this->_getProductVariants( $productItem, $variantAttributeIds );
-
-			if( count( $productItems ) > 1 )
-			{
-				$msg = sprintf( 'No unique article found for selected attributes and product ID "%1$s"', $prodid );
-				throw new Controller_Frontend_Basket_Exception( $msg );
-			}
-			else if( ( $result = reset( $productItems ) ) !== false ) // count == 1
-			{
-				$productItem = $result;
-				$orderBaseProductItem->setProductCode( $productItem->getCode() );
-
-				$subprices = $productItem->getRefItems( 'price', 'default', 'default' );
-
-				if( count( $subprices ) > 0 ) {
-					$prices = $subprices;
-				}
-
-				$orderProductAttrManager = MShop_Factory::createManager( $context, 'order/base/product/attribute' );
-				$variantAttributes = $productItem->getRefItems( 'attribute', null, 'variant' );
-
-				foreach( $this->_getAttributes( array_keys( $variantAttributes ), array( 'text' ) ) as $attrItem )
-				{
-					$orderAttributeItem = $orderProductAttrManager->createItem();
-					$orderAttributeItem->copyFrom( $attrItem );
-					$orderAttributeItem->setType( 'variant' );
-
-					$attr[] = $orderAttributeItem;
-				}
-			}
-			else if( !isset( $options['variant'] ) || $options['variant'] != false ) // count == 0
-			{
-				$msg = sprintf( 'No article found for selected attributes and product ID "%1$s"', $prodid );
-				throw new Controller_Frontend_Basket_Exception( $msg );
-			}
+		if( $productItem->getType() === 'select' ) {
+			$attr = $this->_getVariantDetails( $orderBaseProductItem, $productItem, $prices, $variantAttributeIds, $options );
 		}
-
 
 		$priceManager = MShop_Factory::createManager( $context, 'price' );
 		$price = $priceManager->getLowestPrice( $prices, $quantity );
@@ -149,33 +113,7 @@ class Controller_Frontend_Basket_Default
 		$orderBaseProductItem->setPrice( $price );
 		$orderBaseProductItem->setAttributes( $attr );
 
-
-		$stocklevel = null;
-		if( !isset( $options['stock'] ) || $options['stock'] != false ) {
-			$stocklevel = $this->_getStockLevel( $productItem->getId(), $warehouse );
-		}
-
-		if( $stocklevel === null || $stocklevel > 0 )
-		{
-			$position = $this->_basket->addProduct( $orderBaseProductItem );
-			$orderBaseProductItem = clone $this->_basket->getProduct( $position );
-			$quantity = $orderBaseProductItem->getQuantity();
-
-			if( $stocklevel > 0 && $stocklevel < $quantity )
-			{
-				$this->_basket->deleteProduct( $position );
-				$orderBaseProductItem->setQuantity( $stocklevel );
-				$this->_basket->addProduct( $orderBaseProductItem, $position );
-			}
-		}
-
-		$this->_domainManager->setSession( $this->_basket );
-
-		if( $stocklevel !== null && $stocklevel < $quantity )
-		{
-			$msg = sprintf( 'There are not enough products "%1$s" in stock', $orderBaseProductItem->getName() );
-			throw new Controller_Frontend_Basket_Exception( $msg );
-		}
+		$this->_addProductInStock( $orderBaseProductItem, $productItem->getId(), $quantity, $options, $warehouse );
 	}
 
 
@@ -206,119 +144,35 @@ class Controller_Frontend_Basket_Default
 	 * @param integer $quantity New quantiy of the product item
 	 * @param array $options Possible options are: 'stock'=>true|false
 	 * 	The 'stock'=>false option allows adding products without being in stock.
-	 * @param array $configAttributeCodes Codes of the product config attributes that should be REMOVED
+	 * @param string[] $configAttributeCodes Codes of the product config attributes that should be REMOVED
 	 */
-	public function editProduct( $position, $quantity, $options = array(),
-		$configAttributeCodes = array() )
+	public function editProduct( $position, $quantity, array $options = array(),
+		array $configAttributeCodes = array() )
 	{
 		$product = $this->_basket->getProduct( $position );
 		$product->setQuantity( $quantity ); // Enforce check immediately
 
-
-		if( $product->getFlags() === MShop_Order_Item_Base_Product_Abstract::FLAG_IMMUTABLE )
+		if( $product->getFlags() & MShop_Order_Item_Base_Product_Abstract::FLAG_IMMUTABLE )
 		{
 			$msg = sprintf( 'Basket item at position "%1$d" cannot be changed', $position );
 			throw new Controller_Frontend_Basket_Exception( $msg );
 		}
 
-
-		$context = $this->_getContext();
-		$productManager = MShop_Factory::createManager( $context, 'product' );
-
-		$search = $productManager->createSearch( true );
-		$expr = array(
-			$search->compare( '==', 'product.code', $product->getProductCode() ),
-			$search->getConditions(),
-		);
-		$search->setConditions( $search->combine( '&&', $expr ) );
-
-		$result = $productManager->searchItems( $search, array( 'price', 'text' ) );
-
-		if( ( $productItem = reset( $result ) ) === false )
+		$attributes = $product->getAttributes();
+		foreach( $attributes as $key => $attribute )
 		{
-			$msg = sprintf( 'No product with code "%1$s" found', $product->getProductCode() );
-			throw new Controller_Frontend_Basket_Exception( $msg );
-		}
-
-
-		$prices = $productItem->getRefItems( 'price', 'default' );
-
-		if( empty( $prices ) )
-		{
-			$parentItem = $productManager->getItem( $product->getProductId(), array( 'price' ) );
-			$prices = $parentItem->getRefItems( 'price', 'default' );
-		}
-
-		$priceManager = MShop_Factory::createManager( $context, 'price' );
-		$price = $priceManager->getLowestPrice( $prices, $quantity );
-
-
-		$expr = array();
-		$attributes = array();
-
-		$attributeManager = MShop_Factory::createManager( $context, 'attribute' );
-		$search = $attributeManager->createSearch( true );
-
-		foreach( $product->getAttributes() as $item )
-		{
-			if( !in_array( $item->getCode(), $configAttributeCodes ) )
-			{
-				$tmp = array(
-					$search->compare( '==', 'attribute.domain', 'product' ),
-					$search->compare( '==', 'attribute.code', $item->getValue() ),
-					$search->compare( '==', 'attribute.type.domain', 'product' ),
-					$search->compare( '==', 'attribute.type.code', $item->getCode() ),
-					$search->compare( '>', 'attribute.type.status', 0 ),
-					$search->getConditions(),
-				);
-				$expr[] = $search->combine( '&&', $tmp );
-
-				$attributes[] = $item;
+			if( in_array( $attribute->getCode(), $configAttributeCodes ) ) {
+				unset( $attributes[$key] );
 			}
 		}
-
-		if( !empty( $expr ) )
-		{
-			$search->setConditions( $search->combine( '||', $expr ) );
-			$attributeItems = $attributeManager->searchItems( $search, array( 'price' ) );
-
-			foreach( $attributeItems as $attrItem )
-			{
-				$prices = $attrItem->getRefItems( 'price', 'default' );
-
-				if( count( $prices ) > 0 )
-				{
-					$attrPrice = $priceManager->getLowestPrice( $prices, $quantity );
-					$price->addItem( $attrPrice );
-				}
-			}
-		}
-
-		// remove product rebate of original price in favor to rebates granted for the order
-		$price->setRebate( '0.00' );
-
-		$stocklevel = null;
-		if( !isset( $options['stock'] ) || $options['stock'] != false ) {
-			$stocklevel = $this->_getStockLevel( $productItem->getId(), $product->getWarehouseCode() );
-		}
-
-		$product->setPrice( $price );
-		$product->setQuantity( ( $stocklevel !== null && $stocklevel > 0 ? min( $stocklevel, $quantity ) : $quantity ) );
 		$product->setAttributes( $attributes );
 
-		$this->_basket->deleteProduct( $position );
+		$productItem = $this->_getProductItem( $product->getProductCode() );
+		$prices = $productItem->getRefItems( 'price', 'default' );
 
-		if( $stocklevel === null || $stocklevel > 0 )
-		{
-			$this->_basket->addProduct( $product, $position );
-			$this->_domainManager->setSession( $this->_basket );
-		}
+		$product->setPrice( $this->_calcPrice( $product, $prices, $quantity ) );
 
-		if( $stocklevel !== null && $stocklevel < $quantity )
-		{
-			$msg = sprintf( 'There are not enough products "%1$s" in stock', $productItem->getName() );
-			throw new Controller_Frontend_Basket_Exception( $msg );
-		}
+		$this->_editProductInStock( $product, $productItem, $quantity, $position, $options );
 	}
 
 
@@ -404,9 +258,7 @@ class Controller_Frontend_Basket_Default
 	 * Sets the address of the customer in the basket.
 	 *
 	 * @param string $type Address type constant from MShop_Order_Item_Base_Address_Abstract
-	 * @param MShop_Common_Item_Address_Interface|array|null $billing Address object or array with key/value pairs.
-	 * 	In case of an array, the keys must be the same as the keys returned when calling toArray()
-	 *  on the order base address object like "order.base.address.salutation"
+	 * @param MShop_Common_Item_Address_Interface|array|null $value Address object or array with key/value pairs of address or null to remove address from basket
 	 * @throws Controller_Frontend_Basket_Exception If the billing or delivery address is not of any required type of
 	 * 	if one of the keys is invalid when using an array with key/value pairs
 	 */
@@ -488,6 +340,84 @@ class Controller_Frontend_Basket_Default
 
 
 	/**
+	 * Edits the changed product to the basket if it's in stock.
+	 *
+	 * @param MShop_Order_Item_Base_Product_Interface $orderBaseProductItem Old order product from basket
+	 * @param string $productId Unique ID of the product item that belongs to the order product
+	 * @param integer $quantity New order quantity
+	 * @param integer $position Position of the old order product in the basket
+	 * @param array Associative list of options
+	 * @throws Controller_Frontend_Basket_Exception If there's not enough stock available
+	 */
+	private function _addProductInStock( MShop_Order_Item_Base_Product_Interface $orderBaseProductItem,
+		$productId, $quantity, array $options, $warehouse )
+	{
+		$stocklevel = null;
+		if( !isset( $options['stock'] ) || $options['stock'] != false ) {
+			$stocklevel = $this->_getStockLevel( $productId, $warehouse );
+		}
+
+		if( $stocklevel === null || $stocklevel > 0 )
+		{
+			$position = $this->_basket->addProduct( $orderBaseProductItem );
+			$orderBaseProductItem = clone $this->_basket->getProduct( $position );
+			$quantity = $orderBaseProductItem->getQuantity();
+
+			if( $stocklevel > 0 && $stocklevel < $quantity )
+			{
+				$this->_basket->deleteProduct( $position );
+				$orderBaseProductItem->setQuantity( $stocklevel );
+				$this->_basket->addProduct( $orderBaseProductItem, $position );
+			}
+		}
+
+		$this->_domainManager->setSession( $this->_basket );
+
+		if( $stocklevel !== null && $stocklevel < $quantity )
+		{
+			$msg = sprintf( 'There are not enough products "%1$s" in stock', $orderBaseProductItem->getName() );
+			throw new Controller_Frontend_Basket_Exception( $msg );
+		}
+	}
+
+
+	/**
+	 * Edits the changed product to the basket if it's in stock.
+	 *
+	 * @param MShop_Order_Item_Base_Product_Interface $product Old order product from basket
+	 * @param MShop_Product_Item_Interface $productItem Product item that belongs to the order product
+	 * @param integer $quantity New order quantity
+	 * @param integer $position Position of the old order product in the basket
+	 * @param array Associative list of options
+	 * @throws Controller_Frontend_Basket_Exception If there's not enough stock available
+	 */
+	private function _editProductInStock( MShop_Order_Item_Base_Product_Interface $product,
+		MShop_Product_Item_Interface $productItem, $quantity, $position, array $options )
+	{
+		$stocklevel = null;
+		if( !isset( $options['stock'] ) || $options['stock'] != false ) {
+			$stocklevel = $this->_getStockLevel( $productItem->getId(), $product->getWarehouseCode() );
+		}
+
+		$product->setQuantity( ( $stocklevel !== null && $stocklevel > 0 ? min( $stocklevel, $quantity ) : $quantity ) );
+
+		$this->_basket->deleteProduct( $position );
+
+		if( $stocklevel === null || $stocklevel > 0 )
+		{
+			$this->_basket->addProduct( $product, $position );
+			$this->_domainManager->setSession( $this->_basket );
+		}
+
+		if( $stocklevel !== null && $stocklevel < $quantity )
+		{
+			$msg = sprintf( 'There are not enough products "%1$s" in stock', $productItem->getName() );
+			throw new Controller_Frontend_Basket_Exception( $msg );
+		}
+	}
+
+
+	/**
 	 * Checks if the product is part of at least one category in the product catalog.
 	 *
 	 * @param string $prodid Unique ID of the product
@@ -512,6 +442,197 @@ class Controller_Frontend_Basket_Default
 			$msg = sprintf( 'Adding product with ID "%1$s" is not allowed', $prodid );
 			throw new Controller_Frontend_Basket_Exception( $msg );
 		}
+	}
+
+
+	/**
+	 * Checks for a locale mismatch and migrates the products to the new basket if necessary.
+	 *
+	 * @throws Controller_Basket_Exception If one or more products couldn't migrated
+	 */
+	protected function _checkLocale()
+	{
+		$errors = array();
+		$context = $this->_getContext();
+		$session = $context->getSession();
+		$locale = $this->_basket->getLocale();
+
+		$localeStr = $session->get( 'arcavias/basket/locale' );
+		$localeKey = $locale->getSite()->getCode() . '|' . $locale->getLanguageId() . '|' . $locale->getCurrencyId();
+
+		if( $localeStr !== null && $localeStr !== $localeKey )
+		{
+			$locParts = explode( '|', $localeStr );
+			$locSite = ( isset( $locParts[0] ) ? $locParts[0] : '' );
+			$locLanguage = ( isset( $locParts[1] ) ? $locParts[1] : '' );
+			$locCurrency = ( isset( $locParts[2] ) ? $locParts[2] : '' );
+
+			$localeManager = MShop_Factory::createManager( $context, 'locale' );
+			$locale = $localeManager->bootstrap( $locSite, $locLanguage, $locCurrency, false );
+
+			$context = clone $context;
+			$context->setLocale( $locale );
+
+			$manager = MShop_Order_Manager_Factory::createManager( $context )->getSubManager( 'base' );
+			$basket = $manager->getSession();
+
+			$errors = $this->_copyAddresses( $basket, $errors, $localeKey );
+			$errors = $this->_copyServices( $basket, $errors );
+			$errors = $this->_copyProducts( $basket, $errors, $localeKey );
+			$errors = $this->_copyCoupons( $basket, $errors, $localeKey );
+
+			$manager->setSession( $basket );
+		}
+
+		$session->set( 'arcavias/basket/locale', $localeKey );
+
+		if( !empty( $errors ) )
+		{
+			$msg = $context->getI18n()->dt(
+				'controller/frontend',
+				sprintf( 'One or more items aren\'t available for the chosen locale' )
+			);
+			throw new Controller_Frontend_Basket_Exception( $msg, 0, null, $errors );
+		}
+	}
+
+
+	/**
+	 * Migrates the addresses from the old basket to the current one.
+	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket object
+	 * @param array $errors Associative list of previous errors
+	 * @param string $localeKey Unique identifier of the site, language and currency
+	 * @return array Associative list of errors occured
+	 */
+	private function _copyAddresses( MShop_Order_Item_Base_Interface $basket, array $errors, $localeKey )
+	{
+		foreach( $basket->getAddresses() as $type => $item )
+		{
+			try
+			{
+				$this->setAddress( $type, $item->toArray() );
+				$basket->deleteAddress( $type );
+			}
+			catch( Exception $e )
+			{
+				$logger = $this->_getContext()->getLogger();
+				$str = 'Error migrating address with type "%1$s" in basket to locale "%2$s": %3$s';
+				$logger->log( sprintf( $str, $type, $localeKey, $e->getMessage() ), MW_Logger_Abstract::WARN );
+				$errors['address'][$type] = $e->getMessage();
+			}
+		}
+
+		return $errors;
+	}
+
+
+	/**
+	 * Migrates the coupons from the old basket to the current one.
+	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket object
+	 * @param array $errors Associative list of previous errors
+	 * @param string $localeKey Unique identifier of the site, language and currency
+	 * @return array Associative list of errors occured
+	 */
+	private function _copyCoupons( MShop_Order_Item_Base_Interface $basket, array $errors, $localeKey )
+	{
+		foreach( $basket->getCoupons() as $code => $list )
+		{
+			try
+			{
+				$this->addCoupon( $code );
+				$basket->deleteCoupon( $code, true );
+			}
+			catch( Exception $e )
+			{
+				$logger = $this->_getContext()->getLogger();
+				$str = 'Error migrating coupon with code "%1$s" in basket to locale "%2$s": %3$s';
+				$logger->log( sprintf( $str, $code, $localeKey, $e->getMessage() ), MW_Logger_Abstract::WARN );
+				$errors['coupon'][$code] = $e->getMessage();
+			}
+		}
+
+		return $errors;
+	}
+
+
+	/**
+	 * Migrates the products from the old basket to the current one.
+	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket object
+	 * @param array $errors Associative list of previous errors
+	 * @param string $localeKey Unique identifier of the site, language and currency
+	 * @return array Associative list of errors occured
+	 */
+	private function _copyProducts( MShop_Order_Item_Base_Interface $basket, array $errors, $localeKey )
+	{
+		foreach( $basket->getProducts() as $pos => $product )
+		{
+			if( $product->getFlags() & MShop_Order_Item_Base_Product_Abstract::FLAG_IMMUTABLE ) {
+				continue;
+			}
+
+			try
+			{
+				$attrIds = array();
+
+				foreach( $product->getAttributes() as $attrItem ) {
+					$attrIds[ $attrItem->getType() ][] = $attrItem->getAttributeId();
+				}
+
+				$this->addProduct(
+					$product->getProductId(),
+					$product->getQuantity(),
+					array(),
+					$this->_getValue( $attrIds, 'variant', array() ),
+					$this->_getValue( $attrIds, 'config', array() ),
+					$this->_getValue( $attrIds, 'hidden', array() ),
+					$product->getWarehouseCode()
+				);
+
+				$basket->deleteProduct( $pos );
+			}
+			catch( Exception $e )
+			{
+				$code = $product->getProductCode();
+				$logger = $this->_getContext()->getLogger();
+				$str = 'Error migrating product with code "%1$s" in basket to locale "%2$s": %3$s';
+				$logger->log( sprintf( $str, $code, $localeKey, $e->getMessage() ), MW_Logger_Abstract::WARN );
+				$errors['product'][$pos] = $e->getMessage();
+			}
+		}
+
+		return $errors;
+	}
+
+
+	/**
+	 * Migrates the services from the old basket to the current one.
+	 *
+	 * @param MShop_Order_Item_Base_Interface $basket Basket object
+	 * @param array $errors Associative list of previous errors
+	 * @return array Associative list of errors occured
+	 */
+	private function _copyServices( MShop_Order_Item_Base_Interface $basket, array $errors )
+	{
+		foreach( $basket->getServices() as $type => $item )
+		{
+			try
+			{
+				$attributes = array();
+
+				foreach( $item->getAttributes() as $attrItem ) {
+					$attributes[ $attrItem->getCode() ] = $attrItem->getValue();
+				}
+
+				$this->setService( $type, $item->getServiceId(), $attributes );
+				$basket->deleteService( $type );
+			}
+			catch( Exception $e ) { ; } // Don't notify the user as appropriate services can be added automatically
+		}
+
+		return $errors;
 	}
 
 
@@ -645,8 +766,6 @@ class Controller_Frontend_Basket_Default
 	 * @param MShop_Order_Item_Base_Address_Interface $address Address item to store the values into
 	 * @param array $map Associative array of key/value pairs. The keys must be the same as when calling toArray() from
 	 * 	an address item.
-	 * @param string $prefix Key prefix like "customer." for a billing address or "customer.address." for a delivery
-	 * 	address
 	 * @throws Controller_Frontend_Basket_Exception
 	 */
 	protected function _setAddressFromArray( MShop_Order_Item_Base_Address_Interface $address, array $map )
@@ -666,10 +785,44 @@ class Controller_Frontend_Basket_Default
 
 
 	/**
+	 * Returns the attribute items using the given order attribute items.
+	 *
+	 * @param MShop_Order_Item_Base_Product_Attribute_Item[] $orderAttributes List of order product attribute items
+	 * @return MShop_Attribute_Item_Interface[] Associative list of attribute IDs as key and attribute items as values
+	 */
+	private function _getAttributeItems( array $orderAttributes )
+	{
+		if( empty( $orderAttributes ) ) {
+			return array();
+		}
+
+		$attributeManager = MShop_Factory::createManager( $this->_getContext(), 'attribute' );
+		$search = $attributeManager->createSearch( true );
+		$expr = array();
+
+		foreach( $orderAttributes as $item )
+		{
+			$tmp = array(
+				$search->compare( '==', 'attribute.domain', 'product' ),
+				$search->compare( '==', 'attribute.code', $item->getValue() ),
+				$search->compare( '==', 'attribute.type.domain', 'product' ),
+				$search->compare( '==', 'attribute.type.code', $item->getCode() ),
+				$search->compare( '>', 'attribute.type.status', 0 ),
+				$search->getConditions(),
+			);
+			$expr[] = $search->combine( '&&', $tmp );
+		}
+
+		$search->setConditions( $search->combine( '||', $expr ) );
+		return $attributeManager->searchItems( $search, array( 'price' ) );
+	}
+
+
+	/**
 	 * Returns the attribute items for the given attribute IDs.
 	 *
 	 * @param array $attributeIds List of attribute IDs
-	 * @param array $domains Names of the domain items that should be fetched too
+	 * @param string[] $domains Names of the domain items that should be fetched too
 	 * @return array List of items implementing MShop_Attribute_Item_Interface
 	 * @throws Controller_Frontend_Basket_Exception If the actual attribute number doesn't match the expected one
 	 */
@@ -701,6 +854,76 @@ class Controller_Frontend_Basket_Default
 		}
 
 		return $attrItems;
+	}
+
+
+	/**
+	 * Calculates and returns the current price for the given order product and product prices.
+	 *
+	 * @param MShop_Order_Item_Base_Product_Interface $product Ordered product item
+	 * @param MShop_Price_Item_Interface[] $prices List of price items
+	 * @param integer $quantity New product quantity
+	 * @return MShop_Price_Item_Interface Price item with calculated price
+	 */
+	private function _calcPrice( MShop_Order_Item_Base_Product_Interface $product, array $prices, $quantity )
+	{
+		$context = $this->_getContext();
+
+		if( empty( $prices ) )
+		{
+			$productManager = MShop_Factory::createManager( $context, 'product' );
+			$parentItem = $productManager->getItem( $product->getProductId(), array( 'price' ) );
+			$prices = $parentItem->getRefItems( 'price', 'default' );
+		}
+
+		$priceManager = MShop_Factory::createManager( $context, 'price' );
+		$price = $priceManager->getLowestPrice( $prices, $quantity );
+
+		foreach( $this->_getAttributeItems( $product->getAttributes() ) as $attrItem )
+		{
+			$prices = $attrItem->getRefItems( 'price', 'default' );
+
+			if( count( $prices ) > 0 )
+			{
+				$attrPrice = $priceManager->getLowestPrice( $prices, $quantity );
+				$price->addItem( $attrPrice );
+			}
+		}
+
+		// remove product rebate of original price in favor to rebates granted for the order
+		$price->setRebate( '0.00' );
+
+		return $price;
+	}
+
+
+	/**
+	 * Retrieves the product item specified by the given code.
+	 *
+	 * @param string $code Unique product code
+	 * @return MShop_Product_Item_Interface Product item
+	 * @throws Controller_Frontend_Basket_Exception
+	 */
+	protected function _getProductItem( $code )
+	{
+		$productManager = MShop_Factory::createManager( $this->_getContext(), 'product' );
+
+		$search = $productManager->createSearch( true );
+		$expr = array(
+			$search->compare( '==', 'product.code', $code ),
+			$search->getConditions(),
+		);
+		$search->setConditions( $search->combine( '&&', $expr ) );
+
+		$result = $productManager->searchItems( $search, array( 'price', 'text' ) );
+
+		if( ( $productItem = reset( $result ) ) === false )
+		{
+			$msg = sprintf( 'No product with code "%1$s" found', $code );
+			throw new Controller_Frontend_Basket_Exception( $msg );
+		}
+
+		return $productItem;
 	}
 
 
@@ -781,5 +1004,78 @@ class Controller_Frontend_Basket_Default
 		$search->setConditions( $search->combine( '&&', $expr ) );
 
 		return $productManager->searchItems( $search, $domains );
+	}
+
+
+	/**
+	 * Returns the variant attributes and updates the price list if necessary.
+	 *
+	 * @param MShop_Order_Item_Base_Product_Interface $orderBaseProductItem Order product item
+	 * @param MShop_Product_Item_Interface &$productItem Product item which is replaced if necessary
+	 * @param array &$prices List of product prices that will be updated if necessary
+	 * @param array $variantAttributeIds List of product variant attribute IDs
+	 * @param array $options Associative list of options
+	 * @return MShop_Order_Item_Base_Product_Attribute_Interface[] List of order product attributes
+	 * @throws Controller_Frontend_Basket_Exception If no product variant is found
+	 */
+	private function _getVariantDetails( MShop_Order_Item_Base_Product_Interface $orderBaseProductItem,
+		MShop_Product_Item_Interface &$productItem, array &$prices, array $variantAttributeIds, array $options )
+	{
+		$attr = array();
+		$productItems = $this->_getProductVariants( $productItem, $variantAttributeIds );
+
+		if( count( $productItems ) > 1 )
+		{
+			$msg = sprintf( 'No unique article found for selected attributes and product ID "%1$s"', $productItem->getId() );
+			throw new Controller_Frontend_Basket_Exception( $msg );
+		}
+		else if( ( $result = reset( $productItems ) ) !== false ) // count == 1
+		{
+			$productItem = $result;
+			$orderBaseProductItem->setProductCode( $productItem->getCode() );
+
+			$subprices = $productItem->getRefItems( 'price', 'default', 'default' );
+
+			if( count( $subprices ) > 0 ) {
+				$prices = $subprices;
+			}
+
+			$orderProductAttrManager = MShop_Factory::createManager( $this->_getContext(), 'order/base/product/attribute' );
+			$variantAttributes = $productItem->getRefItems( 'attribute', null, 'variant' );
+
+			foreach( $this->_getAttributes( array_keys( $variantAttributes ), array( 'text' ) ) as $attrItem )
+			{
+				$orderAttributeItem = $orderProductAttrManager->createItem();
+				$orderAttributeItem->copyFrom( $attrItem );
+				$orderAttributeItem->setType( 'variant' );
+
+				$attr[] = $orderAttributeItem;
+			}
+		}
+		else if( !isset( $options['variant'] ) || $options['variant'] != false ) // count == 0
+		{
+			$msg = sprintf( 'No article found for selected attributes and product ID "%1$s"', $productItem->getId() );
+			throw new Controller_Frontend_Basket_Exception( $msg );
+		}
+
+		return $attr;
+	}
+
+
+	/**
+	 * Returns the value of an array or the default value if it's not available.
+	 *
+	 * @param array $values Associative list of key/value pairs
+	 * @param string $name Name of the key to return the value for
+	 * @param mixed $default Default value if no value is available for the given name
+	 * @return mixed Value from the array or default value
+	 */
+	protected function _getValue( array $values, $name, $default = null )
+	{
+		if( isset( $values[$name] ) ) {
+			return $values[$name];
+		}
+
+		return $default;
 	}
 }

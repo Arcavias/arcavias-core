@@ -10,9 +10,8 @@
  */
 class MShop_Locale_Item_Site_DefaultTest extends MW_Unittest_Testcase
 {
-
 	private $_object;
-	private $_value;
+	private $_values;
 
 
 	protected function setUp()
@@ -37,15 +36,6 @@ class MShop_Locale_Item_Site_DefaultTest extends MW_Unittest_Testcase
 	protected function tearDown()
 	{
 		$this->_object = null;
-	}
-
-
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('MShop_Locale_Item_Site_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
 	}
 
 

@@ -15,7 +15,7 @@
  * @subpackage Html
  */
 class Client_Html_Basket_Standard_Default
-	extends Client_Html_Abstract
+	extends Client_Html_Basket_Abstract
 {
 	/** client/html/basket/standard/default/subparts
 	 * List of HTML sub-clients rendered within the basket standard section
@@ -74,23 +74,7 @@ class Client_Html_Basket_Standard_Default
 	 * @category Developer
 	 */
 	private $_subPartNames = array( 'detail', 'coupon' );
-	private $_controller;
 	private $_cache;
-
-
-	/**
-	 * Initializes the client.
-	 *
-	 * @param MShop_Context_Item_Interface $context Context object
-	 * @param array $templatePaths Associative list of the file system paths to the co
-	 *      and a list of relative paths inside the core or the extension as values
-	 */
-	public function __construct( MShop_Context_Item_Interface $context, array $templatePaths )
-	{
-		parent::__construct( $context, $templatePaths );
-
-		$this->_controller = Controller_Frontend_Factory::createController( $this->_getContext(), 'basket' );
-	}
 
 
 	/**
@@ -238,7 +222,6 @@ class Client_Html_Basket_Standard_Default
 	 */
 	public function process()
 	{
-		$refresh = false;
 		$view = $this->getView();
 		$context = $this->_getContext();
 
@@ -298,101 +281,33 @@ class Client_Html_Basket_Standard_Default
 			switch( $view->param( 'b-action' ) )
 			{
 				case 'add':
-
-					$refresh = true;
-					$products = (array) $view->param( 'b-prod', array() );
-
-					if( ( $prodid = $view->param( 'b-prod-id', null ) ) !== null )
-					{
-						$products[] = array(
-							'prod-id' => $prodid,
-							'quantity' => $view->param( 'b-quantity', 1 ),
-							'attrvar-id' => array_filter( (array) $view->param( 'b-attrvar-id', array() ) ),
-							'attrconf-id' => array_filter( (array) $view->param( 'b-attrconf-id', array() ) ),
-							'attrhide-id' => array_filter( (array) $view->param( 'b-attrhide-id', array() ) ),
-							'warehouse' => $view->param( 'b-warehouse', 'default' ),
-						);
-					}
-
-					foreach( $products as $values )
-					{
-						$this->_controller->addProduct(
-							( isset( $values['prod-id'] ) ? $values['prod-id'] : null ),
-							( isset( $values['quantity'] ) ? $values['quantity'] : 1 ),
-							$options,
-							( isset( $values['attrvar-id'] ) ? array_filter( (array) $values['attrvar-id'] ) : array() ),
-							( isset( $values['attrconf-id'] ) ? array_filter( (array) $values['attrconf-id'] ) : array() ),
-							( isset( $values['attrhide-id'] ) ? array_filter( (array) $values['attrhide-id'] ) : array() ),
-							( isset( $values['warehouse'] ) ? $values['warehouse'] : 'default' )
-						);
-					}
-
+					$this->_addProducts( $view, $options );
 					break;
-
 				case 'delete':
-
-					$refresh = true;
-					$products = (array) $view->param( 'b-position', array() );
-
-					foreach( $products as $position ) {
-						$this->_controller->deleteProduct( $position );
-					}
-
+					$this->_deleteProducts( $view );
 					break;
-
-				case 'edit':
-
-					$refresh = true;
-					$products = (array) $view->param( 'b-prod', array() );
-
-					if( ( $positon = $view->param( 'b-position', null ) ) !== null )
-					{
-						$products[] = array(
-							'position' => $positon,
-							'quantity' => $view->param( 'b-quantity', 1 ),
-							'attrconf-code' => array_filter( (array) $view->param( 'b-attrconf-code', array() ) )
-						);
-					}
-
-					foreach( $products as $values )
-					{
-						$this->_controller->editProduct(
-							( isset( $values['position'] ) ? $values['position'] : null ),
-							( isset( $values['quantity'] ) ? $values['quantity'] : 1 ),
-							$options,
-							( isset( $values['attrconf-code'] ) ? array_filter( (array) $values['attrconf-code'] ) : array() )
-						);
-					}
-
-					break;
-			}
-
-			if( $refresh ) // Remove the cached HTML from the session for all baskets
-			{
-				$session = $context->getSession();
-
-				foreach( $session->get( 'arcavias/basket/cache', array() ) as $key => $value ) {
-					$session->set( $key, null );
-				}
+				default:
+					$this->_editProducts( $view, $options );
 			}
 
 			parent::process();
 
-			$this->_controller->get()->check( MShop_Order_Item_Base_Abstract::PARTS_PRODUCT );
+			$controller = Controller_Frontend_Factory::createController( $context, 'basket' );
+			$controller->get()->check( MShop_Order_Item_Base_Abstract::PARTS_PRODUCT );
 		}
 		catch( Client_Html_Exception $e )
 		{
-			$error = array( $this->_getContext()->getI18n()->dt( 'client/html', $e->getMessage() ) );
+			$error = array( $context->getI18n()->dt( 'client/html', $e->getMessage() ) );
 			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
 		}
 		catch( Controller_Frontend_Exception $e )
 		{
-			$error = array( $this->_getContext()->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
+			$error = array( $context->getI18n()->dt( 'controller/frontend', $e->getMessage() ) );
 			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
 		}
 		catch( MShop_Plugin_Provider_Exception $e )
 		{
-			$errors = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$errors = array( $context->getI18n()->dt( 'mshop', $e->getMessage() ) );
 			$errors = array_merge( $errors, $this->_translatePluginErrorCodes( $e->getErrorCodes() ) );
 
 			$view->summaryErrorCodes = $e->getErrorCodes();
@@ -400,7 +315,7 @@ class Client_Html_Basket_Standard_Default
 		}
 		catch( MShop_Exception $e )
 		{
-			$error = array( $this->_getContext()->getI18n()->dt( 'mshop', $e->getMessage() ) );
+			$error = array( $context->getI18n()->dt( 'mshop', $e->getMessage() ) );
 			$view->standardErrorList = $view->get( 'standardErrorList', array() ) + $error;
 		}
 		catch( Exception $e )
@@ -436,20 +351,122 @@ class Client_Html_Basket_Standard_Default
 	{
 		if( !isset( $this->_cache ) )
 		{
-			$params = $this->_getContext()->getSession()->get( 'arcavias/catalog/detail/params/last', array() );
+			$context = $this->_getContext();
+			$params = $context->getSession()->get( 'arcavias/catalog/detail/params/last', array() );
 
 			$target = $view->config( 'client/html/catalog/detail/url/target' );
 			$controller = $view->config( 'client/html/catalog/detail/url/controller', 'catalog' );
 			$action = $view->config( 'client/html/catalog/detail/url/action', 'detail' );
 			$config = $view->config( 'client/html/catalog/detail/url/config', array() );
 
-			$view->standardBackUrl = $view->url( $target, $controller, $action, $params, array(), $config );
 			$view->standardParams = $this->_getClientParams( $view->param() );
-			$view->standardBasket = $this->_controller->get();
+			$view->standardBackUrl = $view->url( $target, $controller, $action, $params, array(), $config );
+			$view->standardBasket = Controller_Frontend_Factory::createController( $context, 'basket' )->get();
 
 			$this->_cache = $view;
 		}
 
 		return $this->_cache;
+	}
+
+
+	/**
+	 * Adds the products specified by the view parameters to the basket.
+	 *
+	 * @param MW_View_Interface $view View object
+	 * @param array $options List of options for addProducts() in basket controller
+	 */
+	protected function _addProducts( MW_View_Interface $view, array $options )
+	{
+		$this->_clearCached();
+		$products = (array) $view->param( 'b-prod', array() );
+		$controller = Controller_Frontend_Factory::createController( $this->_getContext(), 'basket' );
+
+		if( ( $prodid = $view->param( 'b-prod-id', null ) ) !== null )
+		{
+			$products[] = array(
+				'prod-id' => $prodid,
+				'quantity' => $view->param( 'b-quantity', 1 ),
+				'attrvar-id' => array_filter( (array) $view->param( 'b-attrvar-id', array() ) ),
+				'attrconf-id' => array_filter( (array) $view->param( 'b-attrconf-id', array() ) ),
+				'attrhide-id' => array_filter( (array) $view->param( 'b-attrhide-id', array() ) ),
+				'warehouse' => $view->param( 'b-warehouse', 'default' ),
+			);
+		}
+
+		foreach( $products as $values ) {
+			$this->_addProduct( $controller, $values, $options );
+		}
+	}
+
+
+	/**
+	 * Adds a single product specified by its values to the basket.
+	 *
+	 * @param Controller_Frontend_Interface $controller Basket frontend controller
+	 * @param array $values Associative list of key/value pairs from the view specifying the product
+	 * @param array $options List of options for addProducts() in basket frontend controller
+	 */
+	protected function _addProduct( Controller_Frontend_Interface $controller, array $values, array $options )
+	{
+		$controller->addProduct(
+			( isset( $values['prod-id'] ) ? $values['prod-id'] : null ),
+			( isset( $values['quantity'] ) ? $values['quantity'] : 1 ),
+			$options,
+			( isset( $values['attrvar-id'] ) ? array_filter( (array) $values['attrvar-id'] ) : array() ),
+			( isset( $values['attrconf-id'] ) ? array_filter( (array) $values['attrconf-id'] ) : array() ),
+			( isset( $values['attrhide-id'] ) ? array_filter( (array) $values['attrhide-id'] ) : array() ),
+			( isset( $values['warehouse'] ) ? $values['warehouse'] : 'default' )
+		);
+	}
+
+
+	/**
+	 * Removes the products specified by the view parameters from the basket.
+	 *
+	 * @param MW_View_Interface $view View object
+	 */
+	protected function _deleteProducts( MW_View_Interface $view )
+	{
+		$this->_clearCached();
+		$products = (array) $view->param( 'b-position', array() );
+		$controller = Controller_Frontend_Factory::createController( $this->_getContext(), 'basket' );
+
+		foreach( $products as $position ) {
+			$controller->deleteProduct( $position );
+		}
+	}
+
+
+	/**
+	 * Edits the products specified by the view parameters to the basket.
+	 *
+	 * @param MW_View_Interface $view View object
+	 * @param array $options List of options for editProducts() in basket controller
+	 */
+	protected function _editProducts( MW_View_Interface $view, array $options )
+	{
+		$this->_clearCached();
+		$products = (array) $view->param( 'b-prod', array() );
+		$controller = Controller_Frontend_Factory::createController( $this->_getContext(), 'basket' );
+
+		if( ( $positon = $view->param( 'b-position', null ) ) !== null )
+		{
+			$products[] = array(
+				'position' => $positon,
+				'quantity' => $view->param( 'b-quantity', 1 ),
+				'attrconf-code' => array_filter( (array) $view->param( 'b-attrconf-code', array() ) )
+			);
+		}
+
+		foreach( $products as $values )
+		{
+			$controller->editProduct(
+				( isset( $values['position'] ) ? $values['position'] : null ),
+				( isset( $values['quantity'] ) ? $values['quantity'] : 1 ),
+				$options,
+				( isset( $values['attrconf-code'] ) ? array_filter( (array) $values['attrconf-code'] ) : array() )
+			);
+		}
 	}
 }

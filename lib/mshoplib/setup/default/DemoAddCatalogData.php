@@ -14,7 +14,7 @@ class MW_Setup_Task_DemoAddCatalogData extends MW_Setup_Task_MShopAddDataAbstrac
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -25,7 +25,7 @@ class MW_Setup_Task_DemoAddCatalogData extends MW_Setup_Task_MShopAddDataAbstrac
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -62,7 +62,7 @@ class MW_Setup_Task_DemoAddCatalogData extends MW_Setup_Task_MShopAddDataAbstrac
 			$this->_removeItems( $item->getId(), 'catalog/list', 'catalog', 'text' );
 			$this->_removeListItems( $item->getId(), 'catalog/list', 'product' );
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // If no root node was already inserted into the database
 
 
 		if( $context->getConfig()->get( 'setup/default/demo', false ) == true )

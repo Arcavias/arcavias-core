@@ -52,16 +52,8 @@ class Controller_ExtJS_Order_Base_Product_Attribute_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'order.base.product.attribute.id'} ) ) { $item->setId( $entry->{'order.base.product.attribute.id'} ); }
-			if( isset( $entry->{'order.base.product.attribute.ordprodid'} ) ) { $item->setProductId( $entry->{'order.base.product.attribute.ordprodid'} ); }
-			if( isset( $entry->{'order.base.product.attribute.code'} ) ) { $item->setCode( $entry->{'order.base.product.attribute.code'} ); }
-			if( isset( $entry->{'order.base.product.attribute.value'} ) ) { $item->setValue( $entry->{'order.base.product.attribute.value'} ); }
-			if( isset( $entry->{'order.base.product.attribute.name'} ) ) { $item->setName( $entry->{'order.base.product.attribute.name'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -78,9 +70,35 @@ class Controller_ExtJS_Order_Base_Product_Attribute_Default
 
 
 	/**
+	 * Creates a new order base product attribute item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "order.base.product.attribute" prefix
+	 * @return MShop_Order_Item_Base_Product_Attribute_Interface Order product attribute item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'order.base.product.attribute.id': $item->setId( $value ); break;
+				case 'order.base.product.attribute.name': $item->setName( $value ); break;
+				case 'order.base.product.attribute.code': $item->setCode( $value ); break;
+				case 'order.base.product.attribute.value': $item->setValue( $value ); break;
+				case 'order.base.product.attribute.ordprodid': $item->setProductId( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

@@ -14,23 +14,7 @@ class MShop_Common_Manager_Address_AbstractTest extends MW_Unittest_Testcase
 {
 	private $_fixture = null;
 	private $_object = null;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
-
-	/**
-	 * Runs the test methods of this class.
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Common_Manager_Address_AbstractTest');
-		PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -39,7 +23,7 @@ class MShop_Common_Manager_Address_AbstractTest extends MW_Unittest_Testcase
 	protected function setUp()
 	{
 		$this->_editor = TestHelper::getContext()->getEditor();
-		$customer = new MShop_Customer_Manager_Default( TestHelper::getContext(), 'Default' );
+		$customer = new MShop_Customer_Manager_Default( TestHelper::getContext() );
 		$search = $customer->createSearch();
 		$conditions = array(
 			$search->compare( '==', 'customer.label', 'unitCustomer001' ),

@@ -12,21 +12,6 @@ class Client_Html_Checkout_Standard_Order_DefaultTest extends MW_Unittest_Testca
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Checkout_Standard_Order_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -61,14 +46,15 @@ class Client_Html_Checkout_Standard_Order_DefaultTest extends MW_Unittest_Testca
 		$view->standardStepActive = 'order';
 		$this->_object->setView( $view );
 
-		$this->_object->getHeader();
+		$output = $this->_object->getHeader();
+		$this->assertNotNull( $output );
 	}
 
 
 	public function testGetHeaderOtherStep()
 	{
 		$output = $this->_object->getHeader();
-		$this->assertEquals( '', $output );
+		$this->assertNotNull( $output );
 	}
 
 
@@ -102,13 +88,6 @@ class Client_Html_Checkout_Standard_Order_DefaultTest extends MW_Unittest_Testca
 	{
 		$this->setExpectedException( 'Client_Html_Exception' );
 		$this->_object->getSubClient( '$$$', '$$$' );
-	}
-
-
-	public function testIsCachable()
-	{
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_BODY ) );
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_HEADER ) );
 	}
 
 

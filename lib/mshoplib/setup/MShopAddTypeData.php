@@ -12,11 +12,13 @@
 class MW_Setup_Task_MShopAddTypeData extends MW_Setup_Task_Abstract
 {
 	private $_editor = '';
+	private $_domainManagers = array();
+
 
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -100,7 +102,7 @@ class MW_Setup_Task_MShopAddTypeData extends MW_Setup_Task_Abstract
 				try {
 					$domainManager->saveItem( $type );
 					$num++;
-				} catch( Exception $e ) { ; }
+				} catch( Exception $e ) { ; } // if type was already available
 			}
 
 			$this->_status( $num > 0 ? $num . '/' . $total : 'OK' );

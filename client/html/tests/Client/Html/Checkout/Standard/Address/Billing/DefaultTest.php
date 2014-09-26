@@ -12,21 +12,6 @@ class Client_Html_Checkout_Standard_Address_Billing_DefaultTest extends MW_Unitt
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('Client_Html_Checkout_Standard_Address_BillingDefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -57,7 +42,8 @@ class Client_Html_Checkout_Standard_Address_Billing_DefaultTest extends MW_Unitt
 
 	public function testGetHeader()
 	{
-		$this->_object->getHeader();
+		$output = $this->_object->getHeader();
+		$this->assertNotNull( $output );
 	}
 
 
@@ -85,13 +71,6 @@ class Client_Html_Checkout_Standard_Address_Billing_DefaultTest extends MW_Unitt
 	{
 		$this->setExpectedException( 'Client_Html_Exception' );
 		$this->_object->getSubClient( '$$$', '$$$' );
-	}
-
-
-	public function testIsCachable()
-	{
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_BODY ) );
-		$this->assertEquals( false, $this->_object->isCachable( Client_HTML_Abstract::CACHE_HEADER ) );
 	}
 
 
@@ -159,6 +138,77 @@ class Client_Html_Checkout_Standard_Address_Billing_DefaultTest extends MW_Unitt
 			$this->assertArrayHasKey( 'order.base.address.salutation', $view->billingError );
 			$this->assertArrayHasKey( 'order.base.address.email', $view->billingError );
 			$this->assertArrayHasKey( 'order.base.address.languageid', $view->billingError );
+			return;
+		}
+
+		$this->fail( 'Expected exception not thrown' );
+	}
+
+
+	public function testProcessNewAddressUnknown()
+	{
+		$view = TestHelper::getView();
+
+		$param = array(
+			'ca-billing-option' => 'null',
+			'ca-billing' => array(
+				'order.base.address.salutation' => 'mr',
+				'order.base.address.firstname' => 'test',
+				'order.base.address.lastname' => 'user',
+				'order.base.address.address1' => 'mystreet 1',
+				'order.base.address.postal' => '20000',
+				'order.base.address.city' => 'hamburg',
+				'order.base.address.email' => 'me@localhost',
+				'order.base.address.languageid' => 'en',
+				'order.base.address.flag' => '1',
+			),
+		);
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+		$this->_object->process();
+
+		$basket = Controller_Frontend_Basket_Factory::createController( $this->_context )->get();
+		$this->assertEquals( 0, $basket->getAddress( 'payment' )->getFlag() );
+	}
+
+
+	public function testProcessNewAddressInvalid()
+	{
+		$view = TestHelper::getView();
+
+		$config = $this->_context->getConfig();
+		$config->set( 'client/html/common/address/validate/postal', '/^[0-9]{5}$/' );
+		$helper = new MW_View_Helper_Config_Default( $view, $config );
+		$view->addHelper( 'config', $helper );
+
+		$param = array(
+			'ca-billing-option' => 'null',
+			'ca-billing' => array(
+				'order.base.address.salutation' => 'mr',
+				'order.base.address.firstname' => 'test',
+				'order.base.address.lastname' => 'user',
+				'order.base.address.address1' => 'mystreet 1',
+				'order.base.address.postal' => '20AB',
+				'order.base.address.city' => 'hamburg',
+				'order.base.address.email' => 'me@localhost',
+				'order.base.address.languageid' => 'en',
+			),
+		);
+		$helper = new MW_View_Helper_Parameter_Default( $view, $param );
+		$view->addHelper( 'param', $helper );
+
+		$this->_object->setView( $view );
+
+		try
+		{
+			$this->_object->process();
+		}
+		catch( Client_Html_Exception $e )
+		{
+			$this->assertEquals( 1, count( $view->billingError ) );
+			$this->assertArrayHasKey( 'order.base.address.postal', $view->billingError );
 			return;
 		}
 

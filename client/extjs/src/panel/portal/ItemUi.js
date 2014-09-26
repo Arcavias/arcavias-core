@@ -11,53 +11,51 @@ Ext.ns('MShop.panel.portal');
  */
 MShop.panel.portal.ItemUi = Ext.extend(Ext.Panel, {
 
-	idProperty : 'id',
-	autoScroll: true,
+    idProperty : 'id',
+    autoScroll : true,
 
-	autoScroll: true,
+    initComponent : function() {
 
-	initComponent : function() {
+        this.title = MShop.I18n.dt('client/extjs', 'Overview');
 
-		this.title = MShop.I18n.dt( 'client/extjs', 'Overview' );
-		
-		this.items = [ {
-			xtype:'portal',
-			region:'center',
-			items:[{
-				columnWidth: 1,
-				items:[{
-					xtype: 'MShop.panel.job.listuismall',
-					style:'margin:5px',
-					layout: 'fit',
-					height: 400,
-					border: true,
-					draggable : true,
-					collapsible : true,
-					collapsed : false
-				}, {
-					xtype: 'MShop.panel.log.listuismall',
-					style:'margin:5px',
-					layout: 'fit',
-					height: 400,
-					border: true,
-					draggable : true,
-					collapsible : true,
-					collapsed : false
-				}, {
-					xtype: 'MShop.panel.cache.listuismall',
-					style:'margin:5px',
-					layout: 'fit',
-					height: 400,
-					border: true,
-					draggable : true,
-					collapsible : true,
-					collapsed : false
-				}]
-			}]
-		}];
+        this.items = [{
+            xtype : 'portal',
+            region : 'center',
+            items : [{
+                columnWidth : 1,
+                items : [{
+                    xtype : 'MShop.panel.job.listuismall',
+                    style : 'margin:5px',
+                    layout : 'fit',
+                    height : 400,
+                    border : true,
+                    draggable : true,
+                    collapsible : true,
+                    collapsed : false
+                }, {
+                    xtype : 'MShop.panel.log.listuismall',
+                    style : 'margin:5px',
+                    layout : 'fit',
+                    height : 400,
+                    border : true,
+                    draggable : true,
+                    collapsible : true,
+                    collapsed : false
+                }, {
+                    xtype : 'MShop.panel.cache.listuismall',
+                    style : 'margin:5px',
+                    layout : 'fit',
+                    height : 400,
+                    border : true,
+                    draggable : true,
+                    collapsible : true,
+                    collapsed : false
+                }]
+            }]
+        }];
 
-		MShop.panel.portal.ItemUi.superclass.initComponent.call(this);
-	}
+        MShop.panel.portal.ItemUi.superclass.initComponent.call(this);
+    }
 });
 
 Ext.reg('MShop.panel.portal.itemui', MShop.panel.portal.ItemUi);

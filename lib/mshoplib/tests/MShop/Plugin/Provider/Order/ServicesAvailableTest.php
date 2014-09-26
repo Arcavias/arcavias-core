@@ -11,20 +11,6 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 	private $_plugin;
 	private $_service;
 
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Plugin_Provider_Order_ServicesAvailableTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -41,15 +27,10 @@ class MShop_Plugin_Provider_Order_ServicesAvailableTest extends PHPUnit_Framewor
 		$this->_plugin->setProvider( 'ServicesAvailable' );
 		$this->_plugin->setStatus( 1 );
 
-		$this->_orderManager = MShop_Order_Manager_Factory::createManager( $context );
-		$orderBaseManager = $this->_orderManager->getSubManager('base');
+		$orderBaseManager = MShop_Order_Manager_Factory::createManager( $context )->getSubManager( 'base' );
+		$orderBaseServiceManager = $orderBaseManager->getSubManager( 'service' );
 
 		$this->_order = $orderBaseManager->createItem();
-
-		$this->_plugin->setConfig( array() );
-
-		$orderBaseServiceManager = $orderBaseManager->getSubManager('service');
-
 		$this->_service = $orderBaseServiceManager->createItem();
 	}
 

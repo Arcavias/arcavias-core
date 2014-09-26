@@ -85,13 +85,7 @@ class Controller_ExtJS_Catalog_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $manager->createItem();
-
-			if( isset( $entry->{'catalog.id'} ) ) { $item->setId( $entry->{'catalog.id'} ); }
-			if( isset( $entry->{'catalog.code'} ) ) { $item->setCode( $entry->{'catalog.code'} ); }
-			if( isset( $entry->{'catalog.label'} ) ) { $item->setLabel( $entry->{'catalog.label'} ); }
-			if( isset( $entry->{'catalog.config'} ) ) { $item->setConfig( (array) $entry->{'catalog.config'} );	}
-			if( isset( $entry->{'catalog.status'} ) ) { $item->setStatus( $entry->{'catalog.status'} ); }
+			$item = $this->_createItem( (array) $entry );
 			$manager->insertItem( $item, $parentId, $refId );
 
 			$ids[] = $item->getId();
@@ -160,16 +154,8 @@ class Controller_ExtJS_Catalog_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $manager->createItem();
-
-			if( isset( $entry->{'catalog.id'} ) ) { $item->setId( $entry->{'catalog.id'} ); }
-			if( isset( $entry->{'catalog.code'} ) ) { $item->setCode( $entry->{'catalog.code'} ); }
-			if( isset( $entry->{'catalog.label'} ) ) { $item->setLabel( $entry->{'catalog.label'} ); }
-			if( isset( $entry->{'catalog.config'} ) ) {	$item->setConfig( (array) $entry->{'catalog.config'} );	}
-			if( isset( $entry->{'catalog.status'} ) ) { $item->setStatus( $entry->{'catalog.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -231,6 +217,33 @@ class Controller_ExtJS_Catalog_Default
 
 
 	/**
+	 * Creates a new catalog item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "catalog" prefix
+	 * @return MShop_Catalog_Item_Interface Catalog item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_getManager()->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'catalog.id': $item->setId( $value ); break;
+				case 'catalog.code': $item->setCode( $value ); break;
+				case 'catalog.label': $item->setLabel( $value ); break;
+				case 'catalog.domain': $item->setDomain( $value ); break;
+				case 'catalog.status': $item->setStatus( $value ); break;
+				case 'catalog.config': $item->setConfig( (array) $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Creates a list of nodes with children.
 	 *
 	 * @param MShop_Catalog_Item_Interface $node Catalog node
@@ -250,7 +263,7 @@ class Controller_ExtJS_Catalog_Default
 	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

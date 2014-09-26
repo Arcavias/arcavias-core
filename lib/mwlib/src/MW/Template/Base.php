@@ -16,9 +16,9 @@
  */
 class MW_Template_Base implements MW_Template_Interface
 {
-	private $_begin = '[$]';
-	private $_end = '[/$]';
-	private $_text = '';
+	private $_begin;
+	private $_end;
+	private $_text;
 
 
 	/**
@@ -144,8 +144,8 @@ class MW_Template_Base implements MW_Template_Interface
 		foreach( $substitute as $marker => $value )
 		{
 			$begin = 0;
-			$mbegin = str_replace( '$', $marker, $this->_begin );
-			$mend = str_replace( '$', $marker, $this->_end );
+			$mbegin = (string) str_replace( '$', $marker, $this->_begin );
+			$mend = (string) str_replace( '$', $marker, $this->_end );
 
 			while( ( $begin = strpos( $this->_text, $mbegin, $begin ) ) !== false )
 			{
@@ -165,7 +165,7 @@ class MW_Template_Base implements MW_Template_Interface
 	/**
 	 * Generates the template by replacing substrings and remove markers.
 	 *
-	 * @param bool $remove Remove still disabled markers from statement
+	 * @param boolean $remove Remove still disabled markers from statement
 	 * @return string
 	 */
 	public function str( $remove = true )

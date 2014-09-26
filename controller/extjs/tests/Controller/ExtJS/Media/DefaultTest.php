@@ -13,21 +13,6 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite( 'Controller_ExtJS_Media_DefaultTest' );
-		$result = PHPUnit_TextUI_TestRunner::run( $suite );
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -143,8 +128,6 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 			'error' => UPLOAD_ERR_OK,
 		);
 
-		$filebase = md5( $_FILES['unittest']['name'] );
-
 		$mediaItem = $this->_object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 
 		$this->assertTrue( is_file( PATH_TESTS . DIRECTORY_SEPARATOR . $mediaItem->{'media.url'} ) );
@@ -161,8 +144,6 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 			'tmp_name' => $this->_directory . '/testfiles/test.pdf',
 			'error' => UPLOAD_ERR_OK,
 		);
-
-		$filebase = md5( $_FILES['unittest']['name'] );
 
 		$mediaItem = $this->_object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 
@@ -194,7 +175,7 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 	{
 		$_FILES = array();
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );
-		$mediaItem = $this->_object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
+		$this->_object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 	}
 
 
@@ -212,7 +193,7 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 		$object = new Controller_ExtJS_Media_Default( $context );
 
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );// not a real file upload
-		$mediaItem = $object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
+		$object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 	}
 
 
@@ -229,7 +210,7 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 		);
 
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );// no upload directory
-		$mediaItem = $object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
+		$object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 	}
 
 
@@ -269,7 +250,7 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 		);
 
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );
-		$mediaItem = $object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
+		$object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 
 	}
 
@@ -290,7 +271,7 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 		);
 
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );
-		$mediaItem = $object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
+		$object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 	}
 
 
@@ -325,7 +306,7 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 		);
 
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );
-		$mediaItem = $object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
+		$object->uploadItem( (object) array( 'site' => 'unittest', 'domain' => 'product' ) );
 	}
 
 

@@ -51,7 +51,7 @@ class MW_Config_Decorator_APC
 
 		// negative cache
 		$success = false;
-		$value = apc_fetch( '-' . $this->_prefix . $path, $success );
+		apc_fetch( '-' . $this->_prefix . $path, $success );
 
 		if( $success === true ) {
 			return $default;
@@ -82,7 +82,7 @@ class MW_Config_Decorator_APC
 	 * Sets the value for the specified key.
 	 *
 	 * @param string $path Path to the requested value like tree/node/classname
-	 * @param mixed $value Value that should be associated with the given path
+	 * @param string $value Value that should be associated with the given path
 	 */
 	public function set( $path, $value )
 	{

@@ -24,7 +24,7 @@ abstract class MW_Container_Content_Abstract
 	/**
 	 * Initializes the CSV content object.
 	 *
-	 * @param resource|string $resource File pointer or path to the actual file
+	 * @param mixed $resource Path to the actual file
 	 * @param string $name Name of the CSV file
 	 * @param array $options Associative list of key/value pairs for configuration
 	 */
@@ -62,7 +62,7 @@ abstract class MW_Container_Content_Abstract
 	 * Returns the configured value for the given name or the default value if nothing is configured.
 	 *
 	 * @param string $name Name of the configuration option
-	 * @param mixed $default Default value if option is not configured
+	 * @param string $default Default value if option is not configured
 	 * @return mixed Option value
 	 */
 	protected function _getOption( $name, $default = null )

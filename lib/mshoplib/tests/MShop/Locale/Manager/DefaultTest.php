@@ -10,22 +10,8 @@
  */
 class MShop_Locale_Manager_DefaultTest extends MW_Unittest_Testcase
 {
-
 	private $_object;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
-
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite = new PHPUnit_Framework_TestSuite('MShop_Locale_Manager_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	protected function setUp()
@@ -125,6 +111,7 @@ class MShop_Locale_Manager_DefaultTest extends MW_Unittest_Testcase
 	{
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '!=', 'locale.id', null );
 		$expr[] = $search->compare( '!=', 'locale.siteid', null);
 		$expr[] = $search->compare( '==', 'locale.languageid', 'de' );

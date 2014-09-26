@@ -12,21 +12,6 @@ class Controller_Frontend_Plugin_Decorator_ExampleTest extends MW_Unittest_Testc
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite( 'Controller_Frontend_Plugin_Decorator_ExampleTest' );
-		$result = PHPUnit_TextUI_TestRunner::run( $suite );
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -55,7 +40,7 @@ class Controller_Frontend_Plugin_Decorator_ExampleTest extends MW_Unittest_Testc
 	public function testCall()
 	{
 		$this->setExpectedException( 'Controller_Frontend_Service_Exception' );
-		$result = $this->_object->checkServiceAttributes( 'delivery', -1, array() );
+		$this->_object->checkServiceAttributes( 'delivery', -1, array() );
 	}
 
 }

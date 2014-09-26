@@ -11,32 +11,8 @@
  */
 class MShop_Attribute_Manager_DefaultTest extends MW_Unittest_Testcase
 {
-	/**
-	 * @var    MShop_Attribute_Manager_Default
-	 * @access protected
-	 */
 	private $_object;
-
-	/**
-	 * @var string
-	 * @access protected
-	 */
 	private $_editor = '';
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Attribute_Manager_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -138,7 +114,7 @@ class MShop_Attribute_Manager_DefaultTest extends MW_Unittest_Testcase
 		$search->setConditions( $search->combine( '&&', $conditions ) );
 		$typeItems = $typeManager->searchItems( $search );
 
-		if( ( $this->typeItem = reset($typeItems) ) === false ) {
+		if( ( $typeItem = reset($typeItems) ) === false ) {
 			throw new Exception('No attribute type item available in setUp()');
 		}
 
@@ -147,7 +123,7 @@ class MShop_Attribute_Manager_DefaultTest extends MW_Unittest_Testcase
 		$item->setDomain( 'tmpDomainx' );
 		$item->setCode( '106x' );
 		$item->setLabel( '106x' );
-		$item->setTypeId( $this->typeItem->getId() );
+		$item->setTypeId( $typeItem->getId() );
 		$item->setPosition( 0 );
 		$item->setStatus( 7 );
 		$this->_object->saveItem( $item );
@@ -209,6 +185,7 @@ class MShop_Attribute_Manager_DefaultTest extends MW_Unittest_Testcase
 	{
 		$search = $this->_object->createSearch();
 
+		$expr = array();
 		$expr[] = $search->compare( '!=', 'attribute.id', null );
 		$expr[] = $search->compare( '!=', 'attribute.siteid', null);
 		$expr[] = $search->compare( '!=', 'attribute.typeid', null );

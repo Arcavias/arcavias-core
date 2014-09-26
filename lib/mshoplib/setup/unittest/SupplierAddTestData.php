@@ -14,7 +14,7 @@ class MW_Setup_Task_SupplierAddTestData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -103,6 +103,7 @@ class MW_Setup_Task_SupplierAddTestData extends MW_Setup_Task_Abstract
 
 			$supAdr->setId( null );
 			$supAdr->setCompany( $dataset['company'] );
+			$supAdr->setVatID( ( isset( $dataset['vatid'] ) ? $dataset['vatid'] : '' ) );
 			$supAdr->setVatID( $dataset['vatid'] );
 			$supAdr->setSalutation( $dataset['salutation'] );
 			$supAdr->setTitle( $dataset['title'] );

@@ -8,11 +8,8 @@
  */
 class MW_Setup_DBSchema_Column_ItemTest extends MW_Unittest_Testcase
 {
-	/**
-	 * @var    MW_Setup_DBSchema_Column_Item
-	 * @access protected
-	 */
 	private $_object;
+
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -74,6 +71,6 @@ class MW_Setup_DBSchema_Column_ItemTest extends MW_Unittest_Testcase
 		$this->assertFalse( $item->isNullable() );
 
 		$this->setExpectedException('MW_Setup_Exception');
-		$item = new MW_Setup_DBSchema_Column_Item( '', '', '', 0, '', '', '' );
+		new MW_Setup_DBSchema_Column_Item( '', '', '', 0, '', '', '' );
 	}
 }

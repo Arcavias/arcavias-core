@@ -76,7 +76,7 @@ class MShop_Service_Provider_Delivery_Default
 	 */
 	public function __construct(MShop_Context_Item_Interface $context, MShop_Service_Item_Interface $serviceItem)
 	{
-		parent::__construct($context, $serviceItem);
+		parent::__construct( $context, $serviceItem );
 	}
 
 
@@ -87,13 +87,14 @@ class MShop_Service_Provider_Delivery_Default
 	 */
 	public function process( MShop_Order_Item_Interface $order )
 	{
+		$logger = $this->_getContext()->getLogger();
 		$xml = $this->buildXML( $order );
 
-		$this->_context->getLogger()->log( __METHOD__ . ": XML request =\n" . $xml, MW_Logger_Abstract::INFO );
+		$logger->log( __METHOD__ . ": XML request =\n" . $xml, MW_Logger_Abstract::INFO );
 
 		$response = $this->_sendRequest( $xml );
 
-		$this->_context->getLogger()->log( __METHOD__ . ": XML response =\n" . trim( $response ), MW_Logger_Abstract::INFO );
+		$logger->log( __METHOD__ . ": XML response =\n" . trim( $response ), MW_Logger_Abstract::INFO );
 
 		$this->_checkResponse( $response, $order->getId() );
 
@@ -426,11 +427,10 @@ class MShop_Service_Provider_Delivery_Default
 					}
 
 					$paymentitem->appendChild( $fieldlist );
+					$orderitem->appendChild( $paymentitem );
 					break;
 			}
 		}
-
-		$orderitem->appendChild( $paymentitem );
 	}
 
 
@@ -606,7 +606,6 @@ class MShop_Service_Provider_Delivery_Default
 		$this->_appendChildCDATA( 'firstname', $address->getFirstname(), $dom, $addressitem );
 		$this->_appendChildCDATA( 'lastname', $address->getLastname(), $dom, $addressitem );
 		$this->_appendChildCDATA( 'company', $address->getCompany(), $dom, $addressitem );
-		$this->_appendChildCDATA( 'vatid', $address->getVatID(), $dom, $addressitem );
 		$this->_appendChildCDATA( 'address1', $address->getAddress1(), $dom, $addressitem );
 		$this->_appendChildCDATA( 'address2', $address->getAddress2(), $dom, $addressitem );
 		$this->_appendChildCDATA( 'address3', $address->getAddress3(), $dom, $addressitem );
@@ -616,6 +615,7 @@ class MShop_Service_Provider_Delivery_Default
 		$this->_appendChildCDATA( 'countrycode', strtoupper( $address->getCountryId() ), $dom, $addressitem );
 		$this->_appendChildCDATA( 'email', $address->getEmail(), $dom, $addressitem );
 		$this->_appendChildCDATA( 'phone', $address->getTelephone(), $dom, $addressitem );
+		$this->_appendChildCDATA( 'vatid', $address->getVatID(), $dom, $addressitem );
 
 		$addresslist->appendChild( $addressitem );
 	}

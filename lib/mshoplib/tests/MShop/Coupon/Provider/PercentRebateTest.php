@@ -16,21 +16,6 @@ class MShop_Coupon_Provider_PercentRebateTest extends MW_Unittest_Testcase
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Coupon_Provider_PercentRebateTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -40,60 +25,13 @@ class MShop_Coupon_Provider_PercentRebateTest extends MW_Unittest_Testcase
 	{
 		$context = TestHelper::getContext();
 
-		$couponManager = MShop_Coupon_Manager_Factory::createManager( $context );
-		$search = $couponManager->createSearch();
-		$search->setConditions( $search->compare( '==', 'coupon.code.code', '90AB') );
-		$results = $couponManager->searchItems( $search );
-
-		if( ( $couponItem = reset( $results ) ) === false ) {
-			throw new Exception( 'No coupon item found' );
-		}
-
-		$this->_object = new MShop_Coupon_Provider_PercentRebate( $context, $couponItem, '90AB' );
-
-
-		$orderManager = MShop_Order_Manager_Factory::createManager( $context );
-		$orderBaseManager = $orderManager->getSubManager('base');
-		$orderProductManager = $orderBaseManager->getSubManager( 'product' );
-
-		$productManager = MShop_Product_Manager_Factory::createManager( $context );
-		$search = $productManager->createSearch();
-		$search->setConditions( $search->compare( '==', 'product.code', array( 'CNE' ) ) );
-		$products = $productManager->searchItems( $search, array('price') );
-
-		$priceIds = $priceMap = array();
-
-		foreach( $products as $product )
-		{
-			foreach ( $product->getListItems( 'price' ) AS $listItem )
-			{
-				$priceIds[] = $listItem->getRefId();
-				$priceMap[ $listItem->getRefId() ] = $product->getCode();
-			}
-
-			$orderProduct = $orderProductManager->createItem();
-			$orderProduct->setName( $product->getName() );
-			$orderProduct->setProductCode( $product->getCode() );
-			$orderProduct->setQuantity( 1 );
-
-			$this->orderProducts[ $product->getCode() ] = $orderProduct;
-		}
-
 		$priceManager = MShop_Price_Manager_Factory::createManager( $context );
-		$search = $priceManager->createSearch();
-		$expr[] = $search->compare( '==', 'price.id', $priceIds );
-		$expr[] = $search->compare( '==', 'price.quantity', 1 );
-		$search->setConditions( $search->combine( '&&', $expr ) );
-
-		foreach( $priceManager->searchItems( $search ) as $priceItem )
-		{
-			$productCode = $priceMap[ $priceItem->getId() ];
-			$this->orderProducts[ $productCode ]->setPrice( $priceItem );
-		}
-
+		$couponItem = MShop_Coupon_Manager_Factory::createManager( $context )->createItem();
+		$couponItem->setConfig( array( 'percentrebate.productcode' => 'U:MD', 'percentrebate.rebate' => '10' ) );
 
 		// Don't create order base item by createItem() as this would already register the plugins
 		$this->_orderBase = new MShop_Order_Item_Base_Default( $priceManager->createItem(), $context->getLocale() );
+		$this->_object = new MShop_Coupon_Provider_PercentRebate( $context, $couponItem, 'zyxw' );
 	}
 
 
@@ -112,20 +50,24 @@ class MShop_Coupon_Provider_PercentRebateTest extends MW_Unittest_Testcase
 
 	public function testAddCoupon()
 	{
-		$this->_orderBase->addProduct( $this->orderProducts['CNE'] );
+		$orderProducts = $this->_getOrderProducts();
+
+		$this->_orderBase->addProduct( $orderProducts['CNE'] );
+		$this->_orderBase->addProduct( $orderProducts['CNC'] );
+
 		$this->_object->addCoupon( $this->_orderBase );
 
 		$coupons = $this->_orderBase->getCoupons();
 		$products = $this->_orderBase->getProducts();
 
-		if( ( $product = reset( $coupons['90AB'] ) ) === false ) {
+		if( ( $product = reset( $coupons['zyxw'] ) ) === false ) {
 			throw new Exception( 'No coupon available' );
 		}
 
-		$this->assertEquals( 2, count( $products ) );
-		$this->assertEquals( 1, count( $coupons['90AB'] ) );
-		$this->assertEquals( '-1.80', $product->getPrice()->getValue() );
-		$this->assertEquals( '1.80', $product->getPrice()->getRebate() );
+		$this->assertEquals( 3, count( $products ) );
+		$this->assertEquals( 1, count( $coupons['zyxw'] ) );
+		$this->assertEquals( '-66.70', $product->getPrice()->getValue() );
+		$this->assertEquals( '66.70', $product->getPrice()->getRebate() );
 		$this->assertEquals( 'unitSupplier', $product->getSupplierCode() );
 		$this->assertEquals( 'U:MD', $product->getProductCode() );
 		$this->assertNotEquals( '', $product->getProductId() );
@@ -134,9 +76,41 @@ class MShop_Coupon_Provider_PercentRebateTest extends MW_Unittest_Testcase
 	}
 
 
+	public function testAddCouponMultipleTaxRates()
+	{
+		$products = $this->_getOrderProducts();
+
+		$products['CNC']->getPrice()->setTaxRate( '10.00' );
+		$products['CNE']->getPrice()->setTaxRate( '20.00' );
+
+		$this->_orderBase->addProduct( $products['CNE'] );
+		$this->_orderBase->addProduct( $products['CNC'] );
+
+		$this->_object->addCoupon( $this->_orderBase );
+
+		$coupons = $this->_orderBase->getCoupons();
+		$products = $this->_orderBase->getProducts();
+
+		if( ( $couponProduct20 = reset( $coupons['zyxw'] ) ) === false ) {
+			throw new Exception( 'No coupon available' );
+		}
+
+		if( ( $couponProduct10 = end( $coupons['zyxw'] ) ) === false ) {
+			throw new Exception( 'No coupon available' );
+		}
+
+		$this->assertEquals( 4, count( $products ) );
+		$this->assertEquals( '-37.00', $couponProduct20->getPrice()->getValue() );
+		$this->assertEquals( '37.00', $couponProduct20->getPrice()->getRebate() );
+		$this->assertEquals( '-29.70', $couponProduct10->getPrice()->getValue() );
+		$this->assertEquals( '29.70', $couponProduct10->getPrice()->getRebate() );
+	}
+
+
 	public function testDeleteCoupon()
 	{
-		$this->_orderBase->addProduct( $this->orderProducts['CNE'] );
+		$orderProducts = $this->_getOrderProducts();
+		$this->_orderBase->addProduct( $orderProducts['CNE'] );
 
 		$this->_object->addCoupon( $this->_orderBase );
 		$this->_object->deleteCoupon($this->_orderBase);
@@ -145,27 +119,54 @@ class MShop_Coupon_Provider_PercentRebateTest extends MW_Unittest_Testcase
 		$coupons = $this->_orderBase->getCoupons();
 
 		$this->assertEquals( 1, count( $products ) );
-		$this->assertArrayNotHasKey( '90AB', $coupons );
+		$this->assertArrayNotHasKey( 'zyxw', $coupons );
 	}
 
 
 	public function testAddCouponInvalidConfig()
 	{
-		$outer = null;
-
 		$context = TestHelper::getContext();
-		$this->manager = MShop_Coupon_Manager_Factory::createManager( TestHelper::getContext() );
-		$couponItem=$this->manager->createItem();
+		$couponItem = MShop_Coupon_Manager_Factory::createManager( TestHelper::getContext() )->createItem();
 
-		$this->manager = new MShop_Coupon_Provider_PercentRebate( $context, $couponItem, '5678', $outer );
+		$object = new MShop_Coupon_Provider_PercentRebate( $context, $couponItem, 'zyxw' );
 
-		$this->setExpectedException('MShop_Coupon_Exception');
-		$this->manager->addCoupon($this->_orderBase);
+		$this->setExpectedException( 'MShop_Coupon_Exception' );
+		$object->addCoupon( $this->_orderBase );
 	}
+
 
 	public function testIsAvailable()
 	{
 		$this->assertTrue( $this->_object->isAvailable( $this->_orderBase ) );
 	}
 
+
+	/**
+	 * Return the order products.
+	 *
+	 * @return MShop_Order_Item_Base_Product_Interface[]
+	 * @throws Exception
+	 */
+	protected function _getOrderProducts()
+	{
+		$products = array();
+		$manager = MShop_Factory::createManager( TestHelper::getContext(), 'order/base/product' );
+
+		$search = $manager->createSearch();
+		$search->setConditions( $search->combine('&&', array(
+			$search->compare( '==', 'order.base.product.prodcode', array('CNE', 'CNC') ),
+			$search->compare( '==', 'order.base.product.price', array('600.00', '36.00') )
+		)));
+		$items = $manager->searchItems( $search );
+
+		if ( count( $items ) < 2 ) {
+			throw new Exception( 'Please fix the test data in your database.' );
+		}
+
+		foreach( $items as $item ) {
+			$products[ $item->getProductCode() ] = $item;
+		}
+
+		return $products;
+	}
 }

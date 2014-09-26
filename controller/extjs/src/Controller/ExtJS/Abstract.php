@@ -201,10 +201,46 @@ abstract class Controller_ExtJS_Abstract
 
 
 	/**
+	 * Checks if the uploaded file is valid.
+	 *
+	 * @param string $filename Name of the uploaded file in the file system of the server
+	 * @param integer $errcode Status code of the uploaded file
+	 * @throws Controller_ExtJS_Exception If file upload is invalid
+	 */
+	protected function _checkFileUpload( $filename, $errcode )
+	{
+		switch( $errcode )
+		{
+			case UPLOAD_ERR_OK:
+				break;
+			case UPLOAD_ERR_INI_SIZE:
+			case UPLOAD_ERR_FORM_SIZE:
+				throw new Controller_ExtJS_Exception( 'The uploaded file exceeds the max. allowed filesize' );
+			case UPLOAD_ERR_PARTIAL:
+				throw new Controller_ExtJS_Exception( 'The uploaded file was only partially uploaded' );
+			case UPLOAD_ERR_NO_FILE:
+				throw new Controller_ExtJS_Exception( 'No file was uploaded' );
+			case UPLOAD_ERR_NO_TMP_DIR:
+				throw new Controller_ExtJS_Exception( 'Temporary folder is missing' );
+			case UPLOAD_ERR_CANT_WRITE:
+				throw new Controller_ExtJS_Exception( 'Failed to write file to disk' );
+			case UPLOAD_ERR_EXTENSION:
+				throw new Controller_ExtJS_Exception( 'File upload stopped by extension' );
+			default:
+				throw new Controller_ExtJS_Exception( 'Unknown upload error' );
+		}
+
+		if( is_uploaded_file( $filename ) === false ) {
+			throw new Controller_ExtJS_Exception( 'File was not uploaded' );
+		}
+	}
+
+
+	/**
 	 * Checks if the required parameter are available.
 	 *
 	 * @param stdClass $params Item object containing the parameter
-	 * @param array $names List of names of the required parameter
+	 * @param string[] $names List of names of the required parameter
 	 * @throws Controller_ExtJS_Exception if a required parameter is missing
 	 */
 	protected function _checkParams( stdClass $params, array $names )
@@ -276,7 +312,24 @@ abstract class Controller_ExtJS_Abstract
 	 */
 	protected function _initCriteria( MW_Common_Criteria_Interface $criteria, stdClass $params )
 	{
-		if( isset( $params->condition ) && is_object( $params->condition ) ) {
+		$this->_initCriteriaConditions( $criteria, $params );
+		$this->_initCriteriaSortations( $criteria, $params );
+		$this->_initCriteriaSlice( $criteria, $params );
+
+		return $criteria;
+	}
+
+
+	/**
+	 * Initializes the criteria object with conditions based on the given parameter.
+	 *
+	 * @param MW_Common_Criteria_Interface $criteria Criteria object
+	 * @param stdClass $params Object that may contain the properties "condition", "sort", "dir", "start" and "limit"
+	 */
+	private function _initCriteriaConditions( MW_Common_Criteria_Interface $criteria, stdClass $params )
+	{
+		if( isset( $params->condition ) && is_object( $params->condition ) )
+		{
 			$existing = $criteria->getConditions();
 			$criteria->setConditions( $criteria->toConditions( (array) $params->condition ) );
 			$expr = array (
@@ -286,8 +339,35 @@ abstract class Controller_ExtJS_Abstract
 
 			$criteria->setConditions( $criteria->combine( '&&', $expr ) );
 		}
+	}
 
 
+	/**
+	 * Initializes the criteria object with the slice based on the given parameter.
+	 *
+	 * @param MW_Common_Criteria_Interface $criteria Criteria object
+	 * @param stdClass $params Object that may contain the properties "condition", "sort", "dir", "start" and "limit"
+	 */
+	private function _initCriteriaSlice( MW_Common_Criteria_Interface $criteria, stdClass $params )
+	{
+		if( isset( $params->start ) && isset( $params->limit ) )
+		{
+			$start = ( isset( $params->start ) ? $params->start : 0 );
+			$size = ( isset( $params->limit ) ? $params->limit : 25 );
+
+			$criteria->setSlice( $start, $size );
+		}
+	}
+
+
+	/**
+	 * Initializes the criteria object with sortations based on the given parameter.
+	 *
+	 * @param MW_Common_Criteria_Interface $criteria Criteria object
+	 * @param stdClass $params Object that may contain the properties "condition", "sort", "dir", "start" and "limit"
+	 */
+	private function _initCriteriaSortations( MW_Common_Criteria_Interface $criteria, stdClass $params )
+	{
 		if( isset( $params->sort ) && isset( $params->dir ) )
 		{
 			$sortation = array();
@@ -312,17 +392,6 @@ abstract class Controller_ExtJS_Abstract
 			$sort[] = $criteria->sort( '+', $this->_sort );
 			$criteria->setSortations( $sort );
 		}
-
-
-		if( isset( $params->start ) && isset( $params->limit ) )
-		{
-			$start = ( isset( $params->start ) ? $params->start : 0 );
-			$size = ( isset( $params->limit ) ? $params->limit : 25 );
-
-			$criteria->setSlice( $start, $size );
-		}
-
-		return $criteria;
 	}
 
 
@@ -335,8 +404,6 @@ abstract class Controller_ExtJS_Abstract
 	 */
 	protected function _setLocale( $site, $langid = null, $currencyid = null )
 	{
-		$locale = $this->_context->getLocale();
-
 		$siteManager = MShop_Locale_Manager_Factory::createManager( $this->_context )->getSubManager( 'site' );
 
 		$search = $siteManager->createSearch();
@@ -419,7 +486,7 @@ abstract class Controller_ExtJS_Abstract
 	/**
 	 * Returns the context object.
 	 *
-	 * @return MShop context object implementing MShop_Context_Item_Interface
+	 * @return MShop_Context_Item_Interface Context object
 	 */
 	protected function _getContext()
 	{

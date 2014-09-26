@@ -15,19 +15,6 @@ class MW_View_Helper_Translate_DefaultTest extends MW_Unittest_Testcase
 
 
 	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		$suite  = new PHPUnit_Framework_TestSuite('MW_View_Helper_Translate_Default');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
-	/**
 	 * Sets up the fixture, for example, opens a network connection.
 	 * This method is called before a test is executed.
 	 *
@@ -35,12 +22,6 @@ class MW_View_Helper_Translate_DefaultTest extends MW_Unittest_Testcase
 	 */
 	protected function setUp()
 	{
-		$ds = DIRECTORY_SEPARATOR;
-
-		$translationSources = array(
-			'test' => dirname(__FILE__) . $ds . 'testfiles' . $ds . 'translate',
-		);
-
 		$view = new MW_View_Default();
 		$translate = new MW_Translation_None( 'en_GB' );
 		$this->_object = new MW_View_Helper_Translate_Default( $view, $translate );

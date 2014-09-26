@@ -10,15 +10,6 @@ class Controller_Frontend_Service_FactoryTest extends MW_Unittest_Testcase
 	private $_object;
 
 
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('Controller_Frontend_Service_FactoryTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
 	protected function setUp()
 	{
 	}
@@ -63,10 +54,10 @@ class Controller_Frontend_Service_FactoryTest extends MW_Unittest_Testcase
 	public function testAbstractAddControllerDecoratorsNoDomainException()
 	{
 		$context = TestHelper::getContext();
-		$controller = Controller_Frontend_Service_Factorylocal::createController( $context, 'Default', 'service/type');
+		Controller_Frontend_Service_Factorylocal::createController( $context, 'Default', 'service/type');
 
 		$this->setExpectedException( 'Controller_Frontend_Exception' );
-		$controller = Controller_Frontend_Service_Factorylocal::createController( $context, 'Default', '' );
+		Controller_Frontend_Service_Factorylocal::createController( $context, 'Default', '' );
 	}
 
 	public function testAbstractAddDecorators()
@@ -89,7 +80,7 @@ class Controller_Frontend_Service_FactoryTest extends MW_Unittest_Testcase
 		$config->set( 'controller/frontend/common/decorators/default', array( '$$' ) );
 
 		$this->setExpectedException( 'Controller_Frontend_Exception' );
-		$controller = Controller_Frontend_Service_Factory::createController( $context, 'Default' );
+		Controller_Frontend_Service_Factory::createController( $context, 'Default' );
 	}
 
 	public function testAbstractAddDecoratorsExceptionWrongClass()
@@ -99,7 +90,7 @@ class Controller_Frontend_Service_FactoryTest extends MW_Unittest_Testcase
 		$config->set( 'controller/frontend/common/decorators/default', array( 'WrongClass' ) );
 
 		$this->setExpectedException( 'Controller_Frontend_Exception' );
-		$controller = Controller_Frontend_Service_Factory::createController( $context, 'Default' );
+		Controller_Frontend_Service_Factory::createController( $context, 'Default' );
 	}
 
 	public function testCreateController()

@@ -131,7 +131,7 @@ abstract class MShop_Common_Manager_List_Abstract
 				$statement->bind( 13, $time ); //ctime
 			}
 
-			$result = $statement->execute()->finish();
+			$statement->execute()->finish();
 
 			if( $fetch === true )
 			{
@@ -208,14 +208,14 @@ abstract class MShop_Common_Manager_List_Abstract
 
 		$listItem = $this->getItem( $id );
 
-		$newpos = 0;
+		$newpos = $pos = 0;
 		$oldpos = $listItem->getPosition();
 		$parentid = $listItem->getParentId();
 		$typeid = $listItem->getTypeId();
 		$domain = $listItem->getDomain();
 
-		if( !is_null( $ref ) ) {
-			$refListItem = $this->getItem( $ref );
+		if( $ref !== null ) {
+			$pos = $this->getItem( $ref )->getPosition();
 		}
 
 		$dbm = $context->getDatabaseManager();
@@ -224,36 +224,36 @@ abstract class MShop_Common_Manager_List_Abstract
 
 		try
 		{
-			if( !is_null( $ref ) )
+			if( $ref !== null )
 			{
-				$newpos = $refListItem->getPosition();
+				$newpos = $pos;
 
 				$sql = $config->get( $this->_configPath . 'move' );
 
 				$stmt = $conn->create( $sql );
 				$stmt->bind( 1, +1, MW_DB_Statement_Abstract::PARAM_INT );
-				$stmt->bind( 2, date('Y-m-d H:i:s', time()));//mtime
-				$stmt->bind( 3, $this->_getContext()->getEditor());
+				$stmt->bind( 2, date( 'Y-m-d H:i:s' ) ); //mtime
+				$stmt->bind( 3, $this->_getContext()->getEditor() );
 				$stmt->bind( 4, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
 				$stmt->bind( 5, $parentid, MW_DB_Statement_Abstract::PARAM_INT );
 				$stmt->bind( 6, $typeid, MW_DB_Statement_Abstract::PARAM_INT );
-				$stmt->bind( 7, $domain, MW_DB_Statement_Abstract::PARAM_STR );
-				$stmt->bind( 8, $refListItem->getPosition(), MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 7, $domain );
+				$stmt->bind( 8, $pos, MW_DB_Statement_Abstract::PARAM_INT );
 
-				$result = $stmt->execute()->finish();
+				$stmt->execute()->finish();
 			}
 			else
 			{
 				$sql = $config->get( $this->_configPath . 'getposmax' );
 
-				$statement = $conn->create( $sql );
+				$stmt = $conn->create( $sql );
 
-				$statement->bind( 1, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
-				$statement->bind( 2, $parentid, MW_DB_Statement_Abstract::PARAM_INT );
-				$statement->bind( 3, $typeid, MW_DB_Statement_Abstract::PARAM_INT );
-				$statement->bind( 4, $domain, MW_DB_Statement_Abstract::PARAM_STR );
+				$stmt->bind( 1, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 2, $parentid, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 3, $typeid, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 4, $domain );
 
-				$result = $statement->execute();
+				$result = $stmt->execute();
 				$row = $result->fetch();
 				$result->finish();
 
@@ -266,11 +266,11 @@ abstract class MShop_Common_Manager_List_Abstract
 
 			$stmt = $conn->create( $sql );
 			$stmt->bind( 1, $newpos, MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 2, date('Y-m-d H:i:s', time())); // mtime
-			$stmt->bind( 3, $this->_getContext()->getEditor());
+			$stmt->bind( 2, date( 'Y-m-d H:i:s' ) ); // mtime
+			$stmt->bind( 3, $this->_getContext()->getEditor() );
 			$stmt->bind( 4, $id, MW_DB_Statement_Abstract::PARAM_INT );
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			if ( $oldpos > $newpos ) {
 				$oldpos++;
@@ -280,15 +280,15 @@ abstract class MShop_Common_Manager_List_Abstract
 
 			$stmt = $conn->create( $sql );
 			$stmt->bind( 1, -1, MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 2, date('Y-m-d H:i:s', time())); // mtime
-			$stmt->bind( 3, $this->_getContext()->getEditor());
+			$stmt->bind( 2, date( 'Y-m-d H:i:s' ) ); // mtime
+			$stmt->bind( 3, $this->_getContext()->getEditor() );
 			$stmt->bind( 4, $siteid, MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind( 5, $parentid, MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind( 6, $typeid, MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 7, $domain, MW_DB_Statement_Abstract::PARAM_STR );
+			$stmt->bind( 7, $domain );
 			$stmt->bind( 8, $oldpos, MW_DB_Statement_Abstract::PARAM_INT );
 
-			$result = $stmt->execute()->finish();
+			$stmt->execute()->finish();
 
 			$dbm->release( $conn, $dbname );
 		}
@@ -512,7 +512,7 @@ abstract class MShop_Common_Manager_List_Abstract
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g type, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g type, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -541,7 +541,7 @@ abstract class MShop_Common_Manager_List_Abstract
 	 *
 	 * @param array $list Associative list of search keys and the lists of search definitions
 	 * @param string $path Configuration path to the sub-domains for fetching the search definitions
-	 * @param array $default List of sub-domains if no others are configured
+	 * @param string[] $default List of sub-domains if no others are configured
 	 * @param boolean $withsub True to include search definitions of sub-domains, false if not
 	 * @return array Associative list of search keys and objects implementing the MW_Common_Criteria_Attribute_Interface
 	 * @todo 2015.03 Remove method as it's a workaround for backward compatibility

@@ -62,8 +62,6 @@ class MShop_Plugin_Provider_Order_BasketLimits
 
 
 		$count = 0;
-		$failures = array();
-		$config = $this->_getItem()->getConfig();
 		$sum = MShop_Factory::createManager( $context, 'price' )->createItem();
 
 		foreach( $order->getProducts() as $product )
@@ -72,7 +70,23 @@ class MShop_Plugin_Provider_Order_BasketLimits
 			$count += $product->getQuantity();
 		}
 
+		$this->_checkLimits( $sum, $count );
+
+		return true;
+	}
+
+
+	/**
+	 * Checks for the configured basket limits.
+	 *
+	 * @param MShop_Price_Item_Interface $sum Total sum of all product price items
+	 * @param integer $count Total number of products in the basket
+	 * @throws MShop_Plugin_Provider_Exception If one of the minimum or maximum limits is exceeded
+	 */
+	protected function _checkLimits( MShop_Price_Item_Interface $sum, $count )
+	{
 		$currencyId = $sum->getCurrencyId();
+		$config = $this->_getItem()->getConfig();
 
 		if( ( isset( $config['min-value'][$currencyId] ) ) && ( $sum->getValue() + $sum->getRebate() < $config['min-value'][$currencyId] ) )
 		{
@@ -97,7 +111,5 @@ class MShop_Plugin_Provider_Order_BasketLimits
 			$msg = sprintf( 'The maximum product quantity of %1$d is exceeded', $config['max-products'] );
 			throw new MShop_Plugin_Provider_Exception( $msg );
 		}
-
-		return true;
 	}
 }

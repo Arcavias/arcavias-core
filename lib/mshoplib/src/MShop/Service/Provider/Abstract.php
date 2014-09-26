@@ -26,7 +26,7 @@ implements MShop_Service_Provider_Interface
 	/**
 	 * Initializes the service provider object.
 	 *
-	 * @param MShop_Context_Interface $context Context object with required objects
+	 * @param MShop_Context_Item_Interface $context Context object with required objects
 	 * @param MShop_Service_Item_Interface $serviceItem Service item with configuration for the provider
 	 */
 	public function __construct( MShop_Context_Item_Interface $context, MShop_Service_Item_Interface $serviceItem )
@@ -215,7 +215,7 @@ implements MShop_Service_Provider_Interface
 	/**
 	 * Returns the communication object for the service provider.
 	 *
-	 * @param MW_Communication_Interface $communication Object of communication
+	 * @return MW_Communication_Interface Object for communication
 	 */
 	protected function _getCommunication()
 	{
@@ -360,7 +360,7 @@ implements MShop_Service_Provider_Interface
 	 * be returned.
 	 *
 	 * @param array $keys List of key names that should be tested for in the order to test
-	 * @param mixed $default Returned value if the key wasn't was found
+	 * @param string $default Returned value if the key wasn't was found
 	 * @return mixed Value of the first key that matches or null if none was found
 	 */
 	protected function _getConfigValue( array $keys, $default = null )

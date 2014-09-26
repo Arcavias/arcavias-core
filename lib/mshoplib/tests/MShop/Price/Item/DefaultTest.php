@@ -10,26 +10,9 @@
  */
 class MShop_Price_Item_DefaultTest extends MW_Unittest_Testcase
 {
-	/**
-	 * @var    MShop_Price_Item_Default
-	 * @access protected
-	 */
 	private $_object;
 	private $_values;
 
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Price_Item_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -70,6 +53,42 @@ class MShop_Price_Item_DefaultTest extends MW_Unittest_Testcase
 	protected function tearDown()
 	{
 		$this->_object = null;
+	}
+
+	public function testAddItem()
+	{
+		$price = new MShop_Price_Item_Default( $this->_values );
+		$this->_object->addItem( $price );
+
+		$this->assertEquals( '391.00', $this->_object->getValue() );
+		$this->assertEquals( '39.90', $this->_object->getCosts() );
+		$this->assertEquals( '20.00', $this->_object->getRebate() );
+	}
+
+	public function testAddItemWrongCurrency()
+	{
+		$values = $this->_values;
+		$values['currencyid'] = 'USD';
+
+		$price = new MShop_Price_Item_Default( $values );
+
+		$this->setExpectedException( 'MShop_Price_Exception' );
+		$this->_object->addItem( $price );
+	}
+
+	public function testCompare()
+	{
+		$price = new MShop_Price_Item_Default( $this->_values );
+		$this->assertTrue( $this->_object->compare( $price ) );
+	}
+
+	public function testCompareFail()
+	{
+		$values = $this->_values;
+		$values['value'] = '200.00';
+
+		$price = new MShop_Price_Item_Default( $values );
+		$this->assertFalse( $this->_object->compare( $price ) );
 	}
 
 	public function testGetId()

@@ -15,7 +15,7 @@
  * @subpackage Product
  */
 class MShop_Product_Manager_Default
-	extends MShop_Common_Manager_Abstract
+	extends MShop_Common_Manager_ListRef_Abstract
 	implements MShop_Product_Manager_Interface
 {
 	private $_searchConfig = array(
@@ -143,7 +143,7 @@ class MShop_Product_Manager_Default
 	/**
 	 * Removes old entries from the storage.
 	 *
-	 * @param array $siteids List of IDs for sites whose entries should be deleted
+	 * @param integer[] $siteids List of IDs for sites whose entries should be deleted
 	 */
 	public function cleanup( array $siteids )
 	{
@@ -171,7 +171,7 @@ class MShop_Product_Manager_Default
 	/**
 	 * Adds a new product to the storage.
 	 *
-	 * @param MShop_Product_Item_Interface $product Product item that should be saved to the storage
+	 * @param MShop_Common_Item_Interface $item Product item that should be saved to the storage
 	 * @param boolean $fetch True if the new ID should be returned in the item
 	 */
 	public function saveItem( MShop_Common_Item_Interface $item, $fetch = true )
@@ -365,7 +365,7 @@ class MShop_Product_Manager_Default
 	 * Returns the product item for the given product ID.
 	 *
 	 * @param integer $id Unique ID of the product item
-	 * @param array $ref List of domains to fetch list items and referenced items for
+	 * @param string[] $ref List of domains to fetch list items and referenced items for
 	 * @return MShop_Product_Item_Interface Returns the product item of the given id
 	 * @throws MShop_Exception If item couldn't be found
 	 */
@@ -570,7 +570,7 @@ class MShop_Product_Manager_Default
 	 *
 	 * @param string $manager Name of the sub manager type in lower case
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions, e.g stock, tags, locations, etc.
+	 * @return MShop_Common_Manager_Interface Manager for different extensions, e.g stock, tags, locations, etc.
 	 */
 	public function getSubManager( $manager, $name = null )
 	{
@@ -702,14 +702,16 @@ class MShop_Product_Manager_Default
 
 			$expr = array( $object->getConditions() );
 
-			$temp = array();
-			$temp[] = $object->compare( '==', 'product.datestart', null );
-			$temp[] = $object->compare( '<=', 'product.datestart', $curDate );
+			$temp = array(
+				$object->compare( '==', 'product.datestart', null ),
+				$object->compare( '<=', 'product.datestart', $curDate ),
+			);
 			$expr[] = $object->combine( '||', $temp );
 
-			$temp = array();
-			$temp[] = $object->compare( '==', 'product.dateend', null );
-			$temp[] = $object->compare( '>=', 'product.dateend', $curDate );
+			$temp = array(
+				$object->compare( '==', 'product.dateend', null ),
+				$object->compare( '>=', 'product.dateend', $curDate ),
+			);
 			$expr[] = $object->combine( '||', $temp );
 
 			$object->setConditions( $object->combine( '&&', $expr ) );
@@ -722,42 +724,9 @@ class MShop_Product_Manager_Default
 
 
 	/**
-	* Returns the type search configurations array for the type manager.
-	*
-	* @return array associative array of the search code as key and the definitions as associative array
-	*/
-	protected function _getListTypeSearchConfig()
-	{
-		return $this->_listTypeSearchConfig;
-	}
-
-
-	/**
-	* Returns the list search definitions for the list manager.
-	*
-	* @return array Associative array of the search code as key and the definition as associative array
-	*/
-	protected function _getListSearchConfig()
-	{
-		return $this->_listSearchConfig;
-	}
-
-
-	/**
-	* Returns the type search configuration definitons for the type manager.
-	*
-	* @return array Associative array of the search code as key and the definition as associative array
-	*/
-	protected function _getTypeSearchConfig()
-	{
-		return $this->_typeSearchConfig;
-	}
-
-
-	/**
 	 * Create new product item object initialized with given parameters.
 	 *
-	 * @param MShop_Product_Item_Interface $product Product item object
+	 * @param MShop_Product_Item_Interface $item Product item object
 	 * @return array Associative list of key/value pairs suitable for product item constructor
 	 */
 	protected function _createArray( MShop_Product_Item_Interface $item )
@@ -784,11 +753,11 @@ class MShop_Product_Manager_Default
 	 *
 	 * @param array $values Associative list of key/value pairs
 	 * @param array $listitems List of items implementing MShop_Common_Item_List_Interface
-	 * @param array $textItems List of items implementing MShop_Text_Item_Interface
+	 * @param array $refItems List of items implementing MShop_Common_Item_Interface
 	 * @return MShop_Product_Item_Interface New product item
 	 */
-	protected function _createItem( array $values = array(), array $listitems = array(), array $textItems = array() )
+	protected function _createItem( array $values = array(), array $listitems = array(), array $refItems = array() )
 	{
-		return new MShop_Product_Item_Default( $values, $listitems, $textItems );
+		return new MShop_Product_Item_Default( $values, $listitems, $refItems );
 	}
 }

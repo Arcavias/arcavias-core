@@ -3,7 +3,6 @@
  * LGPLv3, http://www.arcavias.com/en/license
  */
 
-
 Ext.ns('MShop.panel.type');
 
 /**
@@ -14,24 +13,24 @@ Ext.ns('MShop.panel.type');
  */
 MShop.panel.type.TabUi = Ext.extend(Ext.Panel, {
 
-	maximized : true,
-	layout : 'fit',
-	modal : true,
+    maximized : true,
+    layout : 'fit',
+    modal : true,
 
-	initComponent : function() {
+    initComponent : function() {
 
-		this.title = MShop.I18n.dt( 'client/extjs', 'Types' );
+        this.title = MShop.I18n.dt('client/extjs', 'Types');
 
-		this.items = [{
-			xtype : 'tabpanel',
-			activeTab : 0,
-			border : false,
-			itemId : 'MShop.panel.type.tabUi',
-			plugins : [ 'ux.itemregistry' ]
-		}];
+        this.items = [{
+            xtype : 'tabpanel',
+            activeTab : 0,
+            border : false,
+            itemId : 'MShop.panel.type.tabUi',
+            plugins : ['ux.itemregistry']
+        }];
 
-		MShop.panel.type.TabUi.superclass.initComponent.call(this);
-	}
+        MShop.panel.type.TabUi.superclass.initComponent.call(this);
+    }
 });
 
 Ext.reg('MShop.panel.type.tabui', MShop.panel.type.TabUi);

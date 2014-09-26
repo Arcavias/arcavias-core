@@ -43,6 +43,9 @@ class TestHelper
 	}
 
 
+	/**
+	 * @param string $site
+	 */
 	private static function _createContext( $site )
 	{
 		$ctx = new MShop_Context_Item_Default();
@@ -65,6 +68,10 @@ class TestHelper
 
 		$logger = new MW_Logger_File( 'unittest.log', MW_Logger_Abstract::DEBUG );
 		$ctx->setLogger( $logger );
+
+
+		$i18n = new MW_Translation_None( 'de' );
+		$ctx->setI18n( array( 'de' => $i18n ) );
 
 
 		$session = new MW_Session_None();

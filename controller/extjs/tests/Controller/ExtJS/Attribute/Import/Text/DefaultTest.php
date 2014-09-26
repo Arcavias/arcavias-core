@@ -13,20 +13,6 @@ class Controller_ExtJS_Attribute_Import_Text_DefaultTest extends MW_Unittest_Tes
 	private $_testfile;
 	private $_context;
 
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite( 'Controller_ExtJS_Attribute_Import_Text_DefaultTest' );
-		$result = PHPUnit_TextUI_TestRunner::run( $suite );
-	}
-
 
 	/**
 	 * Sets up the fixture, for example, opens a network connection.
@@ -76,6 +62,7 @@ class Controller_ExtJS_Attribute_Import_Text_DefaultTest extends MW_Unittest_Tes
 
 	public function testImportFromCSVFile()
 	{
+		$data = array();
 		$data[] = '"Language ID","Type","Code","List type","Text type","Text ID","Text"'."\n";
 		$data[] = '"en","color","white","default","name","","unittest: white"'."\n";
 		$data[] = '"en","color","blue","default","name","","unittest: blue"' ."\n";
@@ -208,7 +195,7 @@ class Controller_ExtJS_Attribute_Import_Text_DefaultTest extends MW_Unittest_Tes
 		$_FILES = array();
 
 		$this->setExpectedException( 'Controller_ExtJS_Exception' );
-		$result = $this->_object->uploadFile( $params );
+		$this->_object->uploadFile( $params );
 	}
 
 
@@ -426,7 +413,6 @@ class Controller_ExtJS_Attribute_Import_Text_DefaultTest extends MW_Unittest_Tes
 		$object = new Controller_ExtJS_Attribute_Import_Text_Default( $this->_context );
 
 		$testfiledir = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'testfiles' . DIRECTORY_SEPARATOR;
-		$directory = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'testdir';
 
 		exec( sprintf( 'cp -r %1$s %2$s', escapeshellarg( $testfiledir ) . '*', escapeshellarg( $this->_testdir ) ) );
 

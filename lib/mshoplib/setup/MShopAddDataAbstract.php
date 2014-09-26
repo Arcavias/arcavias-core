@@ -25,7 +25,7 @@ class MW_Setup_Task_MShopAddDataAbstract extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -471,6 +471,7 @@ class MW_Setup_Task_MShopAddDataAbstract extends MW_Setup_Task_Abstract
 
 		$search = $listManager->createSearch();
 		$expr = array(
+			$search->compare( '==', $key . '.parentid', $parentid ),
 			$search->compare( '==', $key . '.domain', $refdomain ),
 			$search->compare( '==', $key . '.refid', $ids ),
 		);

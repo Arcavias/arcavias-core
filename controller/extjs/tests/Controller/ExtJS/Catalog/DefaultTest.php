@@ -9,23 +9,7 @@
 class Controller_ExtJS_Catalog_DefaultTest extends MW_Unittest_Testcase
 {
 	private $_object;
-
 	private $_rootnode;
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite( 'Controller_ExtJS_Catalog_DefaultTest' );
-		$result = PHPUnit_TextUI_TestRunner::run( $suite );
-	}
 
 
 	/**
@@ -91,7 +75,7 @@ class Controller_ExtJS_Catalog_DefaultTest extends MW_Unittest_Testcase
 				'catalog.status' => 0,
 			),
 		);
-		$saved = $this->_object->saveItems( $saveParams );
+		$this->_object->saveItems( $saveParams );
 
 		$params = (object) array( 'site' => 'unittest', 'items' => $this->_rootnode->{'catalog.id'} );
 		$newroot = $this->_object->getTree( $params );
@@ -124,7 +108,7 @@ class Controller_ExtJS_Catalog_DefaultTest extends MW_Unittest_Testcase
 			'oldparentid' => $this->_rootnode->{'catalog.id'},
 			'newparentid' => $this->_rootnode->{'children'}[0]->{'catalog.id'},
 		);
-		$moved = $this->_object->moveItems( $moveParams );
+		$this->_object->moveItems( $moveParams );
 
 		$params = (object) array( 'site' => 'unittest', 'items' => $this->_rootnode->{'catalog.id'} );
 		$newroot = $this->_object->getTree( $params );

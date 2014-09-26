@@ -25,11 +25,11 @@ class MW_Setup_Task_ServiceRenameDomainToTypeid extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
-		return array('TablesCreateMShop', 'MShopAddTypeData');
+		return array('MShopAddTypeData');
 	}
 
 

@@ -11,27 +11,7 @@
  */
 class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 {
-
-	/**
-	 * @var    MShop_Service_Provider_Delivery_Default
-	 * @access protected
-	 */
 	private $_object;
-
-
-	/**
-	 * Runs the test methods of this class.
-	 *
-	 * @access public
-	 * @static
-	 */
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('MShop_Service_Provider_Delivery_DefaultTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	/**
@@ -298,7 +278,6 @@ class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 							<firstname><![CDATA[Our]]></firstname>
 							<lastname><![CDATA[Unittest]]></lastname>
 							<company><![CDATA[Metaways]]></company>
-							<vatid><![CDATA[DE999999999]]></vatid>
 							<address1><![CDATA[Pickhuben]]></address1>
 							<address2><![CDATA[2-4]]></address2>
 							<address3><![CDATA[]]></address3>
@@ -308,6 +287,7 @@ class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 							<countrycode><![CDATA[DE]]></countrycode>
 							<email><![CDATA[eshop@metaways.de]]></email>
 							<phone><![CDATA[055544332211]]></phone>
+							<vatid><![CDATA[DE999999999]]></vatid>
 						</addressitem>
 						<addressitem>
 							<type><![CDATA[payment]]></type>
@@ -316,7 +296,6 @@ class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 							<firstname><![CDATA[Our]]></firstname>
 							<lastname><![CDATA[Unittest]]></lastname>
 							<company><![CDATA[]]></company>
-							<vatid><![CDATA[]]></vatid>
 							<address1><![CDATA[Durchschnitt]]></address1>
 							<address2><![CDATA[1]]></address2>
 							<address3><![CDATA[]]></address3>
@@ -326,6 +305,7 @@ class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 							<countrycode><![CDATA[DE]]></countrycode>
 							<email><![CDATA[eshop@metaways.de]]></email>
 							<phone><![CDATA[055544332211]]></phone>
+							<vatid><![CDATA[]]></vatid>
 						</addressitem>
 					</addresslist>
 					<additional>
@@ -474,7 +454,6 @@ class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 				<firstname><![CDATA[Adelheid]]></firstname>
 				<lastname><![CDATA[Mustertest]]></lastname>
 				<company><![CDATA[]]></company>
-				<vatid><![CDATA[]]></vatid>
 				<address1><![CDATA[Königallee]]></address1>
 				<address2><![CDATA[1]]></address2>
 				<address3><![CDATA[]]></address3>
@@ -484,6 +463,7 @@ class MShop_Service_Provider_Delivery_DefaultTest extends MW_Unittest_Testcase
 				<countrycode><![CDATA[DE]]></countrycode>
 				<email><![CDATA[eshop@metaways.de]]></email>
 				<phone><![CDATA[055544332211]]></phone>
+				<vatid><![CDATA[]]></vatid>
 			</addressitem>
 		</addresslist>
 		<additional>

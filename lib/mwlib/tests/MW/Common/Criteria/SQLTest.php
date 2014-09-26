@@ -176,8 +176,6 @@ class MW_Common_Criteria_SQLTest extends MW_Unittest_Testcase
 
 	public function testGetConditionStringInvalidOperator()
 	{
-		$types = array( 'int_column' => MW_DB_Statement_Abstract::PARAM_INT );
-
 		$this->setExpectedException('MW_Common_Exception');
 		$this->_object->setConditions( $this->_object->compare( '?', 'int_column', 10 ) );
 	}
@@ -219,9 +217,6 @@ class MW_Common_Criteria_SQLTest extends MW_Unittest_Testcase
 
 	public function testGetSortationStringInvalidDirection()
 	{
-		$types = array( 'asc_column' => MW_DB_Statement_Abstract::PARAM_INT );
-		$translations = array( 'asc_column' => 'asc_int_col' );
-
 		$this->setExpectedException('MW_Common_Exception');
 		$this->_object->setSortations( array( $this->_object->sort( '/', 'asc_column' ) ) );
 	}
@@ -281,6 +276,8 @@ class MW_Common_Criteria_SQLTest extends MW_Unittest_Testcase
 		);
 
 		$condition = $this->_object->toConditions( $array );
+
+		$this->assertInstanceOf( 'MW_Common_Criteria_Expression_Compare_Interface', $condition );
 		$this->assertEquals( '==', $condition->getOperator() );
 		$this->assertEquals( 'name', $condition->getName() );
 		$this->assertEquals( 'value', $condition->getValue() );
@@ -301,11 +298,13 @@ class MW_Common_Criteria_SQLTest extends MW_Unittest_Testcase
 		);
 
 		$condition = $this->_object->toConditions( $array );
+		$this->assertInstanceOf( 'MW_Common_Criteria_Expression_Combine_Interface', $condition );
 		$this->assertEquals( '&&', $condition->getOperator() );
 		$this->assertEquals( 2, count( $condition->getExpressions() ) );
 
 		foreach( $condition->getExpressions() as $expr )
 		{
+			$this->assertInstanceOf( 'MW_Common_Criteria_Expression_Compare_Interface', $expr );
 			$this->assertEquals( '==', $expr->getOperator() );
 			$this->assertEquals( 'name', $expr->getName() );
 			$this->assertEquals( 'value', $expr->getValue() );

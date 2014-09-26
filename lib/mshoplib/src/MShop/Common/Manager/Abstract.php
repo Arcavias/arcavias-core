@@ -14,7 +14,9 @@
  * @package MShop
  * @subpackage Common
  */
-abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
+abstract class MShop_Common_Manager_Abstract
+	extends MW_Common_Manager_Abstract
+	implements MShop_Common_Manager_Interface
 {
 	private $_context;
 	private $_resourceName;
@@ -100,6 +102,8 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	 *
 	 * @param MW_Common_Criteria_Interface $search Search criteria
 	 * @param string $key Search key (usually the ID) to aggregate products for
+	 * @param string $cfgPath Configuration key for the SQL statement
+	 * @param string[] $required List of domain/sub-domain names like "catalog.index" that must be additionally joined
 	 * @return array List of ID values as key and the number of counted products as value
 	 */
 	protected function _aggregate( MW_Common_Criteria_Interface $search, $key, $cfgPath, $required = array() )
@@ -113,7 +117,6 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 
 		try
 		{
-			$reqkey = '';
 			$search = clone $search;
 			$attrList = $this->getSearchAttributes();
 
@@ -207,8 +210,8 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	 * Sets the base criteria "status".
 	 * (setConditions overwrites the base criteria)
 	 *
-	 * @param $domain
-	 * @return MW_Common_Criteria_Interface
+	 * @param string $domain Name of the domain/sub-domain like "product" or "product.list"
+	 * @return MW_Common_Criteria_Interface Search critery object
 	 */
 	protected function _createSearch( $domain )
 	{
@@ -305,12 +308,37 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 
 
 	/**
+	 * Returns the site IDs for the given site level constant.
+	 *
+	 * @param integer $sitelevel Site level constant from MShop_Locale_Manager_Abstract
+	 * @return string[] List of site IDs
+	 */
+	private function _getSiteIds( $sitelevel )
+	{
+		$locale = $this->_context->getLocale();
+		$siteIds = array( $locale->getSiteId() );
+
+		if( $sitelevel & MShop_Locale_Manager_Abstract::SITE_PATH ) {
+			$siteIds = array_merge( $siteIds, $locale->getSitePath() );
+		}
+
+		if( $sitelevel & MShop_Locale_Manager_Abstract::SITE_SUBTREE ) {
+			$siteIds = array_merge( $siteIds, $locale->getSiteSubTree() );
+		}
+
+		$siteIds = array_unique( $siteIds );
+
+		return $siteIds;
+	}
+
+
+	/**
 	 * Returns a new manager the given extension name.
 	 *
 	 * @param string $domain Name of the domain (product, text, media, etc.)
 	 * @param string $manager Name of the sub manager type in lower case (can contain a path like base/product)
 	 * @param string|null $name Name of the implementation, will be from configuration (or Default) if null
-	 * @return mixed Manager for different extensions
+	 * @return MShop_Common_Manager_Interface Manager for different extensions
 	 */
 	protected function _getSubManager( $domain, $manager, $name )
 	{
@@ -363,7 +391,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	/**
 	 * Returns a list of unique criteria names shortend by the last element after the ''
 	 *
-	 * @param array $prefix Required base prefixes of the search keys
+	 * @param string[] $prefix Required base prefixes of the search keys
 	 * @param MW_Common_Criteria_Expression_Interface|null Criteria object
 	 * @return array List of shortend criteria names
 	 */
@@ -387,6 +415,28 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * Returns a sorted list of required criteria keys.
+	 *
+	 * @param MW_Common_Criteria_Interface $criteria Search criteria object
+	 * @param string[] $required List of prefixes of required search conditions
+	 * @return string[] Sorted list of criteria keys
+	 */
+	private function _getCriteriaKeyList( MW_Common_Criteria_Interface $criteria, array $required )
+	{
+		$keys = array_merge( $required, $this->_getCriteriaKeys( $required, $criteria->getConditions() ) );
+
+		foreach( $criteria->getSortations() as $sortation ) {
+			$keys = array_merge( $keys, $this->_getCriteriaKeys( $required, $sortation ) );
+		}
+
+		$keys = array_unique( array_merge( $required, $keys ) );
+		sort( $keys );
+
+		return $keys;
 	}
 
 
@@ -424,7 +474,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		if( $noprefix )
 		{
 			if( ( $pos = strrpos( $string, $sep ) ) !== false ) {
-				$result[] = $string = substr( $string, 0, $pos );
+				$result[] = substr( $string, 0, $pos );
 			} else {
 				$result[] = $string;
 			}
@@ -559,121 +609,6 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 
 
 	/**
-	 * Creates the items with address item, list items and referenced items.
-	 *
-	 * @param array $map Associative list of IDs as keys and the associative array of values
-	 * @param array $ref List of domains to fetch list items and referenced items for
-	 * @param string $prefix Domain prefix
-	 * @return array List of items implementing MShop_Common_Item_Interface
-	 */
-	protected function _buildItems( array $map, array $domains, $prefix )
-	{
-		$items = $listItemMap = $refItemMap = $refIdMap = array();
-
-		if( count( $domains ) > 0 )
-		{
-			$listItems = $this->_getListItems( array_keys( $map ), $domains, $prefix );
-
-			foreach( $listItems as $listItem )
-			{
-				$domain = $listItem->getDomain();
-				$parentid = $listItem->getParentId();
-
-				$listItemMap[ $parentid ][ $domain ][ $listItem->getId() ] = $listItem;
-				$refIdMap[ $domain ][ $listItem->getRefId() ][] = $parentid;
-			}
-
-			$refItemMap = $this->_getRefItems( $refIdMap );
-		}
-
-		foreach ( $map as $id => $values )
-		{
-			$listItems = array();
-			if ( isset( $listItemMap[$id] ) ) {
-				$listItems = $listItemMap[$id];
-			}
-
-			$refItems = array();
-			if ( isset( $refItemMap[$id] ) ) {
-				$refItems = $refItemMap[$id];
-			}
-
-			$items[ $id ] = $this->_createItem( $values, $listItems, $refItems );
-		}
-
-		return $items;
-	}
-
-
-	/**
-	 * Returns the list items that belong to the given IDs.
-	 *
-	 * @param array $ids List of IDs
-	 * @param array $domains List of domain names whose referenced items should be attached
-	 * @param string $prefix Domain prefix
-	 * @return array List of items implementing MShop_Common_List_Item_Interface
-	 */
-	protected function _getListItems( array $ids, array $domains, $prefix )
-	{
-		$manager = $this->getSubManager('list');
-
-		$search = $manager->createSearch( true );
-
-		$expr[] = $search->compare( '==', $prefix . '.list.parentid', $ids );
-		$expr[] = $search->compare( '==', $prefix . '.list.domain', $domains );
-		$expr[] = $search->getConditions();
-
-		$search->setConditions( $search->combine( '&&', $expr ) );
-		$search->setSlice( 0, 0x7fffffff );
-
-		return $manager->searchItems( $search );
-	}
-
-
-	/**
-	 * Returns the referenced items for the given IDs.
-	 *
-	 * @param array $textIdMap Associative list of domain/ref-ID/parent-item-ID key/value pairs
-	 * @return array Associative list of parent-item-ID/domain/items key/value pairs
-	 */
-	protected function _getRefItems( array $refIdMap )
-	{
-		$items = array();
-
-		foreach( $refIdMap as $domain => $list )
-		{
-			try
-			{
-				$manager = MShop_Factory::createManager( $this->_context, $domain );
-
-				$search = $manager->createSearch( true );
-				$expr = array(
-					$search->compare( '==', str_replace( '/', '.', $domain ) . '.id', array_keys( $list ) ),
-					$search->getConditions(),
-				);
-				$search->setConditions( $search->combine( '&&', $expr ) );
-				$search->setSlice( 0, 0x7fffffff );
-
-				foreach( $manager->searchItems( $search ) as $id => $item )
-				{
-					foreach( $list[ $id ] as $parentId ) {
-						$items[ $parentId ][ $domain ][ $id ] = $item;
-					}
-				}
-			}
-			catch( MShop_Exception $e )
-			{
-				$logger = $this->_context->getLogger();
-				$logger->log( sprintf( 'Item referenced in domain "%1$s" not found: %2$s', $domain, $e->getMessage() ) );
-				$logger->log( $e->getTraceAsString() );
-			}
-		}
-
-		return $items;
-	}
-
-
-	/**
 	 * Returns the item for the given search key and ID.
 	 *
 	 * @param string $key Search key for the requested ID
@@ -692,6 +627,30 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		}
 
 		return $item;
+	}
+
+
+	/**
+	 * Returns the SQL strings for joining dependent tables.
+	 *
+	 * @param array $attributes List of search attributes
+	 * @param string $prefix Search key prefix
+	 * @return array List of JOIN SQL strings
+	 */
+	private function _getJoins( array $attributes, $prefix )
+	{
+		$iface = 'MW_Common_Criteria_Attribute_Interface';
+		$sep = $this->_getKeySeparator();
+		$name = $prefix . $sep . 'id';
+
+		if( isset( $attributes[$name] ) && $attributes[$name] instanceof $iface ) {
+			return $attributes[$name]->getInternalDeps();
+		}
+		else if( isset( $attributes['id'] ) && $attributes['id'] instanceof $iface ) {
+			return $attributes['id']->getInternalDeps();
+		}
+
+		return array();
 	}
 
 
@@ -724,7 +683,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	/**
 	 * Sets the name of the database resource that should be used.
 	 *
-	 * @param $name Name of the resource
+	 * @param string $name Name of the resource
 	 */
 	protected function _setResourceName( $name )
 	{
@@ -768,7 +727,7 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 	 * @param MW_Common_Criteria_Interface $search Search criteria
 	 * @param string $cfgPathSearch Path to SQL statement in configuration for searching
 	 * @param string $cfgPathCount Path to SQL statement in configuration for counting
-	 * @param array $required Additional search keys to add conditions for even if no conditions are available
+	 * @param string[] $required Additional search keys to add conditions for even if no conditions are available
 	 * @param integer|null $total Contains the number of all records matching the criteria if not null
 	 * @param integer $sitelevel Constant from MShop_Locale_Manager_Abstract for defining which site IDs should be used for searching
 	 * @return MW_DB_Result_Interface SQL result object for accessing the found records
@@ -778,49 +737,19 @@ abstract class MShop_Common_Manager_Abstract extends MW_Common_Manager_Abstract
 		$cfgPathSearch, $cfgPathCount, array $required, &$total = null,
 		$sitelevel = MShop_Locale_Manager_Abstract::SITE_ONE, array $plugins = array() )
 	{
-		$joins = array();
+		$joins = $cond = array();
+		$sep = $this->_getKeySeparator();
 		$conditions = $search->getConditions();
 		$attributes = $this->getSearchAttributes();
-		$iface = 'MW_Common_Criteria_Attribute_Interface';
+		$siteIds = $this->_getSiteIds( $sitelevel );
+		$keys = $this->_getCriteriaKeyList( $search, $required );
 
-
-		$locale = $this->_context->getLocale();
-		$siteIds = array( $locale->getSiteId() );
-
-		if( $sitelevel & MShop_Locale_Manager_Abstract::SITE_PATH ) {
-			$siteIds = array_merge( $siteIds, $locale->getSitePath() );
-		}
-
-		if( $sitelevel & MShop_Locale_Manager_Abstract::SITE_SUBTREE ) {
-			$siteIds = array_merge( $siteIds, $locale->getSiteSubTree() );
-		}
-
-		$siteIds = array_unique( $siteIds );
-
-
-		$keys = array_merge( $required, $this->_getCriteriaKeys( $required, $conditions ) );
-
-		foreach( $search->getSortations() as $sortation ) {
-			$keys = array_merge( $keys, $this->_getCriteriaKeys( $required, $sortation ) );
-		}
-
-		$sep = $this->_getKeySeparator();
 		$basekey = array_shift( $required );
-		$keys = array_unique( array_merge( $required, $keys ) );
-		sort( $keys );
 
 		foreach( $keys as $key )
 		{
-			if( $key !== $basekey )
-			{
-				$name = $key . $sep . 'id';
-
-				if( isset( $attributes[$name] ) && $attributes[$name] instanceof $iface ) {
-					$joins = array_merge( $joins, $attributes[$name]->getInternalDeps() );
-				}
-				else if( isset( $attributes['id'] ) && $attributes['id'] instanceof $iface ) {
-					$joins = array_merge( $joins, $attributes['id']->getInternalDeps() );
-				}
+			if( $key !== $basekey ) {
+				$joins = array_merge( $joins, $this->_getJoins( $attributes, $key ) );
 			}
 
 			$name = $key . $sep . 'siteid';

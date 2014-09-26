@@ -7,16 +7,8 @@
 
 class Perf_ProductTest extends MW_Unittest_Testcase
 {
+	private $_item;
 	private $_context;
-
-
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('Perf_ProductTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
 
 
 	protected function setUp()
@@ -50,7 +42,7 @@ class Perf_ProductTest extends MW_Unittest_Testcase
 		{
 			$search = $productManager->createSearch( true );
 			$search->setConditions( $search->compare( '==', 'product.id', $ids ) );
-			$result = $productManager->searchItems( $search, array( 'text', 'media', 'price', 'product', 'attribute' ) );
+			$productManager->searchItems( $search, array( 'text', 'media', 'price', 'product', 'attribute' ) );
 		}
 
 		$stop = microtime( true );

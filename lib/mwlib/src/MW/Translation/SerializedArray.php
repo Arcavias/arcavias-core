@@ -71,7 +71,7 @@ class MW_Translation_SerializedArray
 				}
 			}
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // no translation found
 
 		return (string) $string;
 	}
@@ -100,7 +100,7 @@ class MW_Translation_SerializedArray
 				}
 			}
 		}
-		catch( Exception $e ) { ; }
+		catch( Exception $e ) { ; } // no translation found
 
 		if( $index > 0 ) {
 			return (string) $plural;
@@ -149,7 +149,6 @@ class MW_Translation_SerializedArray
 
 			// Reverse locations so the former gets not overwritten by the later
 			$locations = array_reverse( $this->_getTranslationFileLocations( $this->_translationSources[$domain], $this->getLocale() ) );
-			$translations = array();
 
 			foreach( $locations as $location )
 			{

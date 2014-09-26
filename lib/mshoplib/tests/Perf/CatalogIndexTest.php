@@ -12,15 +12,6 @@ class Perf_CatalogIndexTest extends MW_Unittest_Testcase
 	private $_slizeSize = 100;
 
 
-	public static function main()
-	{
-		require_once 'PHPUnit/TextUI/TestRunner.php';
-
-		$suite  = new PHPUnit_Framework_TestSuite('Perf_CatalogIndexTest');
-		$result = PHPUnit_TextUI_TestRunner::run($suite);
-	}
-
-
 	protected function setUp()
 	{
 		$this->_context = TestHelper::getContext( 'unitperf' );
@@ -44,7 +35,7 @@ class Perf_CatalogIndexTest extends MW_Unittest_Testcase
 		$search->setSlice( 0, 10 );
 
 		$total = 0;
-		$result = $indexManager->searchItems( $search, array( 'text', 'price', 'media' ), $total );
+		$indexManager->searchItems( $search, array( 'text', 'price', 'media' ), $total );
 	}
 
 
@@ -157,7 +148,6 @@ class Perf_CatalogIndexTest extends MW_Unittest_Testcase
 		}
 
 		$catIds = array( (int) $this->_catItem->getId(), (int) $catItem->getId() );
-		$siteId = (int) $this->_context->getLocale()->getSiteId();
 
 
 		$start = microtime( true );
@@ -275,7 +265,6 @@ class Perf_CatalogIndexTest extends MW_Unittest_Testcase
 	public function testSearchByCategoryPriceText()
 	{
 		$catId = (int) $this->_catItem->getId();
-		$siteId = (int) $this->_context->getLocale()->getSiteId();
 
 
 		$start = microtime( true );
@@ -319,7 +308,6 @@ class Perf_CatalogIndexTest extends MW_Unittest_Testcase
 		}
 
 		$catIds = array( (int) $this->_catItem->getId(), (int) $catItem->getId() );
-		$siteId = (int) $this->_context->getLocale()->getSiteId();
 
 
 		$start = microtime( true );

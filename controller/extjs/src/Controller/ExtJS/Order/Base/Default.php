@@ -54,14 +54,8 @@ class Controller_ExtJS_Order_Base_Default
 
 			$this->_setLocale( $params->site, $langid, $currencyid );
 
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'order.base.id'} ) ) { $item->setId( $entry->{'order.base.id'} ); }
-			if( isset( $entry->{'order.base.customerid'} ) ) { $item->setCustomerId( $entry->{'order.base.customerid'} ); }
-			if( isset( $entry->{'order.base.comment'} ) ) { $item->setComment( $entry->{'order.base.comment'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -78,9 +72,33 @@ class Controller_ExtJS_Order_Base_Default
 
 
 	/**
+	 * Creates a new order base item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "order.base" prefix
+	 * @return MShop_Order_Item_Base_Interface Order base item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'order.base.id': $item->setId( $value ); break;
+				case 'order.base.comment': $item->setComment( $value ); break;
+				case 'order.base.customerid': $item->setCustomerId( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

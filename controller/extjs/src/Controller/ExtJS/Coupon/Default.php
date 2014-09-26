@@ -24,7 +24,7 @@ class Controller_ExtJS_Coupon_Default
 	/**
 	 * Initializes the coupon controller.
 	 *
-	 * @param MShop_Concoupon_Item_Interface $context MShop context object
+	 * @param MShop_Context_Item_Interface $context MShop context object
 	 */
 	public function __construct( MShop_Context_Item_Interface $context )
 	{
@@ -49,18 +49,8 @@ class Controller_ExtJS_Coupon_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if ( isset($entry->{'coupon.id'}) ) { $item->setId($entry->{'coupon.id'});}
-			if ( isset($entry->{'coupon.label'}) ) { $item->setLabel($entry->{'coupon.label'}); }
-			if ( isset($entry->{'coupon.provider'}) ) { $item->setProvider($entry->{'coupon.provider'}); }
-			if ( isset($entry->{'coupon.datestart'}) ) { $item->setDateStart($entry->{'coupon.datestart'}); }
-			if ( isset($entry->{'coupon.dateend'}) ) { $item->setDateEnd($entry->{'coupon.dateend'} ); }
-			if ( isset($entry->{'coupon.status'}) ) { $item->setStatus($entry->{'coupon.status'});}
-			if ( isset($entry->{'coupon.config'}) ) { $item->setConfig( (array) $entry->{'coupon.config'}); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -79,9 +69,51 @@ class Controller_ExtJS_Coupon_Default
 
 
 	/**
+	 * Creates a new coupon item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "coupon" prefix
+	 * @return MShop_Coupon_Item_Interface Coupon item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'coupon.id': $item->setId( $value ); break;
+				case 'coupon.label': $item->setLabel( $value ); break;
+				case 'coupon.status': $item->setStatus( $value ); break;
+				case 'coupon.provider': $item->setProvider( $value ); break;
+				case 'coupon.config': $item->setConfig( (array) $value ); break;
+				case 'coupon.datestart':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'coupon.datestart'} = $value;
+						$item->setDateStart( $value );
+					}
+					break;
+				case 'coupon.dateend':
+					if( $value != '' )
+					{
+						$value = str_replace( 'T', ' ', $value );
+						$entry->{'coupon.dateend'} = $value;
+						$item->setDateEnd( $value );
+					}
+					break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

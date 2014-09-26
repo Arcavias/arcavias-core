@@ -41,8 +41,6 @@ class Controller_ExtJS_Catalog_Export_Text_Default
 		$this->_setLocale( $params->site );
 
 		$context = $this->_getContext();
-		$config = $context->getConfig();
-		$dir = $config->get( 'controller/extjs/catalog/export/text/default/exportdir', 'uploads' );
 
 		$items = (array) $params->items;
 		$lang = ( property_exists( $params, 'lang' ) ) ? (array) $params->lang : array();
@@ -348,7 +346,7 @@ class Controller_ExtJS_Catalog_Export_Text_Default
 	 * Adds all texts belonging to an catalog item.
 	 *
 	 * @param MW_Container_Content_Interface $contentItem Content item
-	 * @param MShop_Product_Item_Interface $item product item object
+	 * @param MShop_Catalog_Item_Interface $item product item object
 	 * @param string $langid Language id
 	 */
 	protected function _addItem( MW_Container_Content_Interface $contentItem, MShop_Catalog_Item_Interface $item, $langid )
@@ -377,14 +375,15 @@ class Controller_ExtJS_Catalog_Export_Text_Default
 						$items[5] = $textItem->getId();
 						$items[6] = $textItem->getContent();
 					}
+
+					$contentItem->add( $items );
 				}
 			}
 			else
 			{
 				$items = array( $langid, $item->getLabel(), $item->getId(), 'default', $textTypeItem->getCode(), '', '' );
+				$contentItem->add( $items );
 			}
-
-			$contentItem->add( $items );
 		}
 	}
 
@@ -393,7 +392,7 @@ class Controller_ExtJS_Catalog_Export_Text_Default
 	 * Get all child nodes.
 	 *
 	 * @param MShop_Catalog_Item_Interface $node
-	 * @return array $nodes List of nodes
+	 * @return MShop_Catalog_Item_Interface[] $nodes List of nodes
 	 */
 	protected function _getNodeList( MShop_Catalog_Item_Interface $node )
 	{

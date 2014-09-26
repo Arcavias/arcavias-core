@@ -67,15 +67,8 @@ class Controller_ExtJS_Locale_Language_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'locale.language.id'} ) ) { $item->setId( $entry->{'locale.language.id'} ); }
-			if( isset( $entry->{'locale.language.code'} ) ) { $item->setCode( $entry->{'locale.language.code'} ); }
-			if( isset( $entry->{'locale.language.label'} ) ) { $item->setLabel( $entry->{'locale.language.label'} ); }
-			if( isset( $entry->{'locale.language.status'} ) ) { $item->setStatus( $entry->{'locale.language.status'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -184,9 +177,34 @@ class Controller_ExtJS_Locale_Language_Default
 
 
 	/**
+	 * Creates a new locale language item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "locale.language" prefix
+	 * @return MShop_Locale_Item_Language_Interface Locale language item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'locale.language.id': $item->setId( $value ); break;
+				case 'locale.language.code': $item->setCode( $value ); break;
+				case 'locale.language.label': $item->setLabel( $value ); break;
+				case 'locale.language.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Common_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

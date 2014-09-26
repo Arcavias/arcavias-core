@@ -49,17 +49,8 @@ class Controller_ExtJS_Locale_Default
 
 		foreach( $items as $entry )
 		{
-			$item = $this->_manager->createItem();
-
-			if( isset( $entry->{'locale.id'} ) ) { $item->setId( $entry->{'locale.id'} ); }
-			if( isset( $entry->{'locale.languageid'} ) ) { $item->setLanguageId( $entry->{'locale.languageid'} ); }
-			if( isset( $entry->{'locale.currencyid'} ) ) { $item->setCurrencyId( $entry->{'locale.currencyid'} ); }
-			if( isset( $entry->{'locale.status'} ) ) { $item->setStatus( $entry->{'locale.status'} ); }
-			if( isset( $entry->{'locale.siteid'} ) ) {	$item->setSiteId( $entry->{'locale.siteid'} ); }
-			if( isset( $entry->{'locale.position'} ) ) { $item->setPosition( $entry->{'locale.position'} ); }
-
+			$item = $this->_createItem( (array) $entry );
 			$this->_manager->saveItem( $item );
-
 			$ids[] = $item->getId();
 		}
 
@@ -78,9 +69,36 @@ class Controller_ExtJS_Locale_Default
 
 
 	/**
+	 * Creates a new locale item and sets the properties from the given array.
+	 *
+	 * @param array $entry Associative list of name and value properties using the "locale" prefix
+	 * @return MShop_Locale_Item_Interface Locale item
+	 */
+	protected function _createItem( array $entry )
+	{
+		$item = $this->_manager->createItem();
+
+		foreach( $entry as $name => $value )
+		{
+			switch( $name )
+			{
+				case 'locale.id': $item->setId( $value ); break;
+				case 'locale.siteid': $item->setSiteId( $value ); break;
+				case 'locale.languageid': $item->setLanguageId( $value ); break;
+				case 'locale.currencyid': $item->setCurrencyId( $value ); break;
+				case 'locale.position': $item->setPosition( $value ); break;
+				case 'locale.status': $item->setStatus( $value ); break;
+			}
+		}
+
+		return $item;
+	}
+
+
+	/**
 	 * Returns the manager the controller is using.
 	 *
-	 * @return mixed Manager object
+	 * @return MShop_Locale_Manager_Interface Manager object
 	 */
 	protected function _getManager()
 	{

@@ -28,7 +28,7 @@ class MW_Setup_Task_ProductAddBasePerfData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which this task depends on.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPreDependencies()
 	{
@@ -39,7 +39,7 @@ class MW_Setup_Task_ProductAddBasePerfData extends MW_Setup_Task_Abstract
 	/**
 	 * Returns the list of task names which depends on this task.
 	 *
-	 * @return array List of task names
+	 * @return string[] List of task names
 	 */
 	public function getPostDependencies()
 	{
@@ -63,21 +63,8 @@ class MW_Setup_Task_ProductAddBasePerfData extends MW_Setup_Task_Abstract
 	{
 		$this->_msg('Adding product base performance data', 0);
 
-
 		$productManager = MShop_Product_Manager_Factory::createManager( $this->_getContext() );
-		$productTypeManager = $productManager->getSubManager( 'type' );
-
-		$expr = array();
-		$search = $productTypeManager->createSearch();
-		$expr[] = $search->compare('==', 'product.type.domain', 'product');
-		$expr[] = $search->compare('==', 'product.type.code', 'default');
-		$search->setConditions( $search->combine( '&&', $expr ) );
-		$types = $productTypeManager->searchItems($search);
-
-		if ( ($productTypeItem = reset($types)) === false) {
-			throw new Exception('Product type item not found');
-		}
-
+		$productTypeItem = $this->_getTypeItem( 'product/type', 'product', 'default' );
 
 		$this->_txBegin();
 
@@ -99,7 +86,6 @@ class MW_Setup_Task_ProductAddBasePerfData extends MW_Setup_Task_Abstract
 
 		$this->_txCommit();
 
-
 		$this->_status( 'done' );
 	}
 
@@ -110,6 +96,10 @@ class MW_Setup_Task_ProductAddBasePerfData extends MW_Setup_Task_Abstract
 	}
 
 
+	/**
+	 * @param string $domain
+	 * @param string $code
+	 */
 	protected function _getProductListItem( $domain, $code )
 	{
 		$manager = MShop_Factory::createManager( $this->_getContext(), 'product/list/type' );
@@ -135,6 +125,36 @@ class MW_Setup_Task_ProductAddBasePerfData extends MW_Setup_Task_Abstract
 		$listItem->setDomain( $domain );
 
 		return $listItem;
+	}
+
+
+	/**
+	 * Returns the attribute type item specified by the code.
+	 *
+	 * @param string $prefix Domain prefix for the manager, e.g. "media/type"
+	 * @param string $domain Domain of the type item
+	 * @param string $code Code of the type item
+	 * @return MShop_Common_Item_Type_Interface Type item
+	 * @throws Exception If no item is found
+	 */
+	protected function _getTypeItem( $prefix, $domain, $code )
+	{
+		$manager = MShop_Factory::createManager( $this->_getContext(), $prefix );
+		$prefix = str_replace( '/', '.', $prefix );
+
+		$search = $manager->createSearch();
+		$expr = array(
+			$search->compare( '==', $prefix . '.domain', $domain ),
+			$search->compare( '==', $prefix . '.code', $code ),
+		);
+		$search->setConditions( $search->combine( '&&', $expr ) );
+		$result = $manager->searchItems( $search );
+
+		if( ( $item = reset( $result ) ) === false ) {
+			throw new Exception( sprintf( 'No type item for "%1$s/%2$s" in "%3$s" found', $domain, $code, $prefix ) );
+		}
+
+		return $item;
 	}
 
 

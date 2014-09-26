@@ -38,6 +38,7 @@ interface MW_Cache_Interface
 	 * simply do nothing and return immediately.
 	 *
 	 * @throws MW_Cache_Exception If the cache server doesn't respond
+	 * @return void
 	 */
 	public function cleanup();
 
@@ -59,6 +60,7 @@ interface MW_Cache_Interface
 	 *
 	 * @param string $key Key string that identifies the single cache entry
 	 * @throws MW_Cache_Exception If the cache server doesn't respond
+	 * @return void
 	 */
 	public function delete( $key );
 
@@ -111,7 +113,7 @@ interface MW_Cache_Interface
 	 * extremely handy if e.g. all cached entries that relates to one product
 	 * should be deleted because the product has changed.
 	 *
-	 * @param array $tags List of tag strings that are associated to one or more
+	 * @param string[] $tags List of tag strings that are associated to one or more
 	 * 	cache entries that should be removed
 	 * @throws MW_Cache_Exception If the cache server doesn't respond
 	 */
@@ -245,7 +247,7 @@ interface MW_Cache_Interface
 	 * several given tags are associated to one key, the key and its cached
 	 * value is only returned once in the array.
 	 *
-	 * @param array $tags List of tag strings associated to the requested cache entries
+	 * @param string[] $tags List of tag strings associated to the requested cache entries
 	 * @return array Associative list of key/value pairs for the requested cache
 	 * 	entries. If a tag isn't associated to any cache entry, nothing is returned
 	 * 	for that tag
@@ -337,6 +339,7 @@ interface MW_Cache_Interface
 	 * @param string|null $expires Date/time string in "YYYY-MM-DD HH:mm:ss"
 	 * 	format when the cache entry expires
 	 * @throws MW_Cache_Exception If the cache server doesn't respond
+	 * @return void
 	 */
 	public function set( $key, $value, array $tags = array(), $expires = null );
 

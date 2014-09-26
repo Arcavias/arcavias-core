@@ -94,7 +94,7 @@ class MShop_Order_Item_Base_Product_Default
 	 * Sets the parent ID of the ordered product.
 	 * This ID relates to another product of the same order and provides a relation for e.g. sub-products in bundles.
 	 *
-	 * @param integer|null Order product ID
+	 * @param integer|null $orderProductId Order product ID
 	 */
 	public function setOrderProductId( $orderProductId )
 	{
@@ -378,7 +378,7 @@ class MShop_Order_Item_Base_Product_Default
 
 		$price->setValue( $price->getValue() * $this->_values['quantity'] );
 		$price->setCosts( $price->getCosts() * $this->_values['quantity'] );
-		$price->getRebate( $price->getRebate() * $this->_values['quantity'] );
+		$price->setRebate( $price->getRebate() * $this->_values['quantity'] );
 
 		return $price;
 	}
@@ -424,7 +424,7 @@ class MShop_Order_Item_Base_Product_Default
 	/**
 	 * Sets the position of the product within the list of ordered products.
 	 *
-	 * @param integer|null Product position in the order from 1-n or null for resetting the position
+	 * @param integer|null $value Product position in the order from 1-n or null for resetting the position
 	 * @throws MShop_Order_Exception If there's already a position set
 	 */
 	public function setPosition( $value )
@@ -570,6 +570,27 @@ class MShop_Order_Item_Base_Product_Default
 		$list['order.base.product.flags'] = $this->getFlags();
 
 		return $list;
+	}
+
+	/**
+	 * Compares the properties of the given order product item with its own ones.
+	 *
+	 * @param MShop_Order_Item_Base_Product_Interface $item Order product item
+	 * @return boolean True if the item properties are equal, false if not
+	 * @since 2014.09
+	 */
+	public function compare( MShop_Order_Item_Base_Product_Interface $item )
+	{
+		if( $this->getFlags() === $item->getFlags()
+			&& $this->getName() === $item->getName()
+			&& $this->getProductCode() === $item->getProductCode()
+			&& $this->getSupplierCode() === $item->getSupplierCode()
+			&& $this->getPrice()->compare( $item->getPrice() ) === true
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
 
