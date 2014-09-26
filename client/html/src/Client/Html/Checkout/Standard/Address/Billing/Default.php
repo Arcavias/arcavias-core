@@ -461,6 +461,52 @@ class Client_Html_Checkout_Standard_Address_Billing_Default
 
 		return $invalid;
 	}
+	
+	protected function _validateUID($uid, &$error = null) {
+		if (empty($uid)) {
+			$error = 'no uid given';
+			return false;
+		}
+
+		$uid = strtoupper($uid);
+
+		if (!ctype_alpha($uid[0]) || !ctype_alpha($uid[1])) {
+			$error = 'quick validation failed';
+			return false;
+		}
+
+		$result = false;
+		if (substr($uid, 0, 3) == 'CHE') {
+			if (substr($uid, -5) == ' MWST') {
+				$uid = substr($uid, 0, -5);
+			}
+			$soap = new SoapClient('https://www.uid-wse.admin.ch/V3.0/PublicServices.svc?wsdl');
+			try {
+				$result = $soap->ValidateUID(array('uid' => $uid));
+				$result = (bool)$result->ValidateUIDResult;
+			} catch (Exception $e) {
+			}
+		} else {
+			$uri = 'http://vatid.eu/check/';
+			$uri .= substr($uid, 0, 2) . '/';
+			$uri .= substr($uid, 2);
+			//$uri .= '/AT/U36986605';
+			$result = file_get_contents($uri, false, stream_context_create(array(
+				'http' => array(
+					'header' => "Accept: application/json\r\n"
+				)
+			)));
+			$result = json_decode($result, true);
+			$result = !empty($result['response']['valid']) && $result['response']['valid'] === 'true';
+		}
+
+		if ($result) {
+			return true;
+		}
+
+		$error = 'validation failed';
+		return false;
+	}
 
 
 	/**
