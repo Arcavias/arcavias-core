@@ -362,6 +362,8 @@ class Client_Html_Checkout_Confirm_Default
 			$orderManager = MShop_Factory::createManager( $context, 'order' );
 
 			$view->confirmOrderItem = $orderManager->getItem( $orderid );
+			$orderBaseManager = MShop_Factory::createManager( $context, 'order/base' );
+			$view->standardBasket = $orderBaseManager->load($view->confirmOrderItem->getBaseId());
 
 			$this->_cache = $view;
 		}
