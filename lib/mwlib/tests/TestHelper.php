@@ -54,6 +54,10 @@ class TestHelper
 		$path = dirname( __FILE__ ) . DIRECTORY_SEPARATOR . 'config';
 		$file = __DIR__ . DIRECTORY_SEPARATOR . 'confdoc.ser';
 
+		if ( !file_exists( $path . DIRECTORY_SEPARATOR . 'resource.php' ) ) {
+			$path = dirname( dirname( dirname( dirname( __FILE__ ) ) ) ). DIRECTORY_SEPARATOR . 'config';
+		}
+
 		$object = new MW_Config_Array( array(), $path );
 		$object = new MW_Config_Decorator_Documentor( $object, $file );
 
