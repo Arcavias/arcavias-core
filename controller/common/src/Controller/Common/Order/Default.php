@@ -54,10 +54,10 @@ class Controller_Common_Order_Default
 		$status = 1;
 		$orderId = $orderItem->getId();
 
-		$this->_updateStatus ( MShop_Order_Item_Status_Abstract::STOCK_UPDATE, $orderId,
+		$this->_updateStatus( MShop_Order_Item_Status_Abstract::STOCK_UPDATE, $orderId,
 								$orderItem, $status, -1 );
 
-		$this->_updateStatus ( MShop_Order_Item_Status_Abstract::COUPON_UPDATE, $orderId,
+		$this->_updateStatus( MShop_Order_Item_Status_Abstract::COUPON_UPDATE, $orderId,
 								$orderItem, $status, -1 );
 	}
 
@@ -235,7 +235,7 @@ class Controller_Common_Order_Default
 	}
 
 
-	protected function _updateStatus ($type, $orderId, $orderItem, $status, $updateValue)
+	protected function _updateStatus( $type, $orderId, $orderItem, $status, $updateValue )
 	{
 		$statusItem = $this->_getLastStatusItem( $orderItem->getId(), $type );
 
@@ -243,10 +243,10 @@ class Controller_Common_Order_Default
 			return;
 		}
 
-		if ($type == MShop_Order_Item_Status_Abstract::STOCK_UPDATE) {
+		if ( $type == MShop_Order_Item_Status_Abstract::STOCK_UPDATE ) {
 			$this->_updateStock( $orderItem, $updateValue );
 			$this->_addStatusItem( $orderId, $type, $status );
-		} elseif ($type == MShop_Order_Item_Status_Abstract::COUPON_UPDATE) {
+		} elseif ( $type == MShop_Order_Item_Status_Abstract::COUPON_UPDATE ) {
 			$this->_updateCoupons( $orderItem, $updateValue );
 			$this->_addStatusItem( $orderId, $type, $status );
 		}
