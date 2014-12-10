@@ -85,10 +85,10 @@ class Controller_Common_Order_Default
 		$status = 0;
 		$orderId = $orderItem->getId();
 
-		$this->_updateStatus ( MShop_Order_Item_Status_Abstract::STOCK_UPDATE, $orderId,
+		$this->_updateStatus( MShop_Order_Item_Status_Abstract::STOCK_UPDATE, $orderId,
 								$orderItem, $status, +1 );
 
-		$this->_updateStatus ( MShop_Order_Item_Status_Abstract::COUPON_UPDATE, $orderId,
+		$this->_updateStatus( MShop_Order_Item_Status_Abstract::COUPON_UPDATE, $orderId,
 								$orderItem, $status, +1 );
 	}
 
