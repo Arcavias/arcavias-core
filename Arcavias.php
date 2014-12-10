@@ -43,16 +43,7 @@ class Arcavias
 
 		foreach ( $this->_getManifests( $extdirs ) as $location => $manifest )
 		{
-			if ( isset( $this->_extensions[$manifest['name']] ) )
-			{
-				$location2 = $this->_extensions[$manifest['name']]['location'];
-				$msg = 'Extension "%1$s" exists twice in "%2$s" and in "%3$s"';
-				throw new Exception( sprintf( $msg, $manifest['name'], $location, $location2 ) );
-			}
-
-			if ( !isset( $manifest['depends'] ) || !is_array( $manifest['depends'] ) ) {
-				throw new Exception( sprintf( 'Incorrect dependency configuration in manifest "%1$s"', $location ) );
-			}
+			$this->_checkManifestIsValid( $location, $manifest );
 
 			$manifest['location'] = $location;
 			$this->_extensions[$manifest['name']] = $manifest;
@@ -321,5 +312,24 @@ class Arcavias
 			$this->_extensionsDone[] = $extName;
 		}
 	}
-}
 
+
+	/**
+	* Check that manifest has valid name and depends
+	*
+	* @param string $location
+	* @param array $manifest
+	*/
+	protected function _checkManifestIsValid( $location, array $manifest )
+	{
+		if ( isset( $this->_extensions[$manifest['name']] ) ) {
+			$location2 = $this->_extensions[$manifest['name']]['location'];
+			$msg = 'Extension "%1$s" exists twice in "%2$s" and in "%3$s"';
+			throw new Exception( sprintf( $msg, $manifest['name'], $location, $location2 ) );
+		}
+
+		if ( !isset( $manifest['depends'] ) || !is_array( $manifest['depends'] ) ) {
+			throw new Exception( sprintf( 'Incorrect dependency configuration in manifest "%1$s"', $location ) );
+		}
+	}
+}
