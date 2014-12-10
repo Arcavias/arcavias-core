@@ -320,7 +320,7 @@ class Arcavias
 	* @param string $location
 	* @param array $manifest
 	*/
-	protected function _checkManifestIsValid ( $location, array $manifest)
+	protected function _checkManifestIsValid( $location, array $manifest )
 	{
 		if ( isset( $this->_extensions[$manifest['name']] ) ) {
 			$location2 = $this->_extensions[$manifest['name']]['location'];
