@@ -291,8 +291,7 @@ class MShop_Product_Manager_DefaultTest extends MW_Unittest_Testcase
 		$search->setSlice( 0, 10 );
 		$results = $this->_object->searchItems( $search, array(), $total );
 		$this->assertEquals( 10, count( $results ) );
-		$this->assertEquals( 22, $total );
-
+		$this->assertEquals( 28, $total );
 
 		$search = $this->_object->createSearch(true);
 		$expr = array(
@@ -330,7 +329,7 @@ class MShop_Product_Manager_DefaultTest extends MW_Unittest_Testcase
 		}
 		while( $count > 0 );
 
-		$this->assertEquals( 22, $numproducts );
+		$this->assertEquals( 28, $numproducts );
 	}
 
 
