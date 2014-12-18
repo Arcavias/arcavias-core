@@ -66,7 +66,7 @@ class MW_Setup_Task_LocaleAddTestData extends MW_Setup_Task_MShopAddLocaleData
 			throw new MW_Setup_Exception( sprintf( 'No data file "%1$s" found', $filename ) );
 		}
 
-		$localeManager = MShop_Locale_Manager_Factory::createManager( $this->_additional );
+		$localeManager = MShop_Locale_Manager_Factory::createManager( $this->_additional, 'Default' );
 
 		$this->_cleanupSites( $localeManager );
 
@@ -115,7 +115,7 @@ class MW_Setup_Task_LocaleAddTestData extends MW_Setup_Task_MShopAddLocaleData
 	 */
 	private function _cleanupSites( $localeManager )
 	{
-		$localeSiteManager = $localeManager->getSubManager( 'site' );
+		$localeSiteManager = $localeManager->getSubManager( 'site', 'Default' );
 
 		$search = $localeSiteManager->createSearch();
 		$search->setConditions( $search->compare( '==', 'locale.site.code', array( 'unittest', 'unit' ) ) );

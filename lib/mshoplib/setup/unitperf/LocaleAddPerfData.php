@@ -69,8 +69,8 @@ class MW_Setup_Task_LocaleAddPerfData extends MW_Setup_Task_MShopAddLocaleData
 		}
 
 
-		$localeManager = MShop_Locale_Manager_Factory::createManager( $this->_additional );
-		$localeSiteManager = $localeManager->getSubManager( 'site' );
+		$localeManager = MShop_Locale_Manager_Factory::createManager( $this->_additional, 'Default' );
+		$localeSiteManager = $localeManager->getSubManager( 'site', 'Default' );
 		$siteIds = array();
 
 
