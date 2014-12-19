@@ -159,6 +159,10 @@ class Controller_ExtJS_Locale_Site_DefaultTest extends MW_Unittest_Testcase
 	// call moveItems(), throws "not implemented" yet
 	public function testMoveItemsException()
 	{
+		if ( get_class( $this->_object ) !== 'MShop_Locale_Manager_Site_Default' ) {
+			$this->markTestSkipped( 'Locale site manager is not default. MoveItems method might be implemented.' );
+		}
+
 		$moveParams = (object) array(
 			'items' => null,
 			'oldparentid' => null,
