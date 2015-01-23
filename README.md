@@ -21,7 +21,6 @@ It's is suited for medium to large size businesses which needs a seamless integr
 * [Official web site](http://www.arcavias.com/)
 * [News](https://facebook.com/Arcavias)
 * [Documentation](https://docs.arcavias.com/)
-* [Issue tracker](https://bugs.arcavias.com/)
 * [Forum](https://forum.arcavias.com/)
 * [Translate](https://www.transifex.com/projects/p/arcavias-core/)
 
