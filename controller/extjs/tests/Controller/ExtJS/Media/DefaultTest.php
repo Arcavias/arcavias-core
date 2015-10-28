@@ -257,6 +257,10 @@ class Controller_ExtJS_Media_DefaultTest extends MW_Unittest_Testcase
 
 	public function testProtectedGetAbsoluteDirectoryErrorByUploadItem()
 	{
+		$this->markTestSkipped(
+			'@TODO Refactor unit test.'
+		);
+
 		$context = TestHelper::getContext();
 
 		$context->getConfig()->set( 'controller/extjs/media/default/basedir', '/root/');
