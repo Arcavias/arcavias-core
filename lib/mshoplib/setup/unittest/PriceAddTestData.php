@@ -78,11 +78,24 @@ class MW_Setup_Task_PriceAddTestData extends MW_Setup_Task_Abstract
 	{
 		$priceManager = MShop_Price_Manager_Factory::createManager( $this->_additional, 'Default' );
 		$priceTypeManager = $priceManager->getSubManager( 'type', 'Default' );
+		$priceUnitManager = $priceManager->getSubManager( 'unit', 'Default' );
 
-		$ptypeIds = array();
+		$ptypeIds = $punitIds = array();
 		$ptype = $priceTypeManager->createItem();
+		$punit = $priceUnitManager->createItem();
 
 		$this->_conn->begin();
+
+		foreach( $testdata['price/unit'] as $key => $dataset )
+		{
+			$punit->setId( null );
+			$punit->setCode( $dataset['code'] );
+			$punit->setLabel( $dataset['label'] );
+			$punit->setStatus( $dataset['status'] );
+
+			$priceUnitManager->saveItem( $punit );
+			$punitIds[ $key ] = $punit->getId();
+		}
 
 		foreach( $testdata['price/type'] as $key => $dataset )
 		{
@@ -103,6 +116,10 @@ class MW_Setup_Task_PriceAddTestData extends MW_Setup_Task_Abstract
 				throw new MW_Setup_Exception( sprintf( 'No price type ID found for "%1$s"', $dataset['typeid'] ) );
 			}
 
+			if ( !isset( $punitIds[ $dataset['unitid'] ] ) ) {
+				throw new MW_Setup_Exception( sprintf( 'No price unit ID found for "%1$s"', $dataset['unitid'] ) );
+			}
+
 			$price->setId( null );
 			$price->setCurrencyId( $dataset['currencyid'] );
 			$price->setTypeId( $ptypeIds[ $dataset['typeid'] ] );
@@ -113,6 +130,8 @@ class MW_Setup_Task_PriceAddTestData extends MW_Setup_Task_Abstract
 			$price->setCosts( $dataset['shipping'] );
 			$price->setRebate( $dataset['rebate'] );
 			$price->setTaxRate( $dataset['taxrate'] );
+			$price->setDivisibility( $dataset['divisibility'] );
+			$price->setUnitId( $punitIds[ $dataset['unitid'] ] );
 			$price->setStatus( $dataset['status'] );
 
 			$priceManager->saveItem( $price, false );

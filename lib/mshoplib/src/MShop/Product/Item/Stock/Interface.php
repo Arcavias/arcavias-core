@@ -47,6 +47,21 @@ interface MShop_Product_Item_Stock_Interface extends MShop_Common_Item_Interface
 	public function setWarehouseId($warehouseid);
 
 	/**
+	 * Returns the unit Id.
+	 *
+	 * @return integer Unit Id
+	 */
+	public function getUnitId();
+
+	/**
+	 * Sets the Unit Id.
+	 *
+	 * @param integer $unitid New unit Id
+	 * @return void
+	 */
+	public function setUnitId($unitid);
+
+	/**
 	 * Returns the stock level.
 	 *
 	 * @return integer Stock level

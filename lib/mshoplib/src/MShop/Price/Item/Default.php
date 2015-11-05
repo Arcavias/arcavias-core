@@ -258,6 +258,56 @@ class MShop_Price_Item_Default
 
 
 	/**
+	 * Returns the divisibility of the item
+	 *
+	 * @return integer Divisibility of the item
+	 */
+	public function getDivisibility()
+	{
+		return ( isset( $this->_values['divisibility'] ) ? (int) $this->_values['divisibility'] : 0 );
+	}
+
+
+	/**
+	 * Sets the divisibility of the item
+	 *
+	 * @param integer $divisibility Divisibility of the item
+	 */
+	public function setDivisibility( $divisibility )
+	{
+		if ( $divisibility == $this->getDivisibility() ) { return; }
+
+		$this->_values['divisibility'] = (int) $divisibility;
+		$this->setModified();
+	}
+
+
+	/**
+	 * Returns the unit ID of the price.
+	 *
+	 * @return integer|null Unit ID of the price
+	 */
+	public function getUnitId()
+	{
+		return ( isset( $this->_values['unitid'] ) ? (int) $this->_values['unitid'] : null );
+	}
+
+
+	/**
+	 * Sets the new unit ID of the price.
+	 *
+	 * @param integer $unitid Unit ID of the price
+	 */
+	public function setUnitId( $unitid )
+	{
+		if ( $unitid == $this->getUnitId() ) { return; }
+
+		$this->_values['unitid'] = (int) $unitid;
+		$this->setModified();
+	}
+
+
+	/**
 	 * Returns the status of the item
 	 *
 	 * @return integer Status of the item
@@ -377,6 +427,8 @@ class MShop_Price_Item_Default
 		$list['price.costs'] = $this->getCosts();
 		$list['price.rebate'] = $this->getRebate();
 		$list['price.taxrate'] = $this->getTaxRate();
+		$list['price.divisibility'] = $this->getDivisibility();
+		$list['price.unitid'] = $this->getUnitId();
 		$list['price.status'] = $this->getStatus();
 		$list['price.label'] = $this->getLabel();
 

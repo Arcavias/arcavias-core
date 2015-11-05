@@ -13,22 +13,23 @@ return array(
 		',
 		'insert' => '
 			INSERT INTO "mshop_product_stock" (
-				"prodid", "siteid", "warehouseid", "stocklevel", "backdate",
-				"mtime", "editor", "ctime"
+				"prodid", "siteid", "warehouseid", "unitid", "stocklevel", 
+				"backdate", "mtime", "editor", "ctime"
 			) VALUES (
-				?, ?, ?, ?, ?, ?, ?, ?
+				?, ?, ?, ?, ?, ?, ?, ?, ?
 			)
 		',
 		'update' => '
 			UPDATE "mshop_product_stock"
-			SET "prodid" = ?, "siteid" = ?, "warehouseid" = ?,
+			SET "prodid" = ?, "siteid" = ?, "warehouseid" = ?, "unitid" = ?,
 				"stocklevel" = ?, "backdate" = ?, "mtime" = ?, "editor" = ?
 			WHERE "id" = ?
 		',
 		'search' => '
 			SELECT DISTINCT mprost."id", mprost."prodid", mprost."siteid",
-				mprost."warehouseid", mprost."stocklevel", mprost."backdate",
-				mprost."mtime", mprost."editor", mprost."ctime"
+				mprost."warehouseid", mprost."unitid", mprost."stocklevel", 
+				mprost."backdate", mprost."mtime", mprost."editor",
+				mprost."ctime"
 			FROM "mshop_product_stock" AS mprost
 			:joins
 			WHERE :cond

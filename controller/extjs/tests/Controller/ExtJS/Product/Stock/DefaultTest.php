@@ -60,6 +60,17 @@ class Controller_ExtJS_Product_Stock_DefaultTest extends MW_Unittest_Testcase
 
 		$productManager = MShop_Product_Manager_Factory::createManager( $ctx );
 		$warehouseManager = $productManager->getSubManager('stock')->getSubManager('warehouse');
+		$productStockUnitManager = $productManager->getSubManager('stock')->getSubManager('unit');
+
+
+		$search = $productStockUnitManager->createSearch();
+		$search->setConditions( $search->compare( '==', 'product.stock.unit.code', 'default') );
+		$search->setSlice( 0, 1 );
+		$items = $productStockUnitManager->searchItems( $search );
+
+		if( ( $productStockUnitItem = reset( $items ) ) === false ) {
+			throw new Exception( 'No product stock unit item found' );
+		}
 
 		$search = $warehouseManager->createSearch();
 		$search->setConditions( $search->compare( '==', 'product.stock.warehouse.code', 'default') );
@@ -83,6 +94,7 @@ class Controller_ExtJS_Product_Stock_DefaultTest extends MW_Unittest_Testcase
 			'items' =>  (object) array(
 				'product.stock.productid' => $productItem->getId(),
 				'product.stock.warehouseid' => $warehouseItem->getId(),
+				'product.stock.unitid' => $productStockUnitItem->getId(),
 				'product.stock.stocklevel' => 999,
 				'product.stock.dateback' => '2000-01-01 00:00:01',
 			),
@@ -104,6 +116,7 @@ class Controller_ExtJS_Product_Stock_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $saved['items']->{'product.stock.id'}, $searched['items'][0]->{'product.stock.id'} );
 		$this->assertEquals( $saved['items']->{'product.stock.productid'}, $searched['items'][0]->{'product.stock.productid'} );
 		$this->assertEquals( $saved['items']->{'product.stock.warehouseid'}, $searched['items'][0]->{'product.stock.warehouseid'} );
+		$this->assertEquals( $saved['items']->{'product.stock.unitid'}, $searched['items'][0]->{'product.stock.unitid'} );
 		$this->assertEquals( $saved['items']->{'product.stock.stocklevel'}, $searched['items'][0]->{'product.stock.stocklevel'} );
 		$this->assertEquals( $saved['items']->{'product.stock.dateback'}, $searched['items'][0]->{'product.stock.dateback'} );
 		$this->assertEquals( 1, count( $searched['items'] ) );

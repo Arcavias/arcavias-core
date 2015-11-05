@@ -28,6 +28,7 @@ class MShop_Product_Item_Stock_DefaultTest extends MW_Unittest_Testcase
 			'siteid'=>99,
 			'prodid' => 46677,
 			'warehouseid' => 44,
+			'unitid' => 22,
 			'stocklevel' => 1000,
 			'backdate' => '2010-01-01 11:55:00',
 			'mtime' => '2011-01-01 00:00:02',
@@ -91,6 +92,19 @@ class MShop_Product_Item_Stock_DefaultTest extends MW_Unittest_Testcase
 		$this->assertTrue( $this->_object->isModified() );
 
 		$this->assertEquals( 30000, $this->_object->getWarehouseId() );
+	}
+
+	public function testGetUnitId()
+	{
+		$this->assertEquals( $this->_values['unitid'], $this->_object->getUnitId() );
+	}
+
+	public function testSetUnitId()
+	{
+		$this->_object->setUnitId(33);
+		$this->assertTrue( $this->_object->isModified() );
+
+		$this->assertEquals( 33, $this->_object->getUnitId() );
 	}
 
 	public function testGetStocklevel()

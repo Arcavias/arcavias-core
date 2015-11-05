@@ -243,6 +243,8 @@ class Controller_ExtJS_Price_Default
 				case 'price.taxrate': $item->setTaxRate( $value ); break;
 				case 'price.quantity': $item->setQuantity( $value ); break;
 				case 'price.currencyid': $item->setCurrencyId( $value ); break;
+				case 'price.divisibility': $item->setDivisibility( $value ); break;
+				case 'price.unitid': $item->setUnitId( $value ); break;
 			}
 		}
 

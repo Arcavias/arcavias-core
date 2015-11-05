@@ -86,6 +86,35 @@ class MShop_Product_Item_Stock_Default
 
 
 	/**
+	 * Returns the unit Id.
+	 *
+	 * @return integer Unit Id
+	 */
+	public function getUnitId()
+	{
+		return ( isset( $this->_values['unitid'] ) ? (int) $this->_values['unitid'] : null );
+	}
+
+
+	/**
+	 * Sets the unit Id.
+	 *
+	 * @param integer|null $unitid New unit Id
+	 */
+	public function setUnitId( $unitid )
+	{
+		if ( $unitid === $this->getUnitId() ) { return; }
+
+		if ( $unitid !== null ) {
+			$unitid = (int) $unitid;
+		}
+
+		$this->_values['unitid'] = $unitid;
+		$this->setModified();
+	}
+
+
+	/**
 	 * Returns the stock level.
 	 *
 	 * @return integer Stock level
@@ -156,6 +185,7 @@ class MShop_Product_Item_Stock_Default
 
 		$list['product.stock.productid'] = $this->getProductId();
 		$list['product.stock.warehouseid'] = $this->getWarehouseId();
+		$list['product.stock.unitid'] = $this->getUnitId();
 		$list['product.stock.stocklevel'] = $this->getStocklevel();
 		$list['product.stock.dateback'] = $this->getDateBack();
 

@@ -90,6 +90,7 @@ class MShop_Product_Manager_Stock_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $item->getSiteId(), $itemSaved->getSiteId() );
 		$this->assertEquals( $item->getProductId(), $itemSaved->getProductId() );
 		$this->assertEquals( $item->getWarehouseId(), $itemSaved->getWarehouseId() );
+		$this->assertEquals( $item->getUnitId(), $itemSaved->getUnitId() );
 		$this->assertEquals( $item->getStockLevel(), $itemSaved->getStockLevel() );
 		$this->assertEquals( $item->getDateBack(), $itemSaved->getDateBack() );
 
@@ -101,6 +102,7 @@ class MShop_Product_Manager_Stock_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $itemExp->getSiteId(), $itemUpd->getSiteId() );
 		$this->assertEquals( $itemExp->getProductId(), $itemUpd->getProductId() );
 		$this->assertEquals( $itemExp->getWarehouseId(), $itemUpd->getWarehouseId() );
+		$this->assertEquals( $itemExp->getUnitId(), $itemUpd->getUnitId() );
 		$this->assertEquals( $itemExp->getStockLevel(), $itemUpd->getStockLevel() );
 		$this->assertEquals( $itemExp->getDateBack(), $itemUpd->getDateBack() );
 
@@ -109,7 +111,7 @@ class MShop_Product_Manager_Stock_DefaultTest extends MW_Unittest_Testcase
 		$this->assertRegExp( '/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $itemUpd->getTimeModified() );
 
 		$this->setExpectedException( 'MShop_Exception' );
-		$this->_object->getItem($itemSaved->getId());
+		$this->_object->getItem( $itemSaved->getId() );
 	}
 
 
@@ -150,6 +152,7 @@ class MShop_Product_Manager_Stock_DefaultTest extends MW_Unittest_Testcase
 		$expr[] = $search->compare( '!=', 'product.stock.siteid', null );
 		$expr[] = $search->compare( '!=', 'product.stock.productid', null );
 		$expr[] = $search->compare( '!=', 'product.stock.warehouseid', null );
+		$expr[] = $search->compare( '!=', 'product.stock.unitid', null );
 		$expr[] = $search->compare( '==', 'product.stock.stocklevel', 1000 );
 		$expr[] = $search->compare( '==', 'product.stock.dateback', '2010-04-01 00:00:00' );
 		$expr[] = $search->compare( '>=', 'product.stock.mtime', '1970-01-01 00:00:00' );

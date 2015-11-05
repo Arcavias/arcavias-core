@@ -10,6 +10,49 @@ SET SESSION sql_mode='ANSI';
 
 
 --
+-- Table structure for table "mshop_price_unit"
+--
+
+CREATE TABLE "mshop_price_unit" (
+	-- Unique id of the price unit
+	"id" INTEGER NOT NULL AUTO_INCREMENT,
+	-- site id, references mshop_locale_site.id
+	"siteid" INTEGER NOT NULL,
+	-- code, unique price unit code
+	"code"  VARCHAR(32) NOT NULL,
+	-- label, product stock unit label
+	"label"  VARCHAR(255) NOT NULL,
+	-- Status (0=disabled, 1=enabled, >1 for special)
+	"status" SMALLINT NOT NULL,
+	-- Date of creation of this database entry
+	"ctime" DATETIME NOT NULL,
+	-- Date of last modification of this database entry
+	"mtime" DATETIME NOT NULL,
+	-- Editor who modified this entry at last
+	"editor" VARCHAR(255) NOT NULL,
+CONSTRAINT "pk_mspu_id"
+	PRIMARY KEY ("id"),
+CONSTRAINT "fk_mspu_siteid"
+	FOREIGN KEY ("siteid")
+	REFERENCES "mshop_locale_site" ("id")
+	ON UPDATE CASCADE
+	ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX "idx_mspriunit_sid_status" ON "mshop_price_unit" ("siteid", "status");
+
+CREATE INDEX "idx_mspriunit_sid_label" ON "mshop_price_unit" ("siteid", "label");
+
+CREATE INDEX "idx_mspriunit_sid_code" ON "mshop_price_unit" ("siteid", "code");
+
+CREATE INDEX "idx_mspriunit_sid_ctime" ON "mshop_price_unit" ("siteid", "ctime");
+
+CREATE INDEX "idx_mspriunit_sid_mtime" ON "mshop_price_unit" ("siteid", "mtime");
+
+CREATE INDEX "idx_mspriunit_sid_editor" ON "mshop_price_unit" ("siteid", "editor");
+
+
+--
 -- Table structure for table "mshop_price_type"
 --
 
@@ -72,6 +115,10 @@ CREATE TABLE "mshop_price" (
 	"rebate" DECIMAL(12,2) NOT NULL,
 	-- tax rate in percent
 	"taxrate" DECIMAL(5,2) NOT NULL,
+	-- Divisibility of products
+	"divisibility" INTEGER NOT NULL,
+	-- Unit ID of the product price
+	"unitid" INTEGER NOT NULL,
 	-- entry status (0=disabled, 1=enabled, >1 for special)
 	"status" SMALLINT NOT NULL DEFAULT 0,
 	-- Date of last modification of this database entry
@@ -85,6 +132,11 @@ CONSTRAINT "pk_mspri_id"
 CONSTRAINT "fk_mspri_typeid"
 	FOREIGN KEY ("typeid")
 	REFERENCES "mshop_price_type" ("id")
+	ON UPDATE CASCADE
+	ON DELETE CASCADE,
+CONSTRAINT "fk_mspri_unitid"
+	FOREIGN KEY ("unitid")
+	REFERENCES "mshop_price_unit" ("id")
 	ON UPDATE CASCADE
 	ON DELETE CASCADE
 ) ENGINE=InnoDB CHARACTER SET = utf8;
@@ -104,6 +156,8 @@ CREATE INDEX "idx_mspri_sid_dom_costs" ON "mshop_price" ("siteid", "domain", "co
 CREATE INDEX "idx_mspri_sid_dom_rebate" ON "mshop_price" ("siteid", "domain", "rebate");
 
 CREATE INDEX "idx_mspri_sid_dom_taxrate" ON "mshop_price" ("siteid", "domain", "taxrate");
+
+CREATE INDEX "idx_mspri_sid_dom_divisibility" ON "mshop_price" ("siteid", "domain", "divisibility");
 
 CREATE INDEX "idx_mspri_sid_dom_mtime" ON "mshop_price" ("siteid", "domain", "mtime");
 
