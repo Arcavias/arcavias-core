@@ -272,48 +272,6 @@ CREATE INDEX "idx_msprota_sid_label" ON "mshop_product_tag" ("siteid", "label");
 
 CREATE INDEX "idx_msprota_sid_langid" ON "mshop_product_tag" ("siteid", "langid");
 
---
--- Product stock unut
---
-
-CREATE TABLE "mshop_product_stock_unit" (
-	-- Unique id of the product stock unit
-	"id" INTEGER NOT NULL AUTO_INCREMENT,
-	-- site id, references mshop_locale_site.id
-	"siteid" INTEGER NOT NULL,
-	-- code, unique product stock unit code
-	"code"  VARCHAR(32) NOT NULL,
-	-- label, product stock unit label
-	"label"  VARCHAR(255) NOT NULL,
-	-- Status of the product stock unit
-	"status"  SMALLINT(6) NOT NULL,
-	-- Date of creation of this database entry
-	"ctime" DATETIME NOT NULL,
-	-- Date of last modification of this database entry
-	"mtime" DATETIME NOT NULL,
-	-- Editor who modified this entry at last
-	"editor" VARCHAR(255) NOT NULL,
-CONSTRAINT "pk_mspsu_id"
-	PRIMARY KEY ("id"),
-CONSTRAINT "fk_mspsu_siteid"
-	FOREIGN KEY ("siteid")
-	REFERENCES "mshop_locale_site" ("id")
-	ON UPDATE CASCADE
-	ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX "idx_msprostunit_sid_code" ON "mshop_product_stock_unit" ("siteid", "code");
-
-CREATE INDEX "idx_msprostunit_sid_label" ON "mshop_product_stock_unit" ("siteid", "label");
-
-CREATE INDEX "idx_msprostunit_sid_status" ON "mshop_product_stock_unit" ("siteid", "status");
-
-CREATE INDEX "idx_msprostunit_sid_ctime" ON "mshop_product_stock_unit" ("siteid", "ctime");
-
-CREATE INDEX "idx_msprostunit_sid_mtime" ON "mshop_product_stock_unit" ("siteid", "mtime");
-
-CREATE INDEX "idx_msprostunit_sid_editor" ON "mshop_product_stock_unit" ("siteid", "editor");
-
 
 --
 -- Product warehouse
@@ -365,8 +323,6 @@ CREATE TABLE "mshop_product_stock" (
 	"siteid" INTEGER NOT NULL,
 	-- warehouse id
 	"warehouseid" INTEGER NOT NULL,
-	-- unit id
-	"unitid" INTEGER NOT NULL,
 	-- available amount in stock
 	"stocklevel" INTEGER DEFAULT NULL,
 	-- product back in stock
@@ -384,11 +340,6 @@ CONSTRAINT "unq_msprost_sid_pid_wid"
 CONSTRAINT "fk_msprost_prodid"
 	FOREIGN KEY ("prodid")
 	REFERENCES "mshop_product" ("id")
-	ON UPDATE CASCADE
-	ON DELETE CASCADE,
-CONSTRAINT "fk_msprost_stock_unitid"
-	FOREIGN KEY ("unitid")
-	REFERENCES "mshop_product_stock_unit" ("id")
 	ON UPDATE CASCADE
 	ON DELETE CASCADE,
 CONSTRAINT "fk_msprost_stock_warehouseid"

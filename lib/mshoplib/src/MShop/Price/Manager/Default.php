@@ -98,21 +98,6 @@ class MShop_Price_Manager_Default
 			'type' => 'decimal',
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_STR,
 		),
-		'price.divisibility' => array(
-			'code' => 'price.divisibility',
-			'internalcode' => 'mpri."divisibility"',
-			'label' => 'Price divisibility',
-			'type' => 'integer',
-			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
-		),
-		'price.unitid' => array(
-			'label' => 'Price unit ID',
-			'code' => 'price.unitid',
-			'internalcode' => 'mpri."unitid"',
-			'type' => 'integer',
-			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
-			'public' => false,
-		),
 		'price.status' => array(
 			'code' => 'price.status',
 			'internalcode' => 'mpri."status"',
@@ -164,7 +149,7 @@ class MShop_Price_Manager_Default
 	public function cleanup( array $siteids )
 	{
 		$path = 'classes/price/manager/submanagers';
-		foreach( $this->_getContext()->getConfig()->get( $path, array( 'type', 'list', 'unit' ) ) as $domain ) {
+		foreach( $this->_getContext()->getConfig()->get( $path, array( 'type', 'list' ) ) as $domain ) {
 			$this->getSubManager( $domain )->cleanup( $siteids );
 		}
 
@@ -199,7 +184,7 @@ class MShop_Price_Manager_Default
 		 */
 		$path = 'classes/price/manager/submanagers';
 
-		return $this->_getSearchAttributes( $this->_searchConfig, $path, array( 'type', 'list', 'unit' ), $withsub );
+		return $this->_getSearchAttributes( $this->_searchConfig, $path, array( 'type', 'list' ), $withsub );
 	}
 
 
@@ -373,17 +358,15 @@ class MShop_Price_Manager_Default
 			$stmt->bind( 8, $item->getCosts() );
 			$stmt->bind( 9, $item->getRebate() );
 			$stmt->bind( 10, $item->getTaxRate() );
-			$stmt->bind( 11, $item->getDivisibility() );
-			$stmt->bind( 12, $item->getUnitId() );
-			$stmt->bind( 13, $item->getStatus(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 14, $date ); //mtime
-			$stmt->bind( 15, $context->getEditor());
+			$stmt->bind( 11, $item->getStatus(), MW_DB_Statement_Abstract::PARAM_INT );
+			$stmt->bind( 12, $date ); //mtime
+			$stmt->bind( 13, $context->getEditor());
 
 			if( $id !== null ) {
-				$stmt->bind( 16, $id, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 14, $id, MW_DB_Statement_Abstract::PARAM_INT );
 				$item->setId( $id );
 			} else {
-				$stmt->bind( 16, $date ); //ctime
+				$stmt->bind( 14, $date ); //ctime
 			}
 
 			$stmt->execute()->finish();

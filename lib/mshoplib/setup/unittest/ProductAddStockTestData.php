@@ -80,7 +80,6 @@ class MW_Setup_Task_ProductAddStockTestData extends MW_Setup_Task_Abstract
 		$productManager = MShop_Product_Manager_Factory::createManager( $this->_additional, 'Default' );
 		$productStockManager = $productManager->getSubManager( 'stock', 'Default' );
 		$productStockWarehouse = $productStockManager->getSubManager( 'warehouse', 'Default' );
-		$productStockUnitManager = $productStockManager->getSubManager( 'unit', 'Default' );
 
 		$prodcode = array();
 		foreach( $testdata['product/stock'] as $dataset )
@@ -101,22 +100,10 @@ class MW_Setup_Task_ProductAddStockTestData extends MW_Setup_Task_Abstract
 			$parentIds[ 'product/'.$item->getCode() ] = $item->getId();
 		}
 
-		$wareIds = $unitIds = array();
+		$wareIds = array();
 		$ware = $productStockWarehouse->createItem();
-		$unit = $productStockUnitManager->createItem();
 
 		$this->_conn->begin();
-
-		foreach( $testdata['product/stock/unit'] as $key => $dataset )
-		{
-			$unit->setId( null );
-			$unit->setCode( $dataset['code'] );
-			$unit->setLabel( $dataset['label'] );
-			$unit->setStatus( $dataset['status'] );
-
-			$productStockUnitManager->saveItem( $unit );
-			$unitIds[ $key ] = $unit->getId();
-		}
 
 		foreach( $testdata['product/stock/warehouse'] as $key => $dataset )
 		{
@@ -143,7 +130,6 @@ class MW_Setup_Task_ProductAddStockTestData extends MW_Setup_Task_Abstract
 			$stock->setId( null );
 			$stock->setProductId( $parentIds[ $dataset['prodid'] ] );
 			$stock->setWarehouseId( $wareIds[ $dataset['warehouseid'] ] );
-			$stock->setUnitId( $unitIds[ $dataset['unitid'] ] );
 			$stock->setStocklevel(  $dataset['stocklevel'] );
 			$stock->setDateBack( $dataset['backdate'] );
 

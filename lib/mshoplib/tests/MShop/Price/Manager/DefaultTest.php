@@ -112,8 +112,6 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $item->getCosts(), $itemSaved->getCosts() );
 		$this->assertEquals( $item->getRebate(), $itemSaved->getRebate() );
 		$this->assertEquals( $item->getTaxRate(), $itemSaved->getTaxRate() );
-		$this->assertEquals( $item->getDivisibility(), $itemSaved->getDivisibility() );
-		$this->assertEquals( $item->getUnitId(), $itemSaved->getUnitId() );
 		$this->assertEquals( $item->getStatus(), $itemSaved->getStatus() );
 
 		$this->assertEquals( $this->_editor, $itemSaved->getEditor() );
@@ -132,8 +130,6 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $itemExp->getCosts(), $itemUpd->getCosts() );
 		$this->assertEquals( $itemExp->getRebate(), $itemUpd->getRebate() );
 		$this->assertEquals( $itemExp->getTaxRate(), $itemUpd->getTaxRate() );
-		$this->assertEquals( $itemExp->getDivisibility(), $itemUpd->getDivisibility() );
-		$this->assertEquals( $itemExp->getUnitId(), $itemUpd->getUnitId() );
 		$this->assertEquals( $itemExp->getStatus(), $itemUpd->getStatus() );
 
 		$this->assertEquals( $this->_editor, $itemUpd->getEditor() );
@@ -168,8 +164,6 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 		$expr[] = $search->compare( '==', 'price.costs', '20.00' );
 		$expr[] = $search->compare( '==', 'price.rebate', '0.00' );
 		$expr[] = $search->compare( '==', 'price.taxrate', '19.00' );
-		$expr[] = $search->compare( '==', 'price.divisibility', 1 );
-		$expr[] = $search->compare( '!=', 'price.unitid', null );
 		$expr[] = $search->compare( '==', 'price.status', 1 );
 		$expr[] = $search->compare( '>=', 'price.mtime', '1970-01-01 00:00:00' );
 		$expr[] = $search->compare( '>=', 'price.ctime', '1970-01-01 00:00:00' );
@@ -184,15 +178,6 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 		$expr[] = $search->compare( '>=', 'price.type.mtime', '1970-01-01 00:00:00' );
 		$expr[] = $search->compare( '>=', 'price.type.ctime', '1970-01-01 00:00:00' );
 		$expr[] = $search->compare( '==', 'price.type.editor', $this->_editor );
-
-		$expr[] = $search->compare( '!=', 'price.unit.id', null );
-		$expr[] = $search->compare( '!=', 'price.unit.siteid', null );
-		$expr[] = $search->compare( '==', 'price.unit.code', 'default' );
-		$expr[] = $search->compare( '==', 'price.unit.label', 'Default' );
-		$expr[] = $search->compare( '==', 'price.unit.status', 1 );
-		$expr[] = $search->compare( '>=', 'price.unit.mtime', '1970-01-01 00:00:00' );
-		$expr[] = $search->compare( '>=', 'price.unit.ctime', '1970-01-01 00:00:00' );
-		$expr[] = $search->compare( '==', 'price.unit.editor', $this->_editor );
 
 		$search->setConditions( $search->combine('&&', $expr) );
 		$results = $this->_object->searchItems( $search, array(), $total );
@@ -228,9 +213,6 @@ class MShop_Price_Manager_DefaultTest extends MW_Unittest_Testcase
 	{
 		$this->assertInstanceOf( 'MShop_Common_Manager_Interface', $this->_object->getSubManager('type') );
 		$this->assertInstanceOf( 'MShop_Common_Manager_Interface', $this->_object->getSubManager('type', 'Default') );
-
-		$this->assertInstanceOf( 'MShop_Common_Manager_Interface', $this->_object->getSubManager('unit') );
-		$this->assertInstanceOf( 'MShop_Common_Manager_Interface', $this->_object->getSubManager('unit', 'Default') );
 	}
 
 

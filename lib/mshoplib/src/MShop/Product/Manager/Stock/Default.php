@@ -52,14 +52,6 @@ class MShop_Product_Manager_Stock_Default
 			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
 			'public' => false,
 		),
-		'product.stock.unitid' => array(
-			'code'=>'product.stock.unitid',
-			'internalcode'=>'mprost."unitid"',
-			'label'=>'Product stock unit ID',
-			'type'=> 'integer',
-			'internaltype' => MW_DB_Statement_Abstract::PARAM_INT,
-			'public' => false,
-		),
 		'product.stock.stocklevel' => array(
 			'code'=>'product.stock.stocklevel',
 			'internalcode'=>'mprost."stocklevel"',
@@ -118,7 +110,7 @@ class MShop_Product_Manager_Stock_Default
 	public function cleanup( array $siteids )
 	{
 		$path = 'classes/product/manager/stock/submanagers';
-		foreach( $this->_getContext()->getConfig()->get( $path, array( 'warehouse', 'unit' ) ) as $domain ) {
+		foreach( $this->_getContext()->getConfig()->get( $path, array( 'warehouse' ) ) as $domain ) {
 			$this->getSubManager( $domain )->cleanup( $siteids );
 		}
 
@@ -234,17 +226,16 @@ class MShop_Product_Manager_Stock_Default
 			$stmt->bind( 1, $item->getProductId(), MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind( 2, $context->getLocale()->getSiteId(), MW_DB_Statement_Abstract::PARAM_INT );
 			$stmt->bind( 3, $item->getWarehouseId(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 4, $item->getUnitId(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 5, $item->getStocklevel(), MW_DB_Statement_Abstract::PARAM_INT );
-			$stmt->bind( 6, $item->getDateBack() );
-			$stmt->bind( 7, $date ); //mtime
-			$stmt->bind( 8, $context->getEditor() );
+			$stmt->bind( 4, $item->getStocklevel(), MW_DB_Statement_Abstract::PARAM_INT );
+			$stmt->bind( 5, $item->getDateBack() );
+			$stmt->bind( 6, $date ); //mtime
+			$stmt->bind( 7, $context->getEditor() );
 
 			if( $id !== null ) {
-				$stmt->bind( 9, $id, MW_DB_Statement_Abstract::PARAM_INT );
+				$stmt->bind( 8, $id, MW_DB_Statement_Abstract::PARAM_INT );
 				$item->setId( $id ); // modified false
 			} else {
-				$stmt->bind( 9, $date ); //ctime
+				$stmt->bind( 8, $date ); //ctime
 			}
 
 			$stmt->execute()->finish();
@@ -374,7 +365,7 @@ class MShop_Product_Manager_Stock_Default
 		 */
 		$path = 'classes/product/manager/stock/submanagers';
 
-		return $this->_getSearchAttributes( $this->_searchConfig, $path, array( 'warehouse', 'unit' ), $withsub );
+		return $this->_getSearchAttributes( $this->_searchConfig, $path, array( 'warehouse' ), $withsub );
 	}
 
 

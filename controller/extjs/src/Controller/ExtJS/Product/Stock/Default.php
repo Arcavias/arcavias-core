@@ -84,7 +84,6 @@ class Controller_ExtJS_Product_Stock_Default
 				case 'product.stock.id': $item->setId( $value ); break;
 				case 'product.stock.productid': $item->setProductId( $value ); break;
 				case 'product.stock.warehouseid': $item->setWarehouseId( $value ); break;
-				case 'product.stock.unitid': $item->setUnitId( $value ); break;
 				case 'product.stock.stocklevel':
 					if( $value != '' ) {
 						$item->setStocklevel( $value );

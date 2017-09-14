@@ -14,27 +14,26 @@ return array(
 		'insert' => '
 			INSERT INTO "mshop_price" (
 				"siteid", "typeid", "currencyid", "domain", "label",
-				"quantity", "value", "costs", "rebate", "taxrate", 
-				"divisibility", "unitid", "status", "mtime", "editor", 
-				"ctime"
+				"quantity", "value", "costs", "rebate", "taxrate", "status",
+				"mtime", "editor", "ctime"
 			) VALUES (
-				?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+				?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
 			)
 		',
 		'update' => '
 			UPDATE "mshop_price"
 			SET "siteid" = ?, "typeid" = ?, "currencyid" = ?, "domain" = ?,
 				"label" = ?, "quantity" = ?, "value" = ?, "costs" = ?,
-				"rebate" = ?, "taxrate" = ?, "divisibility" = ?, "unitid" = ?, 
-				"status" = ?, "mtime" = ?, "editor" = ?
+				"rebate" = ?, "taxrate" = ?, "status" = ?, "mtime" = ?,
+				"editor" = ?
 			WHERE "id" = ?
 		',
 		'search' => '
 			SELECT DISTINCT mpri."id", mpri."siteid", mpri."typeid",
 				mpri."currencyid", mpri."domain", mpri."label",
 				mpri."quantity", mpri."value", mpri."costs", mpri."rebate",
-				mpri."taxrate", mpri."divisibility", mpri."unitid",
-				mpri."status", mpri."mtime", mpri."editor", mpri."ctime"
+				mpri."taxrate", mpri."status", mpri."mtime", mpri."editor",
+				mpri."ctime"
 			FROM "mshop_price" AS mpri
 			:joins
 			WHERE :cond

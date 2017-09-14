@@ -152,36 +152,6 @@ interface MShop_Price_Item_Interface
 	public function setCurrencyId( $currencyid );
 
 	/**
-	 * Returns the divisibility ID.
-	 *
-	 * @return integer Divisibility of the item
-	 */
-	public function getDivisibility();
-
-	/**
-	 * Sets the divisibility.
-	 *
-	 * @param integer $divisibility Divisibility of the item
-	 * @return void
-	 */
-	public function setDivisibility( $divisibility );
-
-	/**
-	 * Returns the unit ID.
-	 *
-	 * @return integer Unit ID of the item
-	 */
-	public function getUnitId();
-
-	/**
-	 * Sets the unit ID.
-	 *
-	 * @param integer $unitid Unit ID of the item
-	 * @return void
-	 */
-	public function setUnitId( $unitid );
-
-	/**
 	 * Returns the status of the item
 	 *
 	 * @return integer Status of the item

@@ -134,18 +134,6 @@ class Controller_ExtJS_Price_DefaultTest extends MW_Unittest_Testcase
 			throw new Exception( 'No type item found' );
 		}
 
-		$priceManager = MShop_Price_Manager_Factory::createManager( TestHelper::getContext() );
-		$priceUnitManager = $priceManager->getSubManager('unit');
-
-		$search = $priceUnitManager->createSearch();
-		$search->setConditions( $search->compare( '==', 'price.unit.code', 'default') );
-		$search->setSlice( 0, 1 );
-		$items = $priceUnitManager->searchItems( $search );
-
-		if( ( $priceUnitItem = reset( $items ) ) === false ) {
-			throw new Exception( 'No price unit item found' );
-		}
-
 		$saveParams = (object) array(
 			'site' => 'unittest',
 			'items' => (object) array(
@@ -157,8 +145,6 @@ class Controller_ExtJS_Price_DefaultTest extends MW_Unittest_Testcase
 				'price.costs' => '5.00',
 				'price.rebate' => '10.00',
 				'price.taxrate' => '20.00',
-				'price.divisibility' => '1',
-				'price.unitid' => $priceUnitItem->getId(),
 				'price.status' => 0,
 			),
 		);
@@ -186,8 +172,6 @@ class Controller_ExtJS_Price_DefaultTest extends MW_Unittest_Testcase
 		$this->assertEquals( $saved['items']->{'price.costs'}, $searched['items'][0]->{'price.costs'} );
 		$this->assertEquals( $saved['items']->{'price.rebate'}, $searched['items'][0]->{'price.rebate'} );
 		$this->assertEquals( $saved['items']->{'price.taxrate'}, $searched['items'][0]->{'price.taxrate'} );
-		$this->assertEquals( $saved['items']->{'price.divisibility'}, $searched['items'][0]->{'price.divisibility'} );
-		$this->assertEquals( $saved['items']->{'price.unitid'}, $searched['items'][0]->{'price.unitid'} );
 		$this->assertEquals( $saved['items']->{'price.status'}, $searched['items'][0]->{'price.status'} );
 		$this->assertEquals( 1, count( $searched['items'] ) );
 		$this->assertEquals( 0, count( $result['items'] ) );

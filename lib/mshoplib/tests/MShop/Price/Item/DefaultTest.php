@@ -35,8 +35,6 @@ class MShop_Price_Item_DefaultTest extends MW_Unittest_Testcase
 			'costs' => 19.95,
 			'rebate' => 10.00,
 			'taxrate' => 19.00,
-			'divisibility' => 1,
-			'unitid' => 5,
 			'status' => true,
 			'mtime' => '2011-01-01 00:00:02',
 			'ctime' => '2011-01-01 00:00:01',
@@ -243,31 +241,6 @@ class MShop_Price_Item_DefaultTest extends MW_Unittest_Testcase
 		$this->_object->setTaxRate( '22.00' );
 		$this->assertEquals( 22.00, $this->_object->getTaxRate() );
 		$this->assertTrue($this->_object->isModified());
-	}
-
-	public function testGetDivisibility()
-	{
-		$this->assertEquals( 1, $this->_object->getDivisibility() );
-	}
-
-	public function testSetDivisibility()
-	{
-		$this->_object->setDivisibility( 5 );
-		$this->assertEquals( 5, $this->_object->getDivisibility() );
-		$this->assertTrue( $this->_object->isModified() );
-	}
-
-	public function testGetUnitId()
-	{
-		$this->assertEquals( 5, $this->_object->getUnitId() );
-	}
-
-	public function testSetUnitId()
-	{
-		$this->_object->setUnitId(9);
-		$this->assertEquals(9, $this->_object->getUnitId());
-
-		$this->assertTrue( $this->_object->isModified() );
 	}
 
 	public function testGetStatus()
